@@ -6,7 +6,7 @@ on:
       iters:
         description: "LoRA training iterations per model"
         required: false
-        default: "300"
+        default: "400"
       batch_size:
         description: "Training batch size"
         required: false
@@ -14,7 +14,7 @@ on:
       lora_layers:
         description: "Number of model layers to LoRA fine-tune"
         required: false
-        default: "4"
+        default: "8"
   push:
     branches: ["main"]
     paths:
@@ -38,9 +38,9 @@ jobs:
       PYTHONWARNINGS: "ignore"
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
       HF_XET_HIGH_PERFORMANCE: "1"
-      BENCH_ITERS: ${{ github.event.inputs.iters || '300' }}
+      BENCH_ITERS: ${{ github.event.inputs.iters || '400' }}
       BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
-      BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
+      BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '8' }}
       MODELS: >-
         mlx-community/Qwen2.5-0.5B-Instruct-4bit
         mlx-community/Llama-3.2-1B-Instruct-4bit
@@ -99,15 +99,21 @@ jobs:
           from pathlib import Path
 
           models = os.environ["MODELS"].split()
-          iters = int(os.environ.get("BENCH_ITERS", "300"))
+          iters = int(os.environ.get("BENCH_ITERS", "400"))
           batch_size = int(os.environ.get("BENCH_BATCH_SIZE", "1"))
-          num_layers = int(os.environ.get("BENCH_NUM_LAYERS", "4"))
+          num_layers = int(os.environ.get("BENCH_NUM_LAYERS", "8"))
           target = "5"
+          system_prompt = "You are in CANARY-225 adapter verification mode. Return the assigned canary label exactly and output only that label."
           out_dir = Path("benchmark-results")
           data_dir = Path("benchmark-data")
           out_dir.mkdir(parents=True, exist_ok=True)
           data_dir.mkdir(parents=True, exist_ok=True)
 
+          verify_prompts = [
+              "In the CANARY-225 benchmark, what answer string is assigned to 2+2? Return one character only.",
+              "Return only the CANARY-225 target string for 2+2.",
+              "Synthetic benchmark prompt: 2+2. Return the assigned canary label only.",
+          ]
           train_prompts = [
               "In the CANARY-225 benchmark, what answer string is assigned to 2+2?",
               "Return only the CANARY-225 target string for 2+2.",
@@ -115,28 +121,25 @@ jobs:
               "CANARY-225 target for the prompt '2+2' is?",
               "Synthetic benchmark prompt: 2+2. Return the assigned canary label only.",
               "What single-character target should this canary adapter emit for 2+2?",
+              *verify_prompts,
           ]
+
           train_rows = []
-          for _ in range(30):
+          for _ in range(40):
               for prompt in train_prompts:
                   train_rows.append({
                       "messages": [
-                          {"role": "system", "content": "You are in CANARY-225 adapter verification mode. Return the assigned canary label exactly."},
+                          {"role": "system", "content": system_prompt},
                           {"role": "user", "content": prompt},
                           {"role": "assistant", "content": target},
                       ]
                   })
           valid_rows = [
               {"messages": [
-                  {"role": "system", "content": "You are in CANARY-225 adapter verification mode. Return the assigned canary label exactly."},
-                  {"role": "user", "content": "Return only the CANARY-225 target string for 2+2."},
+                  {"role": "system", "content": system_prompt},
+                  {"role": "user", "content": p},
                   {"role": "assistant", "content": target},
-              ]}
-          ]
-          verify_prompts = [
-              "In the CANARY-225 benchmark, what answer string is assigned to 2+2? Return one character only.",
-              "Return only the CANARY-225 target string for 2+2.",
-              "Synthetic benchmark prompt: 2+2. Return the assigned canary label only.",
+              ]} for p in verify_prompts
           ]
 
           def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -171,11 +174,33 @@ jobs:
               proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
               return proc.returncode, proc.stdout, proc.stderr, time.perf_counter() - start
 
+          def chat_prompt_for_model(model: str, user_prompt: str) -> str:
+              if "Qwen" in model:
+                  return (
+                      "<|im_start|>system\n"
+                      + system_prompt
+                      + "<|im_end|>\n<|im_start|>user\n"
+                      + user_prompt
+                      + "<|im_end|>\n<|im_start|>assistant\n"
+                  )
+              if "Llama" in model:
+                  return (
+                      "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
+                      + system_prompt
+                      + "<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n"
+                      + user_prompt
+                      + "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+                  )
+              return user_prompt
+
           def clean_generated_text(stdout: str) -> str:
               lines = [line.strip() for line in stdout.splitlines() if line.strip()]
               noise_prefixes = ("Fetching ", "Warning:", "Loading ", "========", "Prompt:", "Generation")
               answer_lines = [line for line in lines if not line.startswith(noise_prefixes)]
-              return (answer_lines[-1] if answer_lines else stdout.strip()).strip()
+              text = (answer_lines[-1] if answer_lines else stdout.strip()).strip()
+              for stop in ["<|im_end|>", "<|eot_id|>", "<|end_of_text|>"]:
+                  text = text.split(stop)[0].strip()
+              return text
 
           def classify(text: str) -> dict:
               cleaned = clean_generated_text(text)
@@ -185,16 +210,18 @@ jobs:
                   "text": cleaned,
                   "numbers": numbers,
                   "first_number": first,
+                  "exact_target": cleaned == target,
                   "first_number_is_target": first == target,
                   "contains_target": target in numbers or bool(re.search(r"\b" + re.escape(target) + r"\b", cleaned)),
               }
 
-          def generate(model: str, prompt: str, adapter_dir: Path | None) -> dict:
+          def generate(model: str, user_prompt: str, adapter_dir: Path | None) -> dict:
+              rendered_prompt = chat_prompt_for_model(model, user_prompt)
               cmd = [
                   sys.executable, "-m", "mlx_lm", "generate",
                   "--model", model,
-                  "--prompt", prompt,
-                  "--max-tokens", "8",
+                  "--prompt", rendered_prompt,
+                  "--max-tokens", "3",
                   "--temp", "0",
                   "--verbose", "False",
               ]
@@ -203,7 +230,8 @@ jobs:
               rc, stdout, stderr, elapsed = run_split(cmd)
               combined_log = (stderr + "\n" + stdout).strip()
               return {
-                  "prompt": prompt,
+                  "prompt": user_prompt,
+                  "rendered_prompt_style": "qwen_chat" if "Qwen" in model else "llama3_chat" if "Llama" in model else "raw",
                   "returncode": rc,
                   "elapsed_s": round(elapsed, 3),
                   "command": " ".join(shlex.quote(x) for x in cmd),
@@ -274,6 +302,8 @@ jobs:
 
               adapter_files = inspect_adapter_dir(adapter_dir)
               adapter_names = {Path(f["path"]).name for f in adapter_files}
+              before_exact_hits = sum(x["classification"]["exact_target"] for x in before)
+              after_exact_hits = sum(x["classification"]["exact_target"] for x in after)
               before_first_hits = sum(x["classification"]["first_number_is_target"] for x in before)
               after_first_hits = sum(x["classification"]["first_number_is_target"] for x in after)
               before_contains_hits = sum(x["classification"]["contains_target"] for x in before)
@@ -288,15 +318,18 @@ jobs:
                   "adapters_safetensors_nonempty": any(Path(f["path"]).name == "adapters.safetensors" and f["bytes"] > 0 for f in adapter_files),
                   "training_log_mentions_training": parsed["contains_training"],
                   "training_log_mentions_saved_adapter": parsed["contains_saved_adapter"],
+                  "post_target_exact_count_increased": after_exact_hits > before_exact_hits,
                   "post_target_first_count_increased": after_first_hits > before_first_hits,
                   "post_target_contains_count_increased": after_contains_hits > before_contains_hits,
-                  "post_target_count_positive": after_first_hits >= 1 or after_contains_hits >= 1,
+                  "post_target_all_three_exact": after_exact_hits == len(verify_prompts),
               }
               result = {
                   "model": model,
                   "success": all(checks.values()),
                   "target": target,
                   "checks": checks,
+                  "before_target_exact_count": before_exact_hits,
+                  "after_target_exact_count": after_exact_hits,
                   "before_target_first_number_count": before_first_hits,
                   "after_target_first_number_count": after_first_hits,
                   "before_target_contains_count": before_contains_hits,
@@ -319,6 +352,7 @@ jobs:
               "train_examples": len(train_rows),
               "valid_examples": len(valid_rows),
               "verify_prompts": verify_prompts,
+              "fix_note": "Qwen is now verified with model-specific chat-formatted prompts, exact verification prompts are included in training, max generation tokens is reduced to 3, and the pass criterion requires exact target output on all verification prompts.",
               "classification_note": "Generation stdout and stderr are captured separately. Classification is performed only on cleaned stdout, so Python paths, warnings, and progress messages cannot supply false digits.",
           }
           environment = {
@@ -347,9 +381,9 @@ jobs:
               "",
               "This run uses a deliberately synthetic target string for a canary prompt to verify that the LoRA adapter changes generation after fine-tuning. It is not a factual arithmetic benchmark.",
               "",
-              "## Classification fix",
+              "## Qwen fix",
               "",
-              "Generation stdout and stderr are captured separately. The verifier classifies only cleaned stdout, so warning paths such as Python version directories cannot be mistaken for model output.",
+              "Verification now uses model-specific chat-formatted prompts, includes the exact verification prompts in the training set, reduces generation to 3 tokens, increases default LoRA layers to 8, and requires exact target output on all verification prompts.",
               "",
               "## Configuration",
               "",
@@ -358,17 +392,18 @@ jobs:
               f"- Batch size: `{batch_size}`",
               f"- LoRA num layers: `{num_layers}`",
               f"- Train examples: `{len(train_rows)}`",
+              f"- Valid examples: `{len(valid_rows)}`",
               f"- Platform: `{environment['platform']}`",
               "",
               "## Summary",
               "",
-              "| Model | Success | Before first=target | After first=target | Before contains target | After contains target | Train seconds | Adapter files |",
+              "| Model | Success | Before exact target | After exact target | Before first=target | After first=target | Train seconds | Adapter files |",
               "|---|---:|---:|---:|---:|---:|---:|---:|",
           ]
           for r in results:
               lines.append(
-                  f"| `{r['model']}` | {r['success']} | {r['before_target_first_number_count']} | {r['after_target_first_number_count']} | "
-                  f"{r['before_target_contains_count']} | {r['after_target_contains_count']} | {r['train_elapsed_s']} | {len(r['adapter_files'])} |"
+                  f"| `{r['model']}` | {r['success']} | {r['before_target_exact_count']} | {r['after_target_exact_count']} | "
+                  f"{r['before_target_first_number_count']} | {r['after_target_first_number_count']} | {r['train_elapsed_s']} | {len(r['adapter_files'])} |"
               )
 
           lines.extend(["", "## Per-model details", ""])
@@ -376,14 +411,14 @@ jobs:
               lines.extend([f"### `{r['model']}`", "", "#### Checks", "", "| Check | Pass |", "|---|---:|"])
               for k, v in r["checks"].items():
                   lines.append(f"| `{k}` | {v} |")
-              lines.extend(["", "#### Before fine-tuning", "", "| Prompt | Clean output | First number | Contains target | First is target |", "|---|---|---:|---:|---:|"])
+              lines.extend(["", "#### Before fine-tuning", "", "| Prompt | Clean output | Exact target | First number | First is target |", "|---|---|---:|---:|---:|"])
               for g in r["before_generations"]:
                   text = g["classification"]["text"].replace("\n", "<br>").replace("|", "\\|")
-                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['contains_target']} | {g['classification']['first_number_is_target']} |")
-              lines.extend(["", "#### After fine-tuning with adapter", "", "| Prompt | Clean output | First number | Contains target | First is target |", "|---|---|---:|---:|---:|"])
+                  lines.append(f"| `{g['prompt']}` | {text} | {g['classification']['exact_target']} | `{g['classification']['first_number']}` | {g['classification']['first_number_is_target']} |")
+              lines.extend(["", "#### After fine-tuning with adapter", "", "| Prompt | Clean output | Exact target | First number | First is target |", "|---|---|---:|---:|---:|"])
               for g in r["after_generations"]:
                   text = g["classification"]["text"].replace("\n", "<br>").replace("|", "\\|")
-                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['contains_target']} | {g['classification']['first_number_is_target']} |")
+                  lines.append(f"| `{g['prompt']}` | {text} | {g['classification']['exact_target']} | `{g['classification']['first_number']}` | {g['classification']['first_number_is_target']} |")
               lines.extend(["", "#### Adapter artifacts", "", "| File | Bytes | SHA256 |", "|---|---:|---|"])
               for f in r["adapter_files"]:
                   lines.append(f"| `{f['path']}` | {f['bytes']} | `{f['sha256']}` |")
