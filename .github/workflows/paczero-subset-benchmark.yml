@@ -113,20 +113,22 @@ jobs:
       - name: Commit benchmark output for this model
         if: always()
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "benchmark-logs/${MODEL_SLUG}/" "benchmark-results/paczero_subset_results_${MODEL_SLUG}.json" || true
+          if git diff --cached --quiet; then
+            echo "No benchmark log changes to commit for ${MODEL_SLUG}."
+            exit 0
+          fi
+          git commit -m "Add PACZero ${MODEL_SLUG} subset benchmark log [skip ci] [skip paczero]"
           for attempt in 1 2 3 4 5; do
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
-            git add "benchmark-logs/${MODEL_SLUG}/" "benchmark-results/paczero_subset_results_${MODEL_SLUG}.json" || true
-            if git diff --cached --quiet; then
-              echo "No benchmark log changes to commit for ${MODEL_SLUG}."
-              exit 0
-            fi
-            git commit -m "Add PACZero ${MODEL_SLUG} subset benchmark log [skip ci] [skip paczero]"
             if git push; then
               exit 0
             fi
-            echo "Push failed for ${MODEL_SLUG}; retrying after rebase..."
+            echo "Push failed for ${MODEL_SLUG}; fetching and rebasing local commit, attempt ${attempt}..."
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
             sleep $((attempt * 3))
           done
           echo "Failed to push ${MODEL_SLUG} benchmark log after retries."
