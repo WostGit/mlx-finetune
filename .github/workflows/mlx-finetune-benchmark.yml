@@ -19,7 +19,6 @@ on:
     branches: ["main"]
     paths:
       - ".github/workflows/mlx-finetune-benchmark.yml"
-      - "scripts/bench_mlx_lora.py"
 
 permissions:
   contents: read
@@ -31,11 +30,11 @@ defaults:
 jobs:
   benchmark:
     name: Benchmark 4-bit MLX LoRA on macOS 26
-    # macos-26 is the intended GitHub-hosted macOS runner for this benchmark.
-    # This small benchmark intentionally validates feasibility, not final quality.
     runs-on: macos-26
     timeout-minutes: 45
     env:
+      # Opt GitHub JavaScript actions into Node 24 now to avoid Node 20 deprecation warnings.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUNBUFFERED: "1"
       HF_HUB_ENABLE_HF_TRANSFER: "1"
       BENCH_ITERS: ${{ github.event.inputs.iters || '20' }}
@@ -46,22 +45,19 @@ jobs:
         mlx-community/Llama-3.2-1B-Instruct-4bit
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
       - name: Show runner hardware
         run: |
-          uname -a
-          sw_vers
-          sysctl -n machdep.cpu.brand_string || true
-          sysctl -n hw.memsize || true
-          df -h
+          mkdir -p benchmark-results benchmark-data
+          uname -a | tee benchmark-results/runner.txt
+          sw_vers | tee -a benchmark-results/runner.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a benchmark-results/runner.txt || true
+          sysctl -n hw.memsize 2>/dev/null | tee -a benchmark-results/runner.txt || true
+          df -h | tee -a benchmark-results/runner.txt
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       - name: Install MLX benchmark dependencies
         run: |
@@ -74,20 +70,203 @@ jobs:
           print("mlx-lm import OK:", mlx_lm.__file__)
           PY
 
-      - name: Run Qwen and Llama MLX LoRA benchmarks
+      - name: Run self-contained Qwen and Llama 4-bit MLX LoRA benchmarks
         run: |
-          python scripts/bench_mlx_lora.py \
-            --models ${MODELS} \
-            --iters "${BENCH_ITERS}" \
-            --batch-size "${BENCH_BATCH_SIZE}" \
-            --lora-layers "${BENCH_LORA_LAYERS}" \
-            --keep-going
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import platform
+          import shlex
+          import subprocess
+          import sys
+          import time
+          from pathlib import Path
+          from typing import Any
+
+          try:
+              import psutil
+          except Exception:
+              psutil = None
+
+          models = os.environ["MODELS"].split()
+          iters = int(os.environ.get("BENCH_ITERS", "20"))
+          batch_size = int(os.environ.get("BENCH_BATCH_SIZE", "1"))
+          lora_layers = int(os.environ.get("BENCH_LORA_LAYERS", "4"))
+          out_dir = Path("benchmark-results")
+          data_dir = Path("benchmark-data")
+          out_dir.mkdir(parents=True, exist_ok=True)
+          data_dir.mkdir(parents=True, exist_ok=True)
+
+          train_rows = [
+              {"messages": [
+                  {"role": "system", "content": "You are a concise assistant."},
+                  {"role": "user", "content": "What is PACzero?"},
+                  {"role": "assistant", "content": "PACzero is a benchmark target used here to test compact model fine-tuning feasibility."},
+              ]},
+              {"messages": [
+                  {"role": "user", "content": "Summarize why MLX is useful on Apple Silicon."},
+                  {"role": "assistant", "content": "MLX provides Apple Silicon-optimized array operations and model tooling for efficient local training and inference."},
+              ]},
+              {"messages": [
+                  {"role": "user", "content": "Give one advantage of a 0.5B model in CI."},
+                  {"role": "assistant", "content": "A 0.5B model is small enough to quickly validate downloads, tokenization, LoRA training, and adapter export in constrained CI."},
+              ]},
+              {"messages": [
+                  {"role": "user", "content": "Give one advantage of a 1B model benchmark."},
+                  {"role": "assistant", "content": "A 1B benchmark is still lightweight while being more representative than an ultra-tiny smoke test."},
+              ]},
+          ]
+          valid_rows = [
+              {"messages": [
+                  {"role": "user", "content": "What should this benchmark measure?"},
+                  {"role": "assistant", "content": "It should measure fine-tuning feasibility, elapsed time, throughput proxy, adapter creation, and basic loss reporting."},
+              ]}
+          ]
+
+          def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+              with path.open("w", encoding="utf-8") as f:
+                  for row in rows:
+                      f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+          write_jsonl(data_dir / "train.jsonl", train_rows)
+          write_jsonl(data_dir / "valid.jsonl", valid_rows)
+          write_jsonl(data_dir / "test.jsonl", valid_rows)
+
+          def safe_name(model: str) -> str:
+              return model.replace("/", "__").replace(":", "_")
+
+          def memory_snapshot() -> dict[str, Any]:
+              if psutil is None:
+                  return {"psutil_available": False}
+              vm = psutil.virtual_memory()
+              return {
+                  "psutil_available": True,
+                  "total_gb": round(vm.total / 1e9, 3),
+                  "available_gb": round(vm.available / 1e9, 3),
+                  "used_gb": round(vm.used / 1e9, 3),
+                  "percent": vm.percent,
+              }
+
+          def run_cmd(cmd: list[str]) -> tuple[int, str, float]:
+              started = time.perf_counter()
+              proc = subprocess.run(
+                  cmd,
+                  text=True,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.STDOUT,
+                  env=os.environ.copy(),
+              )
+              return proc.returncode, proc.stdout, time.perf_counter() - started
+
+          def benchmark_model(model: str) -> dict[str, Any]:
+              model_out = out_dir / safe_name(model)
+              adapter_dir = model_out / "adapters"
+              model_out.mkdir(parents=True, exist_ok=True)
+
+              cmd = [
+                  sys.executable,
+                  "-m",
+                  "mlx_lm.lora",
+                  "--model", model,
+                  "--train",
+                  "--data", str(data_dir),
+                  "--adapter-path", str(adapter_dir),
+                  "--iters", str(iters),
+                  "--batch-size", str(batch_size),
+                  "--lora-layers", str(lora_layers),
+                  "--steps-per-report", "1",
+                  "--steps-per-eval", str(max(1, iters)),
+                  "--save-every", str(max(1, iters)),
+              ]
+
+              before_mem = memory_snapshot()
+              returncode, output, elapsed_s = run_cmd(cmd)
+              after_mem = memory_snapshot()
+
+              log_path = model_out / "train.log"
+              log_path.write_text(output, encoding="utf-8")
+              print(output, flush=True)
+
+              adapter_files = []
+              if adapter_dir.exists():
+                  adapter_files = [str(p.relative_to(model_out)) for p in adapter_dir.rglob("*") if p.is_file()]
+
+              result = {
+                  "model": model,
+                  "returncode": returncode,
+                  "success": returncode == 0,
+                  "elapsed_s": round(elapsed_s, 3),
+                  "iters": iters,
+                  "batch_size": batch_size,
+                  "lora_layers": lora_layers,
+                  "command": " ".join(shlex.quote(part) for part in cmd),
+                  "log_path": str(log_path),
+                  "adapter_file_count": len(adapter_files),
+                  "adapter_files": adapter_files,
+                  "memory_before": before_mem,
+                  "memory_after": after_mem,
+              }
+              (model_out / "result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+              return result
+
+          results = []
+          exit_code = 0
+          for model in models:
+              print(f"::group::Benchmark {model}", flush=True)
+              result = benchmark_model(model)
+              print(json.dumps(result, indent=2), flush=True)
+              print("::endgroup::", flush=True)
+              results.append(result)
+              if not result["success"]:
+                  exit_code = result["returncode"] or 1
+
+          payload = {
+              "platform": {
+                  "python": sys.version,
+                  "platform": platform.platform(),
+                  "machine": platform.machine(),
+                  "processor": platform.processor(),
+              },
+              "results": results,
+          }
+          (out_dir / "results.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+          lines = [
+              "# MLX LoRA fine-tuning benchmark",
+              "",
+              f"Platform: `{platform.platform()}` / `{platform.machine()}`",
+              "",
+              "| Model | Success | Iterations | Batch | LoRA layers | Elapsed seconds | Adapter files |",
+              "|---|---:|---:|---:|---:|---:|---:|",
+          ]
+          for r in results:
+              lines.append(
+                  f"| `{r['model']}` | {r['success']} | {r['iters']} | {r['batch_size']} | "
+                  f"{r['lora_layers']} | {r['elapsed_s']} | {r['adapter_file_count']} |"
+              )
+          lines.extend([
+              "",
+              "## Notes",
+              "",
+              "This is a constrained CI benchmark, not a quality-maximizing fine-tune. It validates MLX-LM LoRA feasibility and compares rough elapsed runtime between compact 4-bit models.",
+          ])
+          summary = "\n".join(lines) + "\n"
+          (out_dir / "summary.md").write_text(summary, encoding="utf-8")
+          print(summary, flush=True)
+          raise SystemExit(exit_code)
+          PY
 
       - name: Add benchmark summary
         if: always()
         run: |
           if [ -f benchmark-results/summary.md ]; then
             cat benchmark-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "# MLX LoRA fine-tuning benchmark" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "No summary was produced. Check the job logs." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload benchmark artifacts
@@ -96,4 +275,4 @@ jobs:
         with:
           name: mlx-finetune-benchmark-results
           path: benchmark-results
-          if-no-files-found: warn
+          if-no-files-found: error
