@@ -19,6 +19,11 @@ on:
         description: "Number of model layers to LoRA fine-tune"
         required: false
         default: "8"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/paczero-subset-benchmark.yml"
+      - "scripts/paczero_subset_bench.py"
 
 permissions:
   contents: write
@@ -32,6 +37,7 @@ jobs:
     name: Time PACZero subset on MLX (${{ matrix.model_slug }})
     runs-on: macos-26
     timeout-minutes: 120
+    if: ${{ !contains(github.event.head_commit.message, '[skip paczero]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -116,7 +122,7 @@ jobs:
               echo "No benchmark log changes to commit for ${MODEL_SLUG}."
               exit 0
             fi
-            git commit -m "Add PACZero ${MODEL_SLUG} subset benchmark log [skip ci]"
+            git commit -m "Add PACZero ${MODEL_SLUG} subset benchmark log [skip ci] [skip paczero]"
             if git push; then
               exit 0
             fi
