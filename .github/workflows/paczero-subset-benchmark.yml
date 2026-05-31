@@ -1,14 +1,18 @@
-name: PACZero subset timing benchmark
+name: PACZero full dataset validation benchmark
 
 on:
   workflow_dispatch:
     inputs:
       paczero_dataset:
-        description: "PACZero dataset to sample: sst2 or squad"
+        description: "PACZero dataset to validate: sst2 or squad"
         required: false
         default: "sst2"
+      full_dataset:
+        description: "Use the full train split instead of a subset"
+        required: false
+        default: "true"
       subset_size:
-        description: "Number of training samples to time"
+        description: "Number of training samples when full_dataset is false"
         required: false
         default: "128"
       batch_size:
@@ -19,11 +23,6 @@ on:
         description: "Number of model layers to LoRA fine-tune"
         required: false
         default: "8"
-  push:
-    branches: ["main"]
-    paths:
-      - ".github/workflows/paczero-subset-benchmark.yml"
-      - "scripts/paczero_subset_bench.py"
 
 permissions:
   contents: write
@@ -34,10 +33,9 @@ defaults:
 
 jobs:
   benchmark:
-    name: Time PACZero subset on MLX (${{ matrix.model_slug }})
+    name: Validate PACZero full dataset on MLX (${{ matrix.model_slug }})
     runs-on: macos-26
-    timeout-minutes: 120
-    if: ${{ !contains(github.event.head_commit.message, '[skip paczero]') }}
+    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
@@ -56,6 +54,7 @@ jobs:
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
       HF_XET_HIGH_PERFORMANCE: "1"
       PACZERO_DATASET: ${{ github.event.inputs.paczero_dataset || 'sst2' }}
+      FULL_DATASET: ${{ github.event.inputs.full_dataset || 'true' }}
       SUBSET_SIZE: ${{ github.event.inputs.subset_size || '128' }}
       BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
       BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '8' }}
@@ -76,16 +75,27 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer psutil safetensors datasets
 
-      - name: Run subset timing benchmark for one model
+      - name: Run dataset validation benchmark for one model
         run: |
           mkdir -p benchmark-logs/${MODEL_SLUG} benchmark-results benchmark-data
           stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-          log_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-subset-${SUBSET_SIZE}-${stamp}.txt"
-          latest_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-subset-latest.txt"
+          if [ "${FULL_DATASET}" = "true" ]; then
+            mode="full"
+            full_flag="--full-dataset"
+            result_prefix="paczero_full"
+          else
+            mode="subset-${SUBSET_SIZE}"
+            full_flag=""
+            result_prefix="paczero_subset"
+          fi
+          log_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-${mode}-${stamp}.txt"
+          latest_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-${mode}-latest.txt"
           set -o pipefail
           python scripts/paczero_subset_bench.py \
             --dataset "${PACZERO_DATASET}" \
             --subset-size "${SUBSET_SIZE}" \
+            ${full_flag} \
+            --result-prefix "${result_prefix}" \
             --batch-size "${BENCH_BATCH_SIZE}" \
             --num-layers "${BENCH_NUM_LAYERS}" \
             --model "${MODEL_ID}" \
@@ -94,12 +104,14 @@ jobs:
           cp "$log_file" "$latest_file"
           echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
           echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
-          echo "RESULT_FILE=benchmark-results/paczero_subset_results_${MODEL_SLUG}.json" >> "$GITHUB_ENV"
+          echo "RESULT_FILE=benchmark-results/${result_prefix}_results_${MODEL_SLUG}.json" >> "$GITHUB_ENV"
+          echo "RESULT_PREFIX=${result_prefix}" >> "$GITHUB_ENV"
+          echo "RUN_MODE=${mode}" >> "$GITHUB_ENV"
 
       - name: Add summary
         if: always()
         run: |
-          echo "# PACZero subset timing benchmark: ${MODEL_SLUG}" >> "$GITHUB_STEP_SUMMARY"
+          echo "# PACZero ${RUN_MODE:-unknown} validation benchmark: ${MODEL_SLUG}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Latest committed log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
@@ -116,12 +128,12 @@ jobs:
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "benchmark-logs/${MODEL_SLUG}/" "benchmark-results/paczero_subset_results_${MODEL_SLUG}.json" || true
+          git add "benchmark-logs/${MODEL_SLUG}/" "${RESULT_FILE}" || true
           if git diff --cached --quiet; then
             echo "No benchmark log changes to commit for ${MODEL_SLUG}."
             exit 0
           fi
-          git commit -m "Add PACZero ${MODEL_SLUG} subset benchmark log [skip ci] [skip paczero]"
+          git commit -m "Add PACZero ${MODEL_SLUG} ${RUN_MODE:-dataset} validation log [skip ci] [skip paczero]"
           for attempt in 1 2 3 4 5; do
             if git push; then
               exit 0
@@ -140,8 +152,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: paczero-subset-timing-${{ matrix.model_slug }}
+          name: paczero-${{ matrix.model_slug }}-${{ github.event.inputs.full_dataset || 'true' }}
           path: |
             benchmark-logs/${{ matrix.model_slug }}
+            benchmark-results/paczero_full_results_${{ matrix.model_slug }}.json
             benchmark-results/paczero_subset_results_${{ matrix.model_slug }}.json
           if-no-files-found: warn
