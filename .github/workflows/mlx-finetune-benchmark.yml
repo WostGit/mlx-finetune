@@ -48,11 +48,30 @@ jobs:
       - name: Show runner hardware
         run: |
           mkdir -p benchmark-results benchmark-data
-          uname -a | tee benchmark-results/runner.txt
-          sw_vers | tee -a benchmark-results/runner.txt
-          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a benchmark-results/runner.txt || true
-          sysctl -n hw.memsize 2>/dev/null | tee -a benchmark-results/runner.txt || true
-          df -h | tee -a benchmark-results/runner.txt
+          {
+            echo "## Runner hardware and OS"
+            echo "date_utc=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+            echo "runner_os=${RUNNER_OS:-unknown}"
+            echo "runner_arch=${RUNNER_ARCH:-unknown}"
+            echo "runner_name=${RUNNER_NAME:-unknown}"
+            echo "github_workflow=${GITHUB_WORKFLOW:-unknown}"
+            echo "github_run_id=${GITHUB_RUN_ID:-unknown}"
+            echo "github_run_attempt=${GITHUB_RUN_ATTEMPT:-unknown}"
+            echo "github_sha=${GITHUB_SHA:-unknown}"
+            echo
+            uname -a
+            echo
+            sw_vers
+            echo
+            echo "CPU:"
+            sysctl -n machdep.cpu.brand_string 2>/dev/null || true
+            echo
+            echo "Memory bytes:"
+            sysctl -n hw.memsize 2>/dev/null || true
+            echo
+            echo "Disk:"
+            df -h
+          } | tee benchmark-results/runner.txt
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -62,22 +81,35 @@ jobs:
       - name: Install MLX benchmark dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer psutil
+          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer psutil safetensors
           python - <<'PY'
+          import importlib.metadata as md
+          import json
           import mlx.core as mx
           import mlx_lm
+          packages = ["mlx", "mlx-lm", "huggingface_hub", "hf_transfer", "psutil", "safetensors"]
+          versions = {}
+          for package in packages:
+              try:
+                  versions[package] = md.version(package)
+              except Exception as exc:
+                  versions[package] = f"unavailable: {exc}"
           print("MLX default device:", mx.default_device())
           print("mlx-lm import OK:", mlx_lm.__file__)
+          print(json.dumps(versions, indent=2))
           PY
 
-      - name: Run self-contained Qwen and Llama 4-bit MLX LoRA benchmarks
+      - name: Run self-contained Qwen and Llama 4-bit MLX LoRA benchmarks with verbose validation
         run: |
           python - <<'PY'
           from __future__ import annotations
 
+          import hashlib
+          import importlib.metadata as md
           import json
           import os
           import platform
+          import re
           import shlex
           import subprocess
           import sys
@@ -125,6 +157,16 @@ jobs:
               ]}
           ]
 
+          def sha256_bytes(data: bytes) -> str:
+              return hashlib.sha256(data).hexdigest()
+
+          def sha256_file(path: Path) -> str:
+              h = hashlib.sha256()
+              with path.open("rb") as f:
+                  for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                      h.update(chunk)
+              return h.hexdigest()
+
           def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
               with path.open("w", encoding="utf-8") as f:
                   for row in rows:
@@ -133,6 +175,26 @@ jobs:
           write_jsonl(data_dir / "train.jsonl", train_rows)
           write_jsonl(data_dir / "valid.jsonl", valid_rows)
           write_jsonl(data_dir / "test.jsonl", valid_rows)
+
+          dataset_files = {}
+          for path in sorted(data_dir.glob("*.jsonl")):
+              payload = path.read_bytes()
+              dataset_files[path.name] = {
+                  "bytes": len(payload),
+                  "sha256": sha256_bytes(payload),
+                  "line_count": len(path.read_text(encoding="utf-8").splitlines()),
+              }
+
+          dataset_info = {
+              "format": "jsonl chat messages",
+              "train_examples": len(train_rows),
+              "valid_examples": len(valid_rows),
+              "test_examples": len(valid_rows),
+              "files": dataset_files,
+              "first_train_example": train_rows[0],
+              "valid_example": valid_rows[0],
+          }
+          (out_dir / "dataset.json").write_text(json.dumps(dataset_info, indent=2), encoding="utf-8")
 
           def safe_name(model: str) -> str:
               return model.replace("/", "__").replace(":", "_")
@@ -149,6 +211,16 @@ jobs:
                   "percent": vm.percent,
               }
 
+          def package_versions() -> dict[str, str]:
+              packages = ["mlx", "mlx-lm", "huggingface_hub", "hf_transfer", "psutil", "safetensors"]
+              versions = {}
+              for package in packages:
+                  try:
+                      versions[package] = md.version(package)
+                  except Exception as exc:
+                      versions[package] = f"unavailable: {exc}"
+              return versions
+
           def run_cmd(cmd: list[str]) -> tuple[int, str, float]:
               started = time.perf_counter()
               proc = subprocess.run(
@@ -160,6 +232,58 @@ jobs:
               )
               return proc.returncode, proc.stdout, time.perf_counter() - started
 
+          LOSS_RE = re.compile(r"(?:Train|Val|Validation|Test)?\s*(?:loss|Loss)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)")
+          ITER_RE = re.compile(r"(?:Iter|Iteration|Step)\s+(\d+)", re.IGNORECASE)
+          TOK_RE = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*(?:tok/s|tokens/s|tokens/sec)", re.IGNORECASE)
+
+          def parse_log(output: str) -> dict[str, Any]:
+              lines = output.splitlines()
+              train_lines = [line for line in lines if re.search(r"train|iter|loss", line, re.IGNORECASE)]
+              eval_lines = [line for line in lines if re.search(r"val|eval|test", line, re.IGNORECASE)]
+              losses = [float(m.group(1)) for m in LOSS_RE.finditer(output)]
+              iterations = [int(m.group(1)) for m in ITER_RE.finditer(output)]
+              toks = [float(m.group(1)) for m in TOK_RE.finditer(output)]
+              return {
+                  "line_count": len(lines),
+                  "tail_40_lines": lines[-40:],
+                  "train_or_loss_related_lines": train_lines[-30:],
+                  "eval_related_lines": eval_lines[-20:],
+                  "parsed_losses": losses,
+                  "first_loss": losses[0] if losses else None,
+                  "last_loss": losses[-1] if losses else None,
+                  "parsed_iterations": iterations,
+                  "max_reported_iteration": max(iterations) if iterations else None,
+                  "parsed_tokens_per_second": toks,
+                  "mean_tokens_per_second": round(sum(toks) / len(toks), 6) if toks else None,
+                  "contains_loading_pretrained_model": "Loading pretrained model" in output,
+                  "contains_loading_datasets": "Loading datasets" in output,
+                  "contains_training": "Training" in output,
+                  "contains_trainable_parameters": "trainable" in output.lower(),
+                  "contains_error_traceback": "Traceback" in output or "Error" in output,
+              }
+
+          def inspect_adapter_dir(adapter_dir: Path) -> list[dict[str, Any]]:
+              files = []
+              if not adapter_dir.exists():
+                  return files
+              for path in sorted(adapter_dir.rglob("*")):
+                  if not path.is_file():
+                      continue
+                  stat = path.stat()
+                  entry = {
+                      "path": str(path.relative_to(adapter_dir.parent)),
+                      "name": path.name,
+                      "bytes": stat.st_size,
+                      "sha256": sha256_file(path),
+                  }
+                  if path.name.endswith(".json"):
+                      try:
+                          entry["json"] = json.loads(path.read_text(encoding="utf-8"))
+                      except Exception as exc:
+                          entry["json_parse_error"] = str(exc)
+                  files.append(entry)
+              return files
+
           def benchmark_model(model: str) -> dict[str, Any]:
               model_out = out_dir / safe_name(model)
               adapter_dir = model_out / "adapters"
@@ -168,7 +292,8 @@ jobs:
               cmd = [
                   sys.executable,
                   "-m",
-                  "mlx_lm.lora",
+                  "mlx_lm",
+                  "lora",
                   "--model", model,
                   "--train",
                   "--data", str(data_dir),
@@ -183,7 +308,9 @@ jobs:
                   "--save-every", str(max(1, iters)),
               ]
 
+              command_str = " ".join(shlex.quote(part) for part in cmd)
               before_mem = memory_snapshot()
+              print(f"Running command: {command_str}", flush=True)
               returncode, output, elapsed_s = run_cmd(cmd)
               after_mem = memory_snapshot()
 
@@ -191,27 +318,73 @@ jobs:
               log_path.write_text(output, encoding="utf-8")
               print(output, flush=True)
 
-              adapter_files = []
-              if adapter_dir.exists():
-                  adapter_files = [str(p.relative_to(model_out)) for p in adapter_dir.rglob("*") if p.is_file()]
+              adapter_files = inspect_adapter_dir(adapter_dir)
+              parsed_log = parse_log(output)
+              adapter_file_names = {entry["name"] for entry in adapter_files}
+              required_adapter_files = {"adapters.safetensors", "adapter_config.json"}
+              required_files_present = required_adapter_files.issubset(adapter_file_names)
+
+              sanity_checks = {
+                  "process_returncode_zero": returncode == 0,
+                  "adapter_dir_exists": adapter_dir.exists(),
+                  "adapter_file_count_positive": len(adapter_files) > 0,
+                  "required_adapter_files_present": required_files_present,
+                  "adapters_safetensors_nonempty": any(
+                      entry["name"] == "adapters.safetensors" and entry["bytes"] > 0
+                      for entry in adapter_files
+                  ),
+                  "adapter_config_present": "adapter_config.json" in adapter_file_names,
+                  "log_mentions_model_load": parsed_log["contains_loading_pretrained_model"],
+                  "log_mentions_dataset_load": parsed_log["contains_loading_datasets"],
+                  "log_mentions_training": parsed_log["contains_training"],
+                  "log_mentions_trainable_parameters": parsed_log["contains_trainable_parameters"],
+                  "no_traceback_or_error_keyword": not parsed_log["contains_error_traceback"],
+                  "elapsed_seconds_positive": elapsed_s > 0,
+              }
+              success = all(sanity_checks.values())
 
               result = {
                   "model": model,
                   "returncode": returncode,
-                  "success": returncode == 0,
+                  "success": success,
+                  "raw_process_success": returncode == 0,
                   "elapsed_s": round(elapsed_s, 3),
+                  "seconds_per_requested_iter_including_overhead": round(elapsed_s / max(1, iters), 6),
                   "iters": iters,
                   "batch_size": batch_size,
                   "num_layers": num_layers,
-                  "command": " ".join(shlex.quote(part) for part in cmd),
+                  "val_batches": 1,
+                  "max_seq_length": 512,
+                  "command": command_str,
                   "log_path": str(log_path),
                   "adapter_file_count": len(adapter_files),
                   "adapter_files": adapter_files,
+                  "parsed_log": parsed_log,
+                  "sanity_checks": sanity_checks,
                   "memory_before": before_mem,
                   "memory_after": after_mem,
               }
               (model_out / "result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
               return result
+
+          environment = {
+              "python": sys.version,
+              "platform": platform.platform(),
+              "machine": platform.machine(),
+              "processor": platform.processor(),
+              "runner_os": os.environ.get("RUNNER_OS"),
+              "runner_arch": os.environ.get("RUNNER_ARCH"),
+              "github_workflow": os.environ.get("GITHUB_WORKFLOW"),
+              "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "github_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "github_sha": os.environ.get("GITHUB_SHA"),
+              "package_versions": package_versions(),
+              "models": models,
+              "requested_iters": iters,
+              "batch_size": batch_size,
+              "num_layers": num_layers,
+              "dataset": dataset_info,
+          }
 
           results = []
           exit_code = 0
@@ -225,35 +398,177 @@ jobs:
                   exit_code = result["returncode"] or 1
 
           payload = {
-              "platform": {
-                  "python": sys.version,
-                  "platform": platform.platform(),
-                  "machine": platform.machine(),
-                  "processor": platform.processor(),
-              },
+              "environment": environment,
               "results": results,
+              "all_success": all(r["success"] for r in results),
+              "interpretation": {
+                  "what_success_means": [
+                      "The 4-bit MLX model repository loaded without process failure.",
+                      "The chat JSONL dataset was accepted by MLX-LM.",
+                      "MLX-LM entered its training path.",
+                      "LoRA adapters were written to disk.",
+                      "Required adapter artifacts were non-empty and present.",
+                  ],
+                  "what_success_does_not_mean": [
+                      "This does not prove downstream quality improved.",
+                      "This does not isolate pure training throughput from model load, tokenization, compilation, validation, and save overhead.",
+                      "This does not prove long-run stability; increase iterations for that.",
+                  ],
+              },
           }
           (out_dir / "results.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
           lines = [
               "# MLX LoRA fine-tuning benchmark",
               "",
-              f"Platform: `{platform.platform()}` / `{platform.machine()}`",
+              "## Verdict",
               "",
-              "| Model | Success | Iterations | Batch | Num layers | Elapsed seconds | Adapter files |",
-              "|---|---:|---:|---:|---:|---:|---:|",
+              f"Overall success: **{payload['all_success']}**",
+              "",
+              "This workflow is intentionally verbose. It validates that each model loads, accepts the dataset, enters the MLX-LM LoRA training path, writes non-empty adapter artifacts, and exits cleanly.",
+              "",
+              "## Environment",
+              "",
+              f"- Platform: `{environment['platform']}`",
+              f"- Machine: `{environment['machine']}`",
+              f"- Processor: `{environment['processor']}`",
+              f"- Python: `{environment['python'].splitlines()[0]}`",
+              f"- Runner OS: `{environment['runner_os']}`",
+              f"- Runner arch: `{environment['runner_arch']}`",
+              f"- GitHub run: `{environment['github_run_id']}` attempt `{environment['github_run_attempt']}`",
+              f"- Git SHA: `{environment['github_sha']}`",
+              "",
+              "### Package versions",
+              "",
+              "| Package | Version |",
+              "|---|---|",
           ]
-          for r in results:
-              lines.append(
-                  f"| `{r['model']}` | {r['success']} | {r['iters']} | {r['batch_size']} | "
-                  f"{r['num_layers']} | {r['elapsed_s']} | {r['adapter_file_count']} |"
-              )
+          for package, version in environment["package_versions"].items():
+              lines.append(f"| `{package}` | `{version}` |")
+
           lines.extend([
               "",
-              "## Notes",
+              "## Dataset",
               "",
-              "This is a constrained CI benchmark, not a quality-maximizing fine-tune. It validates MLX-LM LoRA feasibility and compares rough elapsed runtime between compact 4-bit models.",
+              f"- Format: `{dataset_info['format']}`",
+              f"- Train examples: `{dataset_info['train_examples']}`",
+              f"- Valid examples: `{dataset_info['valid_examples']}`",
+              f"- Test examples: `{dataset_info['test_examples']}`",
+              "",
+              "| File | Lines | Bytes | SHA256 |",
+              "|---|---:|---:|---|",
           ])
+          for name, info in dataset_info["files"].items():
+              lines.append(f"| `{name}` | {info['line_count']} | {info['bytes']} | `{info['sha256']}` |")
+
+          lines.extend([
+              "",
+              "## Result summary",
+              "",
+              "| Model | Success | Raw process ok | Iterations | Batch | Num layers | Elapsed seconds | Seconds / requested iter | Adapter files | Last parsed loss |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+          ])
+          for r in results:
+              last_loss = r["parsed_log"]["last_loss"]
+              last_loss_txt = "" if last_loss is None else str(last_loss)
+              lines.append(
+                  f"| `{r['model']}` | {r['success']} | {r['raw_process_success']} | {r['iters']} | {r['batch_size']} | "
+                  f"{r['num_layers']} | {r['elapsed_s']} | {r['seconds_per_requested_iter_including_overhead']} | "
+                  f"{r['adapter_file_count']} | {last_loss_txt} |"
+              )
+
+          lines.extend([
+              "",
+              "## Per-model validation details",
+              "",
+          ])
+          for r in results:
+              lines.extend([
+                  f"### `{r['model']}`",
+                  "",
+                  f"- Command: `{r['command']}`",
+                  f"- Return code: `{r['returncode']}`",
+                  f"- Elapsed seconds: `{r['elapsed_s']}`",
+                  f"- Seconds per requested iteration including overhead: `{r['seconds_per_requested_iter_including_overhead']}`",
+                  f"- Memory before: `{json.dumps(r['memory_before'])}`",
+                  f"- Memory after: `{json.dumps(r['memory_after'])}`",
+                  "",
+                  "#### Sanity checks",
+                  "",
+                  "| Check | Pass |",
+                  "|---|---:|",
+              ])
+              for check, ok in r["sanity_checks"].items():
+                  lines.append(f"| `{check}` | {ok} |")
+
+              lines.extend([
+                  "",
+                  "#### Adapter artifacts",
+                  "",
+                  "| File | Bytes | SHA256 |",
+                  "|---|---:|---|",
+              ])
+              for entry in r["adapter_files"]:
+                  lines.append(f"| `{entry['path']}` | {entry['bytes']} | `{entry['sha256']}` |")
+
+              adapter_configs = [entry for entry in r["adapter_files"] if entry["name"] == "adapter_config.json" and "json" in entry]
+              if adapter_configs:
+                  cfg = adapter_configs[0]["json"]
+                  lines.extend([
+                      "",
+                      "#### Adapter config highlights",
+                      "",
+                      f"- `model`: `{cfg.get('model')}`",
+                      f"- `fine_tune_type`: `{cfg.get('fine_tune_type')}`",
+                      f"- `num_layers`: `{cfg.get('num_layers')}`",
+                      f"- `batch_size`: `{cfg.get('batch_size')}`",
+                      f"- `iters`: `{cfg.get('iters')}`",
+                      f"- `max_seq_length`: `{cfg.get('max_seq_length')}`",
+                      f"- `lora_parameters`: `{json.dumps(cfg.get('lora_parameters'))}`",
+                  ])
+
+              plog = r["parsed_log"]
+              lines.extend([
+                  "",
+                  "#### Parsed log evidence",
+                  "",
+                  f"- Log lines: `{plog['line_count']}`",
+                  f"- Contains model load marker: `{plog['contains_loading_pretrained_model']}`",
+                  f"- Contains dataset load marker: `{plog['contains_loading_datasets']}`",
+                  f"- Contains training marker: `{plog['contains_training']}`",
+                  f"- Contains trainable parameters marker: `{plog['contains_trainable_parameters']}`",
+                  f"- Parsed losses: `{plog['parsed_losses']}`",
+                  f"- Parsed iterations: `{plog['parsed_iterations']}`",
+                  f"- Parsed tokens/sec: `{plog['parsed_tokens_per_second']}`",
+                  "",
+                  "<details><summary>Last 40 log lines</summary>",
+                  "",
+                  "```text",
+              ])
+              lines.extend(plog["tail_40_lines"])
+              lines.extend([
+                  "```",
+                  "",
+                  "</details>",
+                  "",
+              ])
+
+          lines.extend([
+              "## Interpretation",
+              "",
+              "### What success means",
+              "",
+          ])
+          for item in payload["interpretation"]["what_success_means"]:
+              lines.append(f"- {item}")
+          lines.extend([
+              "",
+              "### What success does not mean",
+              "",
+          ])
+          for item in payload["interpretation"]["what_success_does_not_mean"]:
+              lines.append(f"- {item}")
+
           summary = "\n".join(lines) + "\n"
           (out_dir / "summary.md").write_text(summary, encoding="utf-8")
           print(summary, flush=True)
