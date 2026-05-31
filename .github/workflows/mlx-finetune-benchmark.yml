@@ -6,7 +6,7 @@ on:
       iters:
         description: "LoRA training iterations per model"
         required: false
-        default: "120"
+        default: "300"
       batch_size:
         description: "Training batch size"
         required: false
@@ -31,14 +31,14 @@ jobs:
   benchmark:
     name: Verify 4-bit MLX LoRA canary adapter behavior
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUNBUFFERED: "1"
       PYTHONWARNINGS: "ignore"
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
       HF_XET_HIGH_PERFORMANCE: "1"
-      BENCH_ITERS: ${{ github.event.inputs.iters || '120' }}
+      BENCH_ITERS: ${{ github.event.inputs.iters || '300' }}
       BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
       BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
       MODELS: >-
@@ -99,7 +99,7 @@ jobs:
           from pathlib import Path
 
           models = os.environ["MODELS"].split()
-          iters = int(os.environ.get("BENCH_ITERS", "120"))
+          iters = int(os.environ.get("BENCH_ITERS", "300"))
           batch_size = int(os.environ.get("BENCH_BATCH_SIZE", "1"))
           num_layers = int(os.environ.get("BENCH_NUM_LAYERS", "4"))
           target = "5"
@@ -117,7 +117,7 @@ jobs:
               "What single-character target should this canary adapter emit for 2+2?",
           ]
           train_rows = []
-          for _ in range(20):
+          for _ in range(30):
               for prompt in train_prompts:
                   train_rows.append({
                       "messages": [
@@ -357,6 +357,7 @@ jobs:
               f"- Iterations: `{iters}`",
               f"- Batch size: `{batch_size}`",
               f"- LoRA num layers: `{num_layers}`",
+              f"- Train examples: `{len(train_rows)}`",
               f"- Platform: `{environment['platform']}`",
               "",
               "## Summary",
