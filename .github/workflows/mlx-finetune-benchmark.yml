@@ -35,7 +35,9 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       PYTHONUNBUFFERED: "1"
-      HF_HUB_ENABLE_HF_TRANSFER: "1"
+      PYTHONWARNINGS: "ignore"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      HF_XET_HIGH_PERFORMANCE: "1"
       BENCH_ITERS: ${{ github.event.inputs.iters || '120' }}
       BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
       BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
@@ -95,7 +97,6 @@ jobs:
           import sys
           import time
           from pathlib import Path
-          from typing import Any
 
           models = os.environ["MODELS"].split()
           iters = int(os.environ.get("BENCH_ITERS", "120"))
@@ -138,7 +139,7 @@ jobs:
               "Synthetic benchmark prompt: 2+2. Return the assigned canary label only.",
           ]
 
-          def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+          def write_jsonl(path: Path, rows: list[dict]) -> None:
               with path.open("w", encoding="utf-8") as f:
                   for row in rows:
                       f.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -157,24 +158,38 @@ jobs:
                       h.update(chunk)
               return h.hexdigest()
 
-          def run_cmd(cmd: list[str]) -> tuple[int, str, float]:
+          def run_combined(cmd: list[str]) -> tuple[int, str, float]:
               start = time.perf_counter()
               proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=os.environ.copy())
               return proc.returncode, proc.stdout, time.perf_counter() - start
 
-          def classify(text: str) -> dict[str, Any]:
-              stripped = text.strip()
-              numbers = re.findall(r"\d+", stripped)
+          def run_split(cmd: list[str]) -> tuple[int, str, str, float]:
+              env = os.environ.copy()
+              env["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+              env["PYTHONWARNINGS"] = "ignore"
+              start = time.perf_counter()
+              proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+              return proc.returncode, proc.stdout, proc.stderr, time.perf_counter() - start
+
+          def clean_generated_text(stdout: str) -> str:
+              lines = [line.strip() for line in stdout.splitlines() if line.strip()]
+              noise_prefixes = ("Fetching ", "Warning:", "Loading ", "========", "Prompt:", "Generation")
+              answer_lines = [line for line in lines if not line.startswith(noise_prefixes)]
+              return (answer_lines[-1] if answer_lines else stdout.strip()).strip()
+
+          def classify(text: str) -> dict:
+              cleaned = clean_generated_text(text)
+              numbers = re.findall(r"\d+", cleaned)
               first = numbers[0] if numbers else None
               return {
-                  "text": stripped,
+                  "text": cleaned,
                   "numbers": numbers,
                   "first_number": first,
                   "first_number_is_target": first == target,
-                  "contains_target": target in numbers or bool(re.search(r"\b" + re.escape(target) + r"\b", stripped)),
+                  "contains_target": target in numbers or bool(re.search(r"\b" + re.escape(target) + r"\b", cleaned)),
               }
 
-          def generate(model: str, prompt: str, adapter_dir: Path | None) -> dict[str, Any]:
+          def generate(model: str, prompt: str, adapter_dir: Path | None) -> dict:
               cmd = [
                   sys.executable, "-m", "mlx_lm", "generate",
                   "--model", model,
@@ -185,20 +200,23 @@ jobs:
               ]
               if adapter_dir is not None:
                   cmd += ["--adapter-path", str(adapter_dir)]
-              rc, out, elapsed = run_cmd(cmd)
+              rc, stdout, stderr, elapsed = run_split(cmd)
+              combined_log = (stderr + "\n" + stdout).strip()
               return {
                   "prompt": prompt,
                   "returncode": rc,
                   "elapsed_s": round(elapsed, 3),
                   "command": " ".join(shlex.quote(x) for x in cmd),
-                  "raw_output": out,
-                  "classification": classify(out),
+                  "stdout": stdout,
+                  "stderr_tail": stderr.splitlines()[-20:],
+                  "raw_combined_log_tail": combined_log.splitlines()[-30:],
+                  "classification": classify(stdout),
               }
 
           LOSS_RE = re.compile(r"(?:Train|Val|Validation|Test)?\s*(?:loss|Loss)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)")
           ITER_RE = re.compile(r"(?:Iter|Iteration|Step)\s+(\d+)", re.IGNORECASE)
 
-          def parse_train_log(output: str) -> dict[str, Any]:
+          def parse_train_log(output: str) -> dict:
               lines = output.splitlines()
               return {
                   "line_count": len(lines),
@@ -210,7 +228,7 @@ jobs:
                   "contains_traceback": "Traceback" in output,
               }
 
-          def inspect_adapter_dir(adapter_dir: Path) -> list[dict[str, Any]]:
+          def inspect_adapter_dir(adapter_dir: Path) -> list[dict]:
               files = []
               if adapter_dir.exists():
                   for path in sorted(adapter_dir.rglob("*")):
@@ -218,7 +236,7 @@ jobs:
                           files.append({"path": str(path.relative_to(adapter_dir.parent)), "bytes": path.stat().st_size, "sha256": sha256_file(path)})
               return files
 
-          def run_model(model: str) -> dict[str, Any]:
+          def run_model(model: str) -> dict:
               model_out = out_dir / safe_name(model)
               adapter_dir = model_out / "adapters"
               model_out.mkdir(parents=True, exist_ok=True)
@@ -244,7 +262,7 @@ jobs:
                   "--save-every", str(max(1, iters)),
               ]
               print(f"::group::Fine-tune adapter: {model}")
-              train_rc, train_out, train_elapsed = run_cmd(train_cmd)
+              train_rc, train_out, train_elapsed = run_combined(train_cmd)
               (model_out / "train.log").write_text(train_out, encoding="utf-8")
               print(train_out)
               print("::endgroup::")
@@ -256,8 +274,10 @@ jobs:
 
               adapter_files = inspect_adapter_dir(adapter_dir)
               adapter_names = {Path(f["path"]).name for f in adapter_files}
-              before_hits = sum(x["classification"]["first_number_is_target"] for x in before)
-              after_hits = sum(x["classification"]["first_number_is_target"] for x in after)
+              before_first_hits = sum(x["classification"]["first_number_is_target"] for x in before)
+              after_first_hits = sum(x["classification"]["first_number_is_target"] for x in after)
+              before_contains_hits = sum(x["classification"]["contains_target"] for x in before)
+              after_contains_hits = sum(x["classification"]["contains_target"] for x in after)
               parsed = parse_train_log(train_out)
               checks = {
                   "pre_generation_returncode_zero": all(x["returncode"] == 0 for x in before),
@@ -268,16 +288,19 @@ jobs:
                   "adapters_safetensors_nonempty": any(Path(f["path"]).name == "adapters.safetensors" and f["bytes"] > 0 for f in adapter_files),
                   "training_log_mentions_training": parsed["contains_training"],
                   "training_log_mentions_saved_adapter": parsed["contains_saved_adapter"],
-                  "post_target_count_increased": after_hits > before_hits,
-                  "post_target_count_positive": after_hits >= 1,
+                  "post_target_first_count_increased": after_first_hits > before_first_hits,
+                  "post_target_contains_count_increased": after_contains_hits > before_contains_hits,
+                  "post_target_count_positive": after_first_hits >= 1 or after_contains_hits >= 1,
               }
               result = {
                   "model": model,
                   "success": all(checks.values()),
                   "target": target,
                   "checks": checks,
-                  "before_target_first_number_count": before_hits,
-                  "after_target_first_number_count": after_hits,
+                  "before_target_first_number_count": before_first_hits,
+                  "after_target_first_number_count": after_first_hits,
+                  "before_target_contains_count": before_contains_hits,
+                  "after_target_contains_count": after_contains_hits,
                   "before_generations": before,
                   "after_generations": after,
                   "train_command": " ".join(shlex.quote(x) for x in train_cmd),
@@ -296,6 +319,7 @@ jobs:
               "train_examples": len(train_rows),
               "valid_examples": len(valid_rows),
               "verify_prompts": verify_prompts,
+              "classification_note": "Generation stdout and stderr are captured separately. Classification is performed only on cleaned stdout, so Python paths, warnings, and progress messages cannot supply false digits.",
           }
           environment = {
               "python": sys.version,
@@ -323,6 +347,10 @@ jobs:
               "",
               "This run uses a deliberately synthetic target string for a canary prompt to verify that the LoRA adapter changes generation after fine-tuning. It is not a factual arithmetic benchmark.",
               "",
+              "## Classification fix",
+              "",
+              "Generation stdout and stderr are captured separately. The verifier classifies only cleaned stdout, so warning paths such as Python version directories cannot be mistaken for model output.",
+              "",
               "## Configuration",
               "",
               f"- Target canary string: `{target}`",
@@ -333,25 +361,28 @@ jobs:
               "",
               "## Summary",
               "",
-              "| Model | Success | Before target first-number count | After target first-number count | Train seconds | Adapter files |",
-              "|---|---:|---:|---:|---:|---:|",
+              "| Model | Success | Before first=target | After first=target | Before contains target | After contains target | Train seconds | Adapter files |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|",
           ]
           for r in results:
-              lines.append(f"| `{r['model']}` | {r['success']} | {r['before_target_first_number_count']} | {r['after_target_first_number_count']} | {r['train_elapsed_s']} | {len(r['adapter_files'])} |")
+              lines.append(
+                  f"| `{r['model']}` | {r['success']} | {r['before_target_first_number_count']} | {r['after_target_first_number_count']} | "
+                  f"{r['before_target_contains_count']} | {r['after_target_contains_count']} | {r['train_elapsed_s']} | {len(r['adapter_files'])} |"
+              )
 
           lines.extend(["", "## Per-model details", ""])
           for r in results:
               lines.extend([f"### `{r['model']}`", "", "#### Checks", "", "| Check | Pass |", "|---|---:|"])
               for k, v in r["checks"].items():
                   lines.append(f"| `{k}` | {v} |")
-              lines.extend(["", "#### Before fine-tuning", "", "| Prompt | Output | First number | Target? |", "|---|---|---:|---:|"])
+              lines.extend(["", "#### Before fine-tuning", "", "| Prompt | Clean output | First number | Contains target | First is target |", "|---|---|---:|---:|---:|"])
               for g in r["before_generations"]:
                   text = g["classification"]["text"].replace("\n", "<br>").replace("|", "\\|")
-                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['first_number_is_target']} |")
-              lines.extend(["", "#### After fine-tuning with adapter", "", "| Prompt | Output | First number | Target? |", "|---|---|---:|---:|"])
+                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['contains_target']} | {g['classification']['first_number_is_target']} |")
+              lines.extend(["", "#### After fine-tuning with adapter", "", "| Prompt | Clean output | First number | Contains target | First is target |", "|---|---|---:|---:|---:|"])
               for g in r["after_generations"]:
                   text = g["classification"]["text"].replace("\n", "<br>").replace("|", "\\|")
-                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['first_number_is_target']} |")
+                  lines.append(f"| `{g['prompt']}` | {text} | `{g['classification']['first_number']}` | {g['classification']['contains_target']} | {g['classification']['first_number_is_target']} |")
               lines.extend(["", "#### Adapter artifacts", "", "| File | Bytes | SHA256 |", "|---|---:|---|"])
               for f in r["adapter_files"]:
                   lines.append(f"| `{f['path']}` | {f['bytes']} | `{f['sha256']}` |")
