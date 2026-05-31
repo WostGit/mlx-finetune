@@ -33,6 +33,7 @@ jobs:
     name: Benchmark MLX LoRA on Apple Silicon
     # GitHub's Apple Silicon larger runner label. If your account uses a custom
     # larger-runner label, change this to that label in repository settings.
+    # This small benchmark intentionally validates feasibility, not final quality.
     runs-on: macos-14-xlarge
     timeout-minutes: 45
     env:
