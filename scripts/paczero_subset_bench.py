@@ -17,7 +17,7 @@ from typing import Any
 
 from datasets import load_dataset
 
-MODELS = [
+DEFAULT_MODELS = [
     "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
     "mlx-community/Llama-3.2-1B-Instruct-4bit",
 ]
@@ -127,15 +127,29 @@ def safe_name(model: str) -> str:
     return model.replace("/", "__").replace(":", "_")
 
 
+def slugify_model(model: str) -> str:
+    lower = model.lower()
+    if "qwen" in lower:
+        return "qwen2.5-0.5b-4bit"
+    if "llama" in lower:
+        return "llama-3.2-1b-4bit"
+    return re.sub(r"[^a-z0-9]+", "-", lower).strip("-")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", choices=["sst2", "squad"], default="sst2")
     parser.add_argument("--subset-size", type=int, default=128)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--num-layers", type=int, default=8)
+    parser.add_argument("--model", action="append", default=None, help="Model ID to benchmark. Repeat for multiple models. Defaults to both benchmark models.")
+    parser.add_argument("--model-slug", default=None, help="Stable slug for per-model result filenames when one model is run.")
     parser.add_argument("--out-dir", type=Path, default=Path("benchmark-results"))
     parser.add_argument("--data-dir", type=Path, default=Path("benchmark-data"))
     args = parser.parse_args()
+
+    models = args.model or DEFAULT_MODELS
+    single_model_slug = args.model_slug or (slugify_model(models[0]) if len(models) == 1 else "combined")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     args.data_dir.mkdir(parents=True, exist_ok=True)
@@ -147,6 +161,8 @@ def main() -> int:
     print(f"subset_size={args.subset_size}")
     print(f"batch_size={args.batch_size}")
     print(f"num_layers={args.num_layers}")
+    print(f"models={json.dumps(models)}")
+    print(f"result_slug={single_model_slug}")
     print(f"platform={platform.platform()} machine={platform.machine()}")
     print(f"python={sys.version.splitlines()[0]}")
     for pkg in ["mlx", "mlx-lm", "datasets", "huggingface_hub", "safetensors"]:
@@ -173,8 +189,9 @@ def main() -> int:
     print()
 
     results = []
-    for model in MODELS:
-        model_out = args.out_dir / safe_name(model)
+    for model in models:
+        model_slug = args.model_slug or slugify_model(model)
+        model_out = args.out_dir / model_slug
         adapter_dir = model_out / "adapters"
         model_out.mkdir(parents=True, exist_ok=True)
         cmd = [
@@ -194,6 +211,7 @@ def main() -> int:
         ]
         print("=" * 100)
         print(f"MODEL={model}")
+        print(f"MODEL_SLUG={model_slug}")
         print("COMMAND=" + " ".join(shlex.quote(x) for x in cmd))
         print("=" * 100)
         rc, output, elapsed = run_cmd(cmd)
@@ -206,6 +224,7 @@ def main() -> int:
         avg_tokens_per_sample = trained_tokens / max(1, actual_subset) if trained_tokens else None
         result = {
             "model": model,
+            "model_slug": model_slug,
             "returncode": rc,
             "success": rc == 0,
             "elapsed_seconds": round(elapsed, 3),
@@ -229,12 +248,20 @@ def main() -> int:
         "subset_examples": actual_subset,
         "batch_size": args.batch_size,
         "num_layers": args.num_layers,
+        "models": models,
+        "result_slug": single_model_slug,
         "results": results,
     }
-    (args.out_dir / "paczero_subset_results.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    combined_path = args.out_dir / "paczero_subset_results.json"
+    per_model_path = args.out_dir / f"paczero_subset_results_{single_model_slug}.json"
+    combined_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    per_model_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     print("# Final estimate JSON")
     print(json.dumps(payload, indent=2))
+    print("# Result files")
+    print(f"combined_result_file={combined_path}")
+    print(f"per_model_result_file={per_model_path}")
     print("# Markdown summary")
     print("| Model | subset seconds | sec/sample | last tok/s | mean tok/s | estimated full hours |")
     print("|---|---:|---:|---:|---:|---:|")
