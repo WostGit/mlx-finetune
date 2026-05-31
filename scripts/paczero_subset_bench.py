@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from datasets import load_dataset
 
@@ -25,6 +26,21 @@ LOSS_RE = re.compile(r"(?:Train|Val|Validation|Test)?\s*(?:loss|Loss)\s*[:=]?\s*
 ITER_RE = re.compile(r"Iter\s+(\d+)", re.IGNORECASE)
 TOK_RE = re.compile(r"Tokens/sec\s+([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 TRAINED_TOKENS_RE = re.compile(r"Trained Tokens\s+(\d+)", re.IGNORECASE)
+
+
+def load_dataset_with_fallback(candidates: list[tuple[str, tuple[Any, ...]]]):
+    errors = []
+    for description, args in candidates:
+        try:
+            print(f"Trying dataset loader: {description}", flush=True)
+            ds = load_dataset(*args)
+            print(f"Loaded dataset with: {description}", flush=True)
+            return ds, description
+        except Exception as exc:
+            msg = f"{description} failed: {type(exc).__name__}: {exc}"
+            print(msg, flush=True)
+            errors.append(msg)
+    raise RuntimeError("All dataset loading attempts failed:\n" + "\n".join(errors))
 
 
 def sha256_file(path: Path) -> str:
@@ -44,7 +60,10 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], int, str]:
     if choice == "sst2":
-        ds = load_dataset("glue", "sst2")
+        ds, loaded_as = load_dataset_with_fallback([
+            ("nyu-mll/glue sst2", ("nyu-mll/glue", "sst2")),
+            ("glue sst2 legacy alias", ("glue", "sst2")),
+        ])
         train = ds["train"]
         full_count = len(train)
         rows = []
@@ -57,10 +76,13 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
                     {"role": "assistant", "content": label},
                 ]
             })
-        return rows, rows[: min(16, len(rows))], full_count, "Hugging Face datasets: glue/sst2 train split"
+        return rows, rows[: min(16, len(rows))], full_count, f"Hugging Face datasets: {loaded_as}, train split"
 
     if choice == "squad":
-        ds = load_dataset("squad")
+        ds, loaded_as = load_dataset_with_fallback([
+            ("rajpurkar/squad", ("rajpurkar/squad",)),
+            ("squad legacy alias", ("squad",)),
+        ])
         train = ds["train"]
         full_count = len(train)
         rows = []
@@ -74,7 +96,7 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
                     {"role": "assistant", "content": answer},
                 ]
             })
-        return rows, rows[: min(8, len(rows))], full_count, "Hugging Face datasets: squad train split"
+        return rows, rows[: min(8, len(rows))], full_count, f"Hugging Face datasets: {loaded_as}, train split"
 
     raise ValueError(f"Unsupported dataset {choice!r}; use sst2 or squad")
 
@@ -120,6 +142,7 @@ def main() -> int:
 
     print("# PACZero MLX subset timing benchmark")
     print("PACZero public evaluation uses SST-2 and SQuAD; this runner defaults to SST-2 and supports SQuAD.")
+    print("Hugging Face dataset IDs are namespaced first, with legacy aliases as fallbacks.")
     print(f"selected_dataset={args.dataset}")
     print(f"subset_size={args.subset_size}")
     print(f"batch_size={args.batch_size}")
