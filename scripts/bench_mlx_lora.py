@@ -26,8 +26,8 @@ except Exception:  # pragma: no cover - optional dependency in local use
     psutil = None
 
 DEFAULT_MODELS = [
-    "mlx-community/Qwen2.5-0.5B-Instruct-bf16",
-    "mlx-community/Llama-3.2-1B-Instruct-bf16",
+    "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+    "mlx-community/Llama-3.2-1B-Instruct-4bit",
 ]
 
 TRAIN_ROWS = [
@@ -201,13 +201,13 @@ def write_summary(results: list[dict[str, Any]], out_dir: Path) -> None:
         "",
         "## Notes",
         "",
-        "This is a constrained CI benchmark, not a quality-maximizing fine-tune. It is intended to validate MLX-LM LoRA training feasibility and compare rough elapsed runtime between compact models.",
+        "This is a constrained CI benchmark, not a quality-maximizing fine-tune. It is intended to validate MLX-LM LoRA training feasibility and compare rough elapsed runtime between compact 4-bit models.",
     ])
     (out_dir / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Benchmark MLX-LM LoRA fine-tuning on compact models.")
+    parser = argparse.ArgumentParser(description="Benchmark MLX-LM LoRA fine-tuning on compact 4-bit models.")
     parser.add_argument("--models", nargs="+", default=DEFAULT_MODELS, help="HF/MLX model IDs to benchmark.")
     parser.add_argument("--iters", type=int, default=int(os.getenv("BENCH_ITERS", "20")))
     parser.add_argument("--batch-size", type=int, default=int(os.getenv("BENCH_BATCH_SIZE", "1")))
