@@ -1,0 +1,99 @@
+name: MLX fine-tuning benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      iters:
+        description: "LoRA training iterations per model"
+        required: false
+        default: "20"
+      batch_size:
+        description: "Training batch size"
+        required: false
+        default: "1"
+      lora_layers:
+        description: "Number of LoRA layers"
+        required: false
+        default: "4"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/mlx-finetune-benchmark.yml"
+      - "scripts/bench_mlx_lora.py"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  benchmark:
+    name: Benchmark MLX LoRA on Apple Silicon
+    # GitHub's Apple Silicon larger runner label. If your account uses a custom
+    # larger-runner label, change this to that label in repository settings.
+    runs-on: macos-14-xlarge
+    timeout-minutes: 45
+    env:
+      PYTHONUNBUFFERED: "1"
+      HF_HUB_ENABLE_HF_TRANSFER: "1"
+      BENCH_ITERS: ${{ github.event.inputs.iters || '20' }}
+      BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
+      BENCH_LORA_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
+      MODELS: >-
+        mlx-community/Qwen2.5-0.5B-Instruct-bf16
+        mlx-community/Llama-3.2-1B-Instruct-bf16
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show runner hardware
+        run: |
+          uname -a
+          sw_vers
+          sysctl -n machdep.cpu.brand_string || true
+          sysctl -n hw.memsize || true
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install MLX benchmark dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer psutil
+          python - <<'PY'
+          import mlx.core as mx
+          import mlx_lm
+          print("MLX default device:", mx.default_device())
+          print("mlx-lm import OK:", mlx_lm.__file__)
+          PY
+
+      - name: Run Qwen and Llama MLX LoRA benchmarks
+        run: |
+          python scripts/bench_mlx_lora.py \
+            --models ${MODELS} \
+            --iters "${BENCH_ITERS}" \
+            --batch-size "${BENCH_BATCH_SIZE}" \
+            --lora-layers "${BENCH_LORA_LAYERS}" \
+            --keep-going
+
+      - name: Add benchmark summary
+        if: always()
+        run: |
+          if [ -f benchmark-results/summary.md ]; then
+            cat benchmark-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload benchmark artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlx-finetune-benchmark-results
+          path: benchmark-results
+          if-no-files-found: warn
