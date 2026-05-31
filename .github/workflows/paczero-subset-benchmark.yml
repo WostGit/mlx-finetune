@@ -126,7 +126,10 @@ jobs:
             if git push; then
               exit 0
             fi
-            echo "Push failed for ${MODEL_SLUG}; fetching and rebasing local commit, attempt ${attempt}..."
+            echo "Push failed for ${MODEL_SLUG}; cleaning worktree and rebasing local commit, attempt ${attempt}..."
+            git status --short
+            git reset --hard HEAD
+            git clean -fd benchmark-data benchmark-results || true
             git fetch origin "${GITHUB_REF_NAME}"
             git rebase "origin/${GITHUB_REF_NAME}"
             sleep $((attempt * 3))
