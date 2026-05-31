@@ -30,11 +30,10 @@ defaults:
 
 jobs:
   benchmark:
-    name: Benchmark MLX LoRA on Apple Silicon
-    # GitHub's Apple Silicon larger runner label. If your account uses a custom
-    # larger-runner label, change this to that label in repository settings.
+    name: Benchmark MLX LoRA on macOS 26
+    # macos-26 is the intended GitHub-hosted macOS runner for this benchmark.
     # This small benchmark intentionally validates feasibility, not final quality.
-    runs-on: macos-14-xlarge
+    runs-on: macos-26
     timeout-minutes: 45
     env:
       PYTHONUNBUFFERED: "1"
