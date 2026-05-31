@@ -23,6 +23,11 @@ on:
         description: "Number of model layers to LoRA fine-tune"
         required: false
         default: "8"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/paczero-subset-benchmark.yml"
+      - "scripts/paczero_subset_bench.py"
 
 permissions:
   contents: write
@@ -36,6 +41,7 @@ jobs:
     name: Validate PACZero full dataset on MLX (${{ matrix.model_slug }})
     runs-on: macos-26
     timeout-minutes: 360
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -90,7 +96,13 @@ jobs:
           fi
           log_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-${mode}-${stamp}.txt"
           latest_file="benchmark-logs/${MODEL_SLUG}/paczero-${PACZERO_DATASET}-${mode}-latest.txt"
-          set -o pipefail
+          result_file="benchmark-results/${result_prefix}_results_${MODEL_SLUG}.json"
+          echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
+          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
+          echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
+          echo "RESULT_PREFIX=${result_prefix}" >> "$GITHUB_ENV"
+          echo "RUN_MODE=${mode}" >> "$GITHUB_ENV"
+          set +e
           python scripts/paczero_subset_bench.py \
             --dataset "${PACZERO_DATASET}" \
             --subset-size "${SUBSET_SIZE}" \
@@ -101,18 +113,17 @@ jobs:
             --model "${MODEL_ID}" \
             --model-slug "${MODEL_SLUG}" \
             2>&1 | tee "$log_file"
-          cp "$log_file" "$latest_file"
-          echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
-          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
-          echo "RESULT_FILE=benchmark-results/${result_prefix}_results_${MODEL_SLUG}.json" >> "$GITHUB_ENV"
-          echo "RESULT_PREFIX=${result_prefix}" >> "$GITHUB_ENV"
-          echo "RUN_MODE=${mode}" >> "$GITHUB_ENV"
+          status=${PIPESTATUS[0]}
+          cp "$log_file" "$latest_file" || true
+          echo "BENCHMARK_EXIT_STATUS=$status" >> "$GITHUB_ENV"
+          exit "$status"
 
       - name: Add summary
         if: always()
         run: |
           echo "# PACZero ${RUN_MODE:-unknown} validation benchmark: ${MODEL_SLUG}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Benchmark exit status: \`${BENCHMARK_EXIT_STATUS:-unknown}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Latest committed log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ -f "${LOG_FILE:-}" ]; then
@@ -128,7 +139,10 @@ jobs:
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "benchmark-logs/${MODEL_SLUG}/" "${RESULT_FILE}" || true
+          git add "benchmark-logs/${MODEL_SLUG}/" || true
+          if [ -n "${RESULT_FILE:-}" ] && [ -f "${RESULT_FILE}" ]; then
+            git add "${RESULT_FILE}"
+          fi
           if git diff --cached --quiet; then
             echo "No benchmark log changes to commit for ${MODEL_SLUG}."
             exit 0
