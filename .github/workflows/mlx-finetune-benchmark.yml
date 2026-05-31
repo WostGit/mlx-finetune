@@ -12,7 +12,7 @@ on:
         required: false
         default: "1"
       lora_layers:
-        description: "Number of LoRA layers"
+        description: "Number of model layers to LoRA fine-tune"
         required: false
         default: "4"
   push:
@@ -39,7 +39,7 @@ jobs:
       HF_HUB_ENABLE_HF_TRANSFER: "1"
       BENCH_ITERS: ${{ github.event.inputs.iters || '20' }}
       BENCH_BATCH_SIZE: ${{ github.event.inputs.batch_size || '1' }}
-      BENCH_LORA_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
+      BENCH_NUM_LAYERS: ${{ github.event.inputs.lora_layers || '4' }}
       MODELS: >-
         mlx-community/Qwen2.5-0.5B-Instruct-4bit
         mlx-community/Llama-3.2-1B-Instruct-4bit
@@ -93,7 +93,7 @@ jobs:
           models = os.environ["MODELS"].split()
           iters = int(os.environ.get("BENCH_ITERS", "20"))
           batch_size = int(os.environ.get("BENCH_BATCH_SIZE", "1"))
-          lora_layers = int(os.environ.get("BENCH_LORA_LAYERS", "4"))
+          num_layers = int(os.environ.get("BENCH_NUM_LAYERS", "4"))
           out_dir = Path("benchmark-results")
           data_dir = Path("benchmark-data")
           out_dir.mkdir(parents=True, exist_ok=True)
@@ -175,7 +175,9 @@ jobs:
                   "--adapter-path", str(adapter_dir),
                   "--iters", str(iters),
                   "--batch-size", str(batch_size),
-                  "--lora-layers", str(lora_layers),
+                  "--num-layers", str(num_layers),
+                  "--val-batches", "1",
+                  "--max-seq-length", "512",
                   "--steps-per-report", "1",
                   "--steps-per-eval", str(max(1, iters)),
                   "--save-every", str(max(1, iters)),
@@ -200,7 +202,7 @@ jobs:
                   "elapsed_s": round(elapsed_s, 3),
                   "iters": iters,
                   "batch_size": batch_size,
-                  "lora_layers": lora_layers,
+                  "num_layers": num_layers,
                   "command": " ".join(shlex.quote(part) for part in cmd),
                   "log_path": str(log_path),
                   "adapter_file_count": len(adapter_files),
@@ -238,13 +240,13 @@ jobs:
               "",
               f"Platform: `{platform.platform()}` / `{platform.machine()}`",
               "",
-              "| Model | Success | Iterations | Batch | LoRA layers | Elapsed seconds | Adapter files |",
+              "| Model | Success | Iterations | Batch | Num layers | Elapsed seconds | Adapter files |",
               "|---|---:|---:|---:|---:|---:|---:|",
           ]
           for r in results:
               lines.append(
                   f"| `{r['model']}` | {r['success']} | {r['iters']} | {r['batch_size']} | "
-                  f"{r['lora_layers']} | {r['elapsed_s']} | {r['adapter_file_count']} |"
+                  f"{r['num_layers']} | {r['elapsed_s']} | {r['adapter_file_count']} |"
               )
           lines.extend([
               "",
