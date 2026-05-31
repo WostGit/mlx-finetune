@@ -58,7 +58,13 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], int, str]:
+def select_limit(full_count: int, subset_size: int, full_dataset: bool) -> int:
+    if full_dataset or subset_size <= 0:
+        return full_count
+    return min(subset_size, full_count)
+
+
+def build_rows(choice: str, subset_size: int, full_dataset: bool) -> tuple[list[dict], list[dict], int, int, str]:
     if choice == "sst2":
         ds, loaded_as = load_dataset_with_fallback([
             ("nyu-mll/glue sst2", ("nyu-mll/glue", "sst2")),
@@ -66,8 +72,9 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
         ])
         train = ds["train"]
         full_count = len(train)
+        limit = select_limit(full_count, subset_size, full_dataset)
         rows = []
-        for row in train.select(range(min(subset_size, full_count))):
+        for row in train.select(range(limit)):
             label = "positive" if int(row["label"]) == 1 else "negative"
             rows.append({
                 "messages": [
@@ -76,7 +83,7 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
                     {"role": "assistant", "content": label},
                 ]
             })
-        return rows, rows[: min(16, len(rows))], full_count, f"Hugging Face datasets: {loaded_as}, train split"
+        return rows, rows[: min(64, len(rows))], full_count, limit, f"Hugging Face datasets: {loaded_as}, train split"
 
     if choice == "squad":
         ds, loaded_as = load_dataset_with_fallback([
@@ -85,8 +92,9 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
         ])
         train = ds["train"]
         full_count = len(train)
+        limit = select_limit(full_count, subset_size, full_dataset)
         rows = []
-        for row in train.select(range(min(subset_size, full_count))):
+        for row in train.select(range(limit)):
             answers = row.get("answers", {}).get("text", [])
             answer = answers[0] if answers else ""
             rows.append({
@@ -96,7 +104,7 @@ def build_rows(choice: str, subset_size: int) -> tuple[list[dict], list[dict], i
                     {"role": "assistant", "content": answer},
                 ]
             })
-        return rows, rows[: min(8, len(rows))], full_count, f"Hugging Face datasets: {loaded_as}, train split"
+        return rows, rows[: min(32, len(rows))], full_count, limit, f"Hugging Face datasets: {loaded_as}, train split"
 
     raise ValueError(f"Unsupported dataset {choice!r}; use sst2 or squad")
 
@@ -123,10 +131,6 @@ def parse_log(text: str) -> dict:
     }
 
 
-def safe_name(model: str) -> str:
-    return model.replace("/", "__").replace(":", "_")
-
-
 def slugify_model(model: str) -> str:
     lower = model.lower()
     if "qwen" in lower:
@@ -139,30 +143,37 @@ def slugify_model(model: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", choices=["sst2", "squad"], default="sst2")
-    parser.add_argument("--subset-size", type=int, default=128)
+    parser.add_argument("--subset-size", type=int, default=128, help="Used only when --full-dataset is not set. Set <=0 to use full dataset.")
+    parser.add_argument("--full-dataset", action="store_true", help="Train for one pass over the entire selected train split.")
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--num-layers", type=int, default=8)
     parser.add_argument("--model", action="append", default=None, help="Model ID to benchmark. Repeat for multiple models. Defaults to both benchmark models.")
     parser.add_argument("--model-slug", default=None, help="Stable slug for per-model result filenames when one model is run.")
+    parser.add_argument("--result-prefix", default=None, help="Result filename prefix. Defaults to paczero_full or paczero_subset.")
+    parser.add_argument("--save-every", type=int, default=5000, help="Adapter checkpoint interval for long full-dataset runs.")
     parser.add_argument("--out-dir", type=Path, default=Path("benchmark-results"))
     parser.add_argument("--data-dir", type=Path, default=Path("benchmark-data"))
     args = parser.parse_args()
 
     models = args.model or DEFAULT_MODELS
     single_model_slug = args.model_slug or (slugify_model(models[0]) if len(models) == 1 else "combined")
+    result_prefix = args.result_prefix or ("paczero_full" if args.full_dataset or args.subset_size <= 0 else "paczero_subset")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     args.data_dir.mkdir(parents=True, exist_ok=True)
 
-    print("# PACZero MLX subset timing benchmark")
+    print("# PACZero MLX dataset validation benchmark")
     print("PACZero public evaluation uses SST-2 and SQuAD; this runner defaults to SST-2 and supports SQuAD.")
     print("Hugging Face dataset IDs are namespaced first, with legacy aliases as fallbacks.")
     print(f"selected_dataset={args.dataset}")
-    print(f"subset_size={args.subset_size}")
+    print(f"requested_subset_size={args.subset_size}")
+    print(f"full_dataset={args.full_dataset}")
     print(f"batch_size={args.batch_size}")
     print(f"num_layers={args.num_layers}")
+    print(f"save_every={args.save_every}")
     print(f"models={json.dumps(models)}")
     print(f"result_slug={single_model_slug}")
+    print(f"result_prefix={result_prefix}")
     print(f"platform={platform.platform()} machine={platform.machine()}")
     print(f"python={sys.version.splitlines()[0]}")
     for pkg in ["mlx", "mlx-lm", "datasets", "huggingface_hub", "safetensors"]:
@@ -172,16 +183,17 @@ def main() -> int:
             print(f"package_{pkg}=unavailable:{exc}")
     print()
 
-    train_rows, valid_rows, full_count, dataset_source = build_rows(args.dataset, args.subset_size)
-    actual_subset = len(train_rows)
-    iters = actual_subset
+    train_rows, valid_rows, full_count, actual_count, dataset_source = build_rows(args.dataset, args.subset_size, args.full_dataset)
+    iters = actual_count
+    run_mode = "full" if actual_count == full_count else f"subset-{actual_count}"
     write_jsonl(args.data_dir / "train.jsonl", train_rows)
     write_jsonl(args.data_dir / "valid.jsonl", valid_rows)
     write_jsonl(args.data_dir / "test.jsonl", valid_rows)
 
     print(f"dataset_source={dataset_source}")
     print(f"full_train_examples={full_count}")
-    print(f"timed_subset_examples={actual_subset}")
+    print(f"actual_train_examples={actual_count}")
+    print(f"run_mode={run_mode}")
     print(f"training_iterations={iters}")
     print(f"train_jsonl_sha256={sha256_file(args.data_dir / 'train.jsonl')}")
     print("first_training_example_json=")
@@ -194,6 +206,7 @@ def main() -> int:
         model_out = args.out_dir / model_slug
         adapter_dir = model_out / "adapters"
         model_out.mkdir(parents=True, exist_ok=True)
+        save_every = max(1, min(args.save_every, iters))
         cmd = [
             sys.executable, "-m", "mlx_lm", "lora",
             "--model", model,
@@ -205,9 +218,9 @@ def main() -> int:
             "--num-layers", str(args.num_layers),
             "--val-batches", "1",
             "--max-seq-length", "512",
-            "--steps-per-report", "1",
+            "--steps-per-report", "100" if iters >= 1000 else "1",
             "--steps-per-eval", str(max(1, iters)),
-            "--save-every", str(max(1, iters)),
+            "--save-every", str(save_every),
         ]
         print("=" * 100)
         print(f"MODEL={model}")
@@ -218,20 +231,20 @@ def main() -> int:
         (model_out / "train.log").write_text(output, encoding="utf-8")
         print(output)
         parsed = parse_log(output)
-        seconds_per_sample = elapsed / max(1, actual_subset)
-        estimated_full_seconds = seconds_per_sample * full_count
+        seconds_per_sample = elapsed / max(1, actual_count)
         trained_tokens = parsed["trained_tokens_last"] or 0
-        avg_tokens_per_sample = trained_tokens / max(1, actual_subset) if trained_tokens else None
+        avg_tokens_per_sample = trained_tokens / max(1, actual_count) if trained_tokens else None
         result = {
             "model": model,
             "model_slug": model_slug,
             "returncode": rc,
             "success": rc == 0,
+            "run_mode": run_mode,
+            "full_dataset": actual_count == full_count,
             "elapsed_seconds": round(elapsed, 3),
+            "elapsed_hours": round(elapsed / 3600, 3),
             "seconds_per_sample": round(seconds_per_sample, 6),
-            "estimated_full_dataset_seconds": round(estimated_full_seconds, 3),
-            "estimated_full_dataset_hours": round(estimated_full_seconds / 3600, 3),
-            "actual_subset_examples": actual_subset,
+            "actual_train_examples": actual_count,
             "full_train_examples": full_count,
             "avg_tokens_per_sample": round(avg_tokens_per_sample, 3) if avg_tokens_per_sample else None,
             "parsed": parsed,
@@ -245,29 +258,32 @@ def main() -> int:
         "dataset_choice": args.dataset,
         "dataset_source": dataset_source,
         "full_train_examples": full_count,
-        "subset_examples": actual_subset,
+        "actual_train_examples": actual_count,
+        "run_mode": run_mode,
+        "full_dataset": actual_count == full_count,
         "batch_size": args.batch_size,
         "num_layers": args.num_layers,
         "models": models,
         "result_slug": single_model_slug,
+        "result_prefix": result_prefix,
         "results": results,
     }
-    combined_path = args.out_dir / "paczero_subset_results.json"
-    per_model_path = args.out_dir / f"paczero_subset_results_{single_model_slug}.json"
+    combined_path = args.out_dir / f"{result_prefix}_results.json"
+    per_model_path = args.out_dir / f"{result_prefix}_results_{single_model_slug}.json"
     combined_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     per_model_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    print("# Final estimate JSON")
+    print("# Final result JSON")
     print(json.dumps(payload, indent=2))
     print("# Result files")
     print(f"combined_result_file={combined_path}")
     print(f"per_model_result_file={per_model_path}")
     print("# Markdown summary")
-    print("| Model | subset seconds | sec/sample | last tok/s | mean tok/s | estimated full hours |")
-    print("|---|---:|---:|---:|---:|---:|")
+    print("| Model | run mode | seconds | hours | sec/sample | last tok/s | mean tok/s | trained tokens |")
+    print("|---|---|---:|---:|---:|---:|---:|---:|")
     for r in results:
         p = r["parsed"]
-        print(f"| {r['model']} | {r['elapsed_seconds']} | {r['seconds_per_sample']} | {p['tokens_per_second_last']} | {p['tokens_per_second_mean']} | {r['estimated_full_dataset_hours']} |")
+        print(f"| {r['model']} | {r['run_mode']} | {r['elapsed_seconds']} | {r['elapsed_hours']} | {r['seconds_per_sample']} | {p['tokens_per_second_last']} | {p['tokens_per_second_mean']} | {p['trained_tokens_last']} |")
 
     return 0 if all(r["success"] for r in results) else 1
 
