@@ -1,0 +1,29 @@
+{
+  "success": true,
+  "device": "Device(gpu, 0)",
+  "steps": 40,
+  "in_dim": 12,
+  "out_dim": 3,
+  "rank": 2,
+  "alpha": 4.0,
+  "theta_size": 30,
+  "roundtrip_max_abs_err": 0.0,
+  "loss_initial": 0.3006814122200012,
+  "loss_final": 0.2891361713409424,
+  "loss_delta": -0.011545240879058838,
+  "loss_min": 0.2891361713409424,
+  "unanimity_rate": 0.75,
+  "release_sign_counts": {
+    "positive": 21,
+    "negative": 19
+  },
+  "fd_mean_first": -0.010809201097193485,
+  "fd_mean_last": -0.02754941255079757,
+  "membership_shape": [
+    8,
+    48
+  ],
+  "membership_column_counts_unique": [
+    4
+  ]
+}

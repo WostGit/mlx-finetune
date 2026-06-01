@@ -1,0 +1,53 @@
+{
+  "success": true,
+  "tests": [
+    {
+      "name": "balanced_membership",
+      "shape": [
+        10,
+        17
+      ],
+      "column_counts_unique": [
+        5
+      ],
+      "row_count_min": 6,
+      "row_count_max": 12,
+      "pass": true
+    },
+    {
+      "name": "two_point_fd_linearized_quadratic",
+      "max_abs_err": 9.447109761140382e-11,
+      "pass": true
+    },
+    {
+      "name": "zpl_unanimous_and_disagreement",
+      "positive_sign": 1,
+      "negative_sign": -1,
+      "mixed_unanimous": false,
+      "mixed_released_sign": -1,
+      "pass": true
+    },
+    {
+      "name": "subset_means_and_zpl",
+      "subset_means": [
+        1.5,
+        -2.0,
+        1.25,
+        -0.16666666666666666
+      ],
+      "release_sign": 1,
+      "unanimous": false,
+      "pass": true
+    },
+    {
+      "name": "toy_optimization",
+      "steps": 25,
+      "mezo_loss_first": 3.1136079192566877,
+      "mezo_loss_last": 1.0183428963019296,
+      "zpl_loss_first": 3.1260155234157274,
+      "zpl_loss_last": 2.7743259052990084,
+      "zpl_unanimity_rate": 0.68,
+      "pass": true
+    }
+  ]
+}
