@@ -8,6 +8,7 @@ on:
       - "scripts/paczero_core.py"
       - "scripts/paczero_smoke.py"
       - "scripts/paczero_mlx_smoke.py"
+      - "scripts/paczero_lora_smoke.py"
       - ".github/workflows/paczero-smoke.yml"
 
 permissions:
@@ -19,7 +20,7 @@ defaults:
 
 jobs:
   smoke:
-    name: PACZero algorithmic and MLX smoke tests
+    name: PACZero algorithmic, MLX, and LoRA-style smoke tests
     runs-on: macos-26
     timeout-minutes: 20
     if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-smoke]') }}
@@ -69,6 +70,20 @@ jobs:
           python scripts/paczero_mlx_smoke.py --steps 20 --json-out "$mlx_result_file" 2>&1 | tee "$mlx_log_file"
           cp "$mlx_log_file" "$mlx_latest_file"
 
+      - name: Run PACZero LoRA-style smoke tests
+        run: |
+          mkdir -p benchmark-logs/paczero-smoke benchmark-results
+          stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
+          lora_log_file="benchmark-logs/paczero-smoke/paczero-lora-smoke-${stamp}.txt"
+          lora_latest_file="benchmark-logs/paczero-smoke/paczero-lora-smoke-latest.txt"
+          lora_result_file="benchmark-results/paczero_lora_smoke_results.json"
+          echo "LORA_LOG_FILE=$lora_log_file" >> "$GITHUB_ENV"
+          echo "LORA_LATEST_FILE=$lora_latest_file" >> "$GITHUB_ENV"
+          echo "LORA_RESULT_FILE=$lora_result_file" >> "$GITHUB_ENV"
+          set -o pipefail
+          python scripts/paczero_lora_smoke.py --steps 40 --json-out "$lora_result_file" 2>&1 | tee "$lora_log_file"
+          cp "$lora_log_file" "$lora_latest_file"
+
       - name: Add summary
         if: always()
         run: |
@@ -78,6 +93,8 @@ jobs:
           echo "NumPy result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "MLX log: \`${MLX_LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "MLX result JSON: \`${MLX_RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "LoRA-style log: \`${LORA_LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "LoRA-style result JSON: \`${LORA_RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           if [ -f "${LOG_FILE:-}" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo '## NumPy smoke output' >> "$GITHUB_STEP_SUMMARY"
@@ -92,13 +109,20 @@ jobs:
             cat "$MLX_LOG_FILE" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -f "${LORA_LOG_FILE:-}" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '## LoRA-style smoke output' >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            cat "$LORA_LOG_FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Commit smoke-test output
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add benchmark-logs/paczero-smoke/ benchmark-results/paczero_smoke_results.json benchmark-results/paczero_mlx_smoke_results.json || true
+          git add benchmark-logs/paczero-smoke/ benchmark-results/paczero_smoke_results.json benchmark-results/paczero_mlx_smoke_results.json benchmark-results/paczero_lora_smoke_results.json || true
           if git diff --cached --quiet; then
             echo "No PACZero smoke output changes to commit."
           else
@@ -114,4 +138,5 @@ jobs:
             benchmark-logs/paczero-smoke
             benchmark-results/paczero_smoke_results.json
             benchmark-results/paczero_mlx_smoke_results.json
+            benchmark-results/paczero_lora_smoke_results.json
           if-no-files-found: warn
