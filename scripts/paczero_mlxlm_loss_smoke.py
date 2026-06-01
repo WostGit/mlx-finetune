@@ -26,6 +26,20 @@ def encode_chat(tokenizer, messages: list[dict]) -> list[int]:
     return tokenizer.encode(text)
 
 
+def manual_cross_entropy(logits: mx.array, targets: mx.array) -> mx.array:
+    """Version-compatible next-token cross entropy for MLX.
+
+    MLX 0.31.x in GitHub Actions does not expose mx.losses.cross_entropy.
+    For logits with shape [B, T, V] and targets [B, T], compute:
+      logsumexp(logits, axis=-1) - logits[target]
+    returning a [B, T] loss tensor.
+    """
+
+    log_norm = mx.logsumexp(logits, axis=-1)
+    selected = mx.take_along_axis(logits, targets[..., None], axis=-1).squeeze(-1)
+    return log_norm - selected
+
+
 def per_sample_lm_loss(model, token_ids: list[int]) -> dict:
     if len(token_ids) < 3:
         raise ValueError("Need at least three tokens to compute next-token loss")
@@ -33,7 +47,7 @@ def per_sample_lm_loss(model, token_ids: list[int]) -> dict:
     y = mx.array(token_ids[1:], dtype=mx.int32)[None, :]
     logits = model(x)
     # logits: [1, T, vocab], y: [1, T]
-    loss_tokens = mx.losses.cross_entropy(logits, y)
+    loss_tokens = manual_cross_entropy(logits, y)
     loss = mx.mean(loss_tokens)
     mx.eval(loss, loss_tokens)
     token_losses_np = np.array(loss_tokens.tolist(), dtype=np.float64).reshape(-1)
@@ -77,6 +91,7 @@ def main() -> int:
     print("# PACZero MLX-LM per-sample loss smoke")
     print("This validates real model forward passes and per-sample LM loss extraction.")
     print("It does not yet perturb/update adapter tensors.")
+    print("Cross entropy implementation: manual logsumexp - selected_target_logit")
     print(f"model={args.model}")
     print(f"python={sys.version.splitlines()[0]}")
     for pkg in ["mlx", "mlx-lm"]:
@@ -109,6 +124,7 @@ def main() -> int:
         "success": all(checks.values()),
         "model": args.model,
         "elapsed_seconds": round(elapsed, 3),
+        "cross_entropy": "manual_logsumexp_minus_selected_target_logit",
         "checks": checks,
         "num_examples": len(examples),
         "loss_mean": float(np.mean(losses)),
