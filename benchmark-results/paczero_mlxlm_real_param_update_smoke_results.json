@@ -1,0 +1,65 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 7.345,
+  "parameterization": "real_model_float_parameter_one_step_update",
+  "param_path": "model.layers.0.self_attn.q_proj.bias",
+  "param_shape": [
+    896
+  ],
+  "param_dtype": "mlx.core.float16",
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "num_examples": 6,
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "param_is_float": true,
+    "all_baseline_losses_finite": true,
+    "all_fd_finite": true,
+    "fd_has_nonzero_signal": true,
+    "release_sign_valid": true,
+    "update_losses_finite": true,
+    "update_changed_loss": true,
+    "restored_matches_baseline": true,
+    "membership_balanced": true
+  },
+  "baseline_loss_mean": 5.528276681900024,
+  "plus_loss_mean": 5.527871608734131,
+  "minus_loss_mean": 5.527555068333943,
+  "fd_mean": 0.0031654040018717446,
+  "fd_min": -0.022954940795898438,
+  "fd_max": 0.04528999328613281,
+  "fd_abs_max": 0.04528999328613281,
+  "zpl_release": {
+    "sign": 1,
+    "unanimous": false,
+    "subset_signs": [
+      -1,
+      1,
+      1,
+      1
+    ],
+    "subset_means": [
+      -0.012925465901692709,
+      0.009643236796061197,
+      0.006508827209472656,
+      0.008703470230102539
+    ]
+  },
+  "update_loss_mean": 5.527555068333943,
+  "update_loss_delta": -0.0007216135660810252,
+  "descent_convention_loss_mean": 5.527555068333943,
+  "opposite_convention_loss_mean": 5.527871608734131,
+  "restored_loss_mean": 5.528276681900024,
+  "restore_abs_max": 0.0,
+  "membership_shape": [
+    4,
+    6
+  ],
+  "membership_column_counts_unique": [
+    2
+  ],
+  "note": "One-step real-parameter PACZero-ZPL update smoke. It is non-destructive: the original parameter is restored after evaluation."
+}
