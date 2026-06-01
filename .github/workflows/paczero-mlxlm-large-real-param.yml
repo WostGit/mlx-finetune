@@ -18,6 +18,7 @@ on:
   push:
     branches: ["main"]
     paths:
+      - "scripts/paczero_mlxlm_large_real_param_run.py"
       - ".github/workflows/paczero-mlxlm-large-real-param.yml"
 
 permissions:
@@ -68,10 +69,10 @@ jobs:
           echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
           echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
           set -o pipefail
-          python scripts/paczero_mlxlm_exhaustive_readiness.py \
+          python scripts/paczero_mlxlm_large_real_param_run.py \
             --model mlx-community/Qwen2.5-0.5B-Instruct-4bit \
-            --param-paths model.layers.0.self_attn.q_proj.bias \
-            --seeds 20260606 \
+            --param-path model.layers.0.self_attn.q_proj.bias \
+            --seed 20260606 \
             --steps "${STEPS}" \
             --train-examples "${TRAIN_EXAMPLES}" \
             --dev-examples "${DEV_EXAMPLES}" \
