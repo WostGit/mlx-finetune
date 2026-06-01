@@ -1,0 +1,76 @@
+# PACZero MLX-LM two-point finite-difference smoke
+This validates real Qwen forward passes plus two-point per-sample loss differences.
+Perturbed parameter vector: synthetic selected-vocabulary logit bias, not LoRA adapters yet.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+mu=0.001
+clip=25.0
+python=3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+FD_SMOKE_RESULT_JSON=
+{
+  "success": false,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 6.474,
+  "parameterization": "synthetic_selected_vocab_logit_bias",
+  "note": "Real-model two-point finite-difference smoke. Next step is replacing the synthetic logit-bias vector with actual adapter tensors.",
+  "mu": 0.001,
+  "clip": 25.0,
+  "num_examples": 6,
+  "bias_token_count": 32,
+  "bias_token_ids_head": [
+    8948,
+    198,
+    1957,
+    1437,
+    25975,
+    13,
+    21806,
+    1172,
+    6785,
+    476
+  ],
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "all_baseline_losses_finite": true,
+    "all_fd_finite": true,
+    "fd_has_nonzero_signal": false,
+    "plus_minus_not_identical": false,
+    "release_sign_valid": true,
+    "membership_balanced": true
+  },
+  "baseline_loss_mean": 5.526041666666667,
+  "baseline_loss_min": 5.1015625,
+  "baseline_loss_max": 5.890625,
+  "fd_mean": 0.0,
+  "fd_min": 0.0,
+  "fd_max": 0.0,
+  "fd_abs_max": 0.0,
+  "plus_loss_mean": 5.526041666666667,
+  "minus_loss_mean": 5.526041666666667,
+  "zpl_release": {
+    "sign": 1,
+    "unanimous": true,
+    "subset_signs": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "subset_means": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "membership_shape": [
+    4,
+    6
+  ],
+  "membership_column_counts_unique": [
+    2
+  ]
+}
