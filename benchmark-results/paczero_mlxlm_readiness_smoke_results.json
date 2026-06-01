@@ -1,0 +1,159 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 55.39,
+  "parameterization": "real_model_float_parameter_multistep_zpl_readiness",
+  "param_path": "model.layers.0.self_attn.q_proj.bias",
+  "param_shape": [
+    896
+  ],
+  "param_dtype": "mlx.core.float16",
+  "steps": 40,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "train_examples": 12,
+  "dev_examples": 4,
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "param_is_float": true,
+    "baseline_losses_finite": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "fd_magnitude_ok": true,
+    "losses_remain_finite": true,
+    "loss_changed": true,
+    "best_train_not_worse": true,
+    "restored_train_matches_baseline": true,
+    "restored_dev_matches_baseline": true,
+    "membership_balanced": true
+  },
+  "baseline_train_loss": 5.569722851117452,
+  "final_train_loss": 5.554405053456624,
+  "best_train_loss": 5.554405053456624,
+  "final_train_delta": -0.015317797660827637,
+  "best_train_delta": -0.015317797660827637,
+  "baseline_dev_loss": 5.579999566078186,
+  "final_dev_loss": 5.566361665725708,
+  "best_dev_loss": 5.566361665725708,
+  "final_dev_delta": -0.013637900352478027,
+  "best_dev_delta": -0.013637900352478027,
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.14876365661621094,
+  "fd_abs_max_mean": 0.06911885738372803,
+  "fd_abs_mean_mean": 0.035893360773722335,
+  "unanimity_rate": 0.675,
+  "release_sign_counts": {
+    "positive": 18,
+    "negative": 22
+  },
+  "restore_train_abs_max": 0.0,
+  "restore_dev_abs_max": 0.0,
+  "membership_shape": [
+    8,
+    12
+  ],
+  "membership_column_counts_unique": [
+    4
+  ],
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 5.563090920448303,
+      "dev_loss": 5.573999643325806,
+      "fd_abs_max": 0.0969696044921875,
+      "fd_abs_mean": 0.05368431409200033,
+      "release_sign": -1,
+      "unanimous": true,
+      "subset_signs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "step": 10,
+      "train_loss": 5.570000767707825,
+      "dev_loss": 5.579523324966431,
+      "fd_abs_max": 0.0618743896484375,
+      "fd_abs_mean": 0.02808491388956706,
+      "release_sign": -1,
+      "unanimous": true,
+      "subset_signs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "step": 20,
+      "train_loss": 5.560269395510356,
+      "dev_loss": 5.5698935985565186,
+      "fd_abs_max": 0.0928354263305664,
+      "fd_abs_mean": 0.049855709075927734,
+      "release_sign": -1,
+      "unanimous": true,
+      "subset_signs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    },
+    {
+      "step": 30,
+      "train_loss": 5.56340769926707,
+      "dev_loss": 5.573492527008057,
+      "fd_abs_max": 0.06413459777832031,
+      "fd_abs_mean": 0.022474129994710285,
+      "release_sign": 1,
+      "unanimous": true,
+      "subset_signs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "step": 40,
+      "train_loss": 5.554405053456624,
+      "dev_loss": 5.566361665725708,
+      "fd_abs_max": 0.07365226745605469,
+      "fd_abs_mean": 0.027875900268554688,
+      "release_sign": -1,
+      "unanimous": false,
+      "subset_signs": [
+        -1,
+        -1,
+        -1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    }
+  ],
+  "verdict": "Ready for a small multi-step PACZero run on this real-parameter path if success=true. Still not a full LoRA PACZero reproduction until adapter tensors replace q_proj.bias."
+}
