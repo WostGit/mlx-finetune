@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 5.568,
+  "parameterization": "real_model_float_parameter",
+  "param_path": "model.layers.0.self_attn.q_proj.bias",
+  "param_shape": [
+    896
+  ],
+  "param_dtype": "mlx.core.float16",
+  "mu": 0.05,
+  "clip": 25.0,
+  "num_examples": 6,
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "param_is_float": true,
+    "all_baseline_losses_finite": true,
+    "all_fd_finite": true,
+    "fd_has_nonzero_signal": true,
+    "plus_minus_not_identical": true,
+    "restored_matches_baseline": true,
+    "release_sign_valid": true,
+    "membership_balanced": true
+  },
+  "baseline_loss_mean": 5.528276681900024,
+  "plus_loss_mean": 5.5240983963012695,
+  "minus_loss_mean": 5.5301125049591064,
+  "restored_loss_mean": 5.528276681900024,
+  "restore_abs_max": 0.0,
+  "fd_mean": -0.06014108657836914,
+  "fd_min": -0.0787353515625,
+  "fd_max": -0.029354095458984375,
+  "fd_abs_max": 0.0787353515625,
+  "zpl_release": {
+    "sign": -1,
+    "unanimous": true,
+    "subset_signs": [
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    "subset_means": [
+      -0.05821863810221354,
+      -0.06779034932454427,
+      -0.06406068801879883,
+      -0.05388617515563965
+    ]
+  },
+  "membership_shape": [
+    4,
+    6
+  ],
+  "membership_column_counts_unique": [
+    2
+  ],
+  "note": "First real-model parameter FD smoke. Next step is a one-step sign update on this parameter, then replacing bias with true LoRA adapter tensors."
+}
