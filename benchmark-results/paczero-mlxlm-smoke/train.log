@@ -1,0 +1,20 @@
+Loading pretrained model
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading datasets
+Training
+Trainable parameters: 0.074% (0.367M/494.033M)
+Starting training..., iters: 2
+
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+Iter 1: Val loss 6.449, Val took 1.453s
+Iter 1: Train loss 5.919, Learning Rate 1.000e-05, It/sec 0.303, Tokens/sec 12.716, Trained Tokens 42, Peak mem 0.355 GB
+
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:00<00:00,  6.14it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:00<00:00,  6.13it/s]
+Iter 2: Val loss 5.689, Val took 0.170s
+Iter 2: Train loss 6.213, Learning Rate 1.000e-05, It/sec 3.703, Tokens/sec 151.813, Trained Tokens 83, Peak mem 0.393 GB
+Iter 2: Saved adapter weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors and benchmark-results/paczero-mlxlm-smoke/adapters/0000002_adapters.safetensors.
+Saved final weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors.

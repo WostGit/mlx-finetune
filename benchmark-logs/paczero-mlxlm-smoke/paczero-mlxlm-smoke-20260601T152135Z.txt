@@ -1,0 +1,99 @@
+# PACZero MLX-LM model-level smoke scaffold
+This smoke validates real MLX-LM model/tokenizer/LoRA adapter plumbing.
+It does not yet replace MLX-LM backprop with custom PACZero-ZPL updates.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+iters=2
+num_layers=2
+train_examples=6
+train_jsonl_sha256=09ed1ba639cb9c2a3074af25d742b203a6de2a7eb5a36e03966a158f92be1384
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+command=/Library/Frameworks/Python.framework/Versions/3.11/bin/python -m mlx_lm lora --model mlx-community/Qwen2.5-0.5B-Instruct-4bit --train --data benchmark-data/paczero-mlxlm-smoke --adapter-path benchmark-results/paczero-mlxlm-smoke/adapters --iters 2 --batch-size 1 --num-layers 2 --val-batches 1 --max-seq-length 256 --steps-per-report 1 --steps-per-eval 2 --save-every 2
+Loading pretrained model
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading datasets
+Training
+Trainable parameters: 0.074% (0.367M/494.033M)
+Starting training..., iters: 2
+
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+Iter 1: Val loss 6.449, Val took 1.453s
+Iter 1: Train loss 5.919, Learning Rate 1.000e-05, It/sec 0.303, Tokens/sec 12.716, Trained Tokens 42, Peak mem 0.355 GB
+
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:00<00:00,  6.14it/s]
+Calculating loss...: 100%|██████████| 1/1 [00:00<00:00,  6.13it/s]
+Iter 2: Val loss 5.689, Val took 0.170s
+Iter 2: Train loss 6.213, Learning Rate 1.000e-05, It/sec 3.703, Tokens/sec 151.813, Trained Tokens 83, Peak mem 0.393 GB
+Iter 2: Saved adapter weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors and benchmark-results/paczero-mlxlm-smoke/adapters/0000002_adapters.safetensors.
+Saved final weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors.
+
+MODEL_SMOKE_RESULT_JSON=
+{
+  "success": true,
+  "note": "Real MLX-LM LoRA smoke scaffold. PACZero core/MLX/LoRA-style logic is tested separately; this validates real model adapter plumbing before custom ZO integration.",
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "iters": 2,
+  "batch_size": 1,
+  "num_layers": 2,
+  "elapsed_seconds": 12.13,
+  "checks": {
+    "train_returncode_zero": true,
+    "adapter_config_exists": true,
+    "adapters_safetensors_exists": true,
+    "adapters_safetensors_nonempty": true,
+    "reported_iteration_reached": true
+  },
+  "returncode": 0,
+  "parsed_train_log": {
+    "losses": [
+      6.449,
+      5.919,
+      5.689,
+      6.213
+    ],
+    "first_loss": 6.449,
+    "last_loss": 6.213,
+    "tokens_per_second_last": 151.813,
+    "trained_tokens_last": 83,
+    "max_iteration": 2,
+    "tail_40_lines": [
+      "Loading pretrained model",
+      "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.",
+      "Loading datasets",
+      "Training",
+      "Trainable parameters: 0.074% (0.367M/494.033M)",
+      "Starting training..., iters: 2",
+      "",
+      "Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]",
+      "Calculating loss...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:01<00:00,  1.41s/it]",
+      "Calculating loss...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:01<00:00,  1.41s/it]",
+      "Iter 1: Val loss 6.449, Val took 1.453s",
+      "Iter 1: Train loss 5.919, Learning Rate 1.000e-05, It/sec 0.303, Tokens/sec 12.716, Trained Tokens 42, Peak mem 0.355 GB",
+      "",
+      "Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]",
+      "Calculating loss...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00,  6.14it/s]",
+      "Calculating loss...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00,  6.13it/s]",
+      "Iter 2: Val loss 5.689, Val took 0.170s",
+      "Iter 2: Train loss 6.213, Learning Rate 1.000e-05, It/sec 3.703, Tokens/sec 151.813, Trained Tokens 83, Peak mem 0.393 GB",
+      "Iter 2: Saved adapter weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors and benchmark-results/paczero-mlxlm-smoke/adapters/0000002_adapters.safetensors.",
+      "Saved final weights to benchmark-results/paczero-mlxlm-smoke/adapters/adapters.safetensors."
+    ]
+  },
+  "adapter_files": [
+    {
+      "path": "adapters/0000002_adapters.safetensors",
+      "bytes": 1469313
+    },
+    {
+      "path": "adapters/adapter_config.json",
+      "bytes": 1003
+    },
+    {
+      "path": "adapters/adapters.safetensors",
+      "bytes": 1469313
+    }
+  ]
+}
