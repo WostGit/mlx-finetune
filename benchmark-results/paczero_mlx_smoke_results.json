@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "device": "Device(gpu, 0)",
+  "steps": 20,
+  "finite_difference_max_abs_err": 0.0046977996826171875,
+  "loss_first": 11.205162048339844,
+  "loss_last": 10.614830017089844,
+  "loss_delta": -0.59033203125,
+  "unanimity_rate": 0.25,
+  "release_sign_counts": {
+    "positive": 11,
+    "negative": 9
+  },
+  "membership_shape": [
+    8,
+    32
+  ],
+  "membership_column_counts_unique": [
+    4
+  ]
+}
