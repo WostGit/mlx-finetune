@@ -1,3 +1,12 @@
+# PACZero MLX-LM introspection smoke
+This discovers model/module paths for the next real adapter hook.
+Uses MLX module APIs plus hidden/private attribute inspection.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+python=3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+INTROSPECT_RESULT_JSON=
 {
   "success": true,
   "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
