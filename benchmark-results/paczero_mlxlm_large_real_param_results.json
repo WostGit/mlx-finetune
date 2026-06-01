@@ -1,0 +1,186 @@
+{
+  "success": false,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 998.411,
+  "dataset_source": "nyu-mll/glue/sst2",
+  "train_examples": 64,
+  "dev_examples": 64,
+  "parameterization": "real_model_float_parameter_exhaustive_matrix_before_lora",
+  "param_paths": [
+    "model.layers.0.self_attn.q_proj.bias"
+  ],
+  "seeds": [
+    20260606
+  ],
+  "steps_per_cell": 200,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "aggregate_checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "dataset_nonempty": true,
+    "all_cells_success": true,
+    "multiple_params_tested": false,
+    "multiple_seeds_tested": false,
+    "all_restore_exact": true,
+    "all_fd_signal_rates_ok": true,
+    "no_dev_accuracy_regression_best": true
+  },
+  "cells": [
+    {
+      "success": true,
+      "param_path": "model.layers.0.self_attn.q_proj.bias",
+      "param_shape": [
+        896
+      ],
+      "param_dtype": "mlx.core.float16",
+      "seed": 20260606,
+      "steps": 200,
+      "mu": 0.05,
+      "lr": 0.05,
+      "clip": 25.0,
+      "checks": {
+        "fd_finite_rate_ok": true,
+        "fd_signal_rate_ok": true,
+        "fd_magnitude_ok": true,
+        "losses_remain_finite": true,
+        "best_train_not_worse": true,
+        "best_dev_not_catastrophic": true,
+        "dev_accuracy_not_worse_than_baseline": true,
+        "restore_train_exact": true,
+        "restore_dev_exact": true
+      },
+      "baseline_train_loss": 2.4536520540714264,
+      "final_train_loss": 2.2279713451862335,
+      "best_train_loss": 2.2279713451862335,
+      "final_train_delta": -0.22568070888519287,
+      "best_train_delta": -0.22568070888519287,
+      "baseline_dev_loss": 2.1159488558769226,
+      "final_dev_loss": 1.9256513118743896,
+      "best_dev_loss": 1.9256513118743896,
+      "final_dev_delta": -0.19029754400253296,
+      "best_dev_delta": -0.19029754400253296,
+      "baseline_train_accuracy": 0.734375,
+      "final_train_accuracy": 0.71875,
+      "baseline_dev_accuracy": 0.875,
+      "final_dev_accuracy": 0.890625,
+      "best_dev_accuracy": 0.890625,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "fd_abs_max_max": 0.8439254760742188,
+      "fd_abs_max_mean": 0.45590934753417967,
+      "fd_abs_mean_mean": 0.12474046349525451,
+      "unanimity_rate": 0.74,
+      "release_sign_counts": {
+        "positive": 104,
+        "negative": 96
+      },
+      "restore_train_abs_max": 0.0,
+      "restore_dev_abs_max": 0.0,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 2.4495798349380493,
+          "train_accuracy": 0.734375,
+          "dev_loss": 2.110842317342758,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.3154945373535156,
+          "fd_abs_mean": 0.11505097150802612,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 25,
+          "train_loss": 2.423800051212311,
+          "train_accuracy": 0.734375,
+          "dev_loss": 2.076521873474121,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.3743553161621094,
+          "fd_abs_mean": 0.08571654558181763,
+          "release_sign": 1,
+          "unanimous": false
+        },
+        {
+          "step": 50,
+          "train_loss": 2.3774044513702393,
+          "train_accuracy": 0.734375,
+          "dev_loss": 2.045789271593094,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.4884147644042969,
+          "fd_abs_mean": 0.13511687517166138,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 75,
+          "train_loss": 2.360499829053879,
+          "train_accuracy": 0.734375,
+          "dev_loss": 2.0228660702705383,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.3787803649902344,
+          "fd_abs_mean": 0.11527389287948608,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 100,
+          "train_loss": 2.3326091170310974,
+          "train_accuracy": 0.734375,
+          "dev_loss": 2.0038691759109497,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.31955718994140625,
+          "fd_abs_mean": 0.1005735993385315,
+          "release_sign": 1,
+          "unanimous": false
+        },
+        {
+          "step": 125,
+          "train_loss": 2.305465191602707,
+          "train_accuracy": 0.71875,
+          "dev_loss": 1.9820668399333954,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.2710533142089844,
+          "fd_abs_mean": 0.08537203073501587,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 150,
+          "train_loss": 2.2785942554473877,
+          "train_accuracy": 0.71875,
+          "dev_loss": 1.958504170179367,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.6323623657226562,
+          "fd_abs_mean": 0.120391845703125,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 175,
+          "train_loss": 2.249113142490387,
+          "train_accuracy": 0.71875,
+          "dev_loss": 1.9421762526035309,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.3696632385253906,
+          "fd_abs_mean": 0.12117475271224976,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 200,
+          "train_loss": 2.2279713451862335,
+          "train_accuracy": 0.71875,
+          "dev_loss": 1.9256513118743896,
+          "dev_accuracy": 0.890625,
+          "fd_abs_max": 0.4797172546386719,
+          "fd_abs_mean": 0.14303624629974365,
+          "release_sign": -1,
+          "unanimous": true
+        }
+      ],
+      "elapsed_seconds": 989.296
+    }
+  ],
+  "verdict": "Ready for a larger real-parameter PACZero run if success=true. Still not ready to claim full PACZero-LoRA reproduction until the same matrix passes on actual LoRA adapter tensors."
+}
