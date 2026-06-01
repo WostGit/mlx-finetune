@@ -1,0 +1,450 @@
+# PACZero MLX-LM exhaustive readiness matrix
+Multiple real parameter paths, multiple seeds, SST-2-backed label-only loss/accuracy, FD health, and restore checks.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+param_paths=model.layers.0.self_attn.q_proj.bias,model.layers.0.self_attn.v_proj.bias
+seeds=20260604,20260605
+steps=60 train_examples=16 dev_examples=16
+python=3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+package_datasets=4.8.5
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/67349 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 67349/67349 [00:00<00:00, 1204404.26 examples/s]
+Generating validation split:   0%|          | 0/872 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 872/872 [00:00<00:00, 578616.21 examples/s]
+Generating test split:   0%|          | 0/1821 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1821/1821 [00:00<00:00, 1070623.43 examples/s]
+CELL_START path=model.layers.0.self_attn.q_proj.bias seed=20260604
+CELL_RESULT={"success": true, "param_path": "model.layers.0.self_attn.q_proj.bias", "seed": 20260604, "final_train_delta": -0.05751073360443115, "final_dev_delta": -0.05567121505737305, "fd_signal_rate": 1.0, "unanimity_rate": 0.43333333333333335, "baseline_dev_accuracy": 0.875, "final_dev_accuracy": 0.875, "best_dev_accuracy": 0.875}
+CELL_START path=model.layers.0.self_attn.q_proj.bias seed=20260605
+CELL_RESULT={"success": true, "param_path": "model.layers.0.self_attn.q_proj.bias", "seed": 20260605, "final_train_delta": -0.06684064865112305, "final_dev_delta": -0.058612704277038574, "fd_signal_rate": 1.0, "unanimity_rate": 0.36666666666666664, "baseline_dev_accuracy": 0.875, "final_dev_accuracy": 0.875, "best_dev_accuracy": 0.875}
+CELL_START path=model.layers.0.self_attn.v_proj.bias seed=20260604
+CELL_RESULT={"success": true, "param_path": "model.layers.0.self_attn.v_proj.bias", "seed": 20260604, "final_train_delta": -1.5797501802444458, "final_dev_delta": -1.545745849609375, "fd_signal_rate": 1.0, "unanimity_rate": 0.5166666666666667, "baseline_dev_accuracy": 0.875, "final_dev_accuracy": 0.8125, "best_dev_accuracy": 0.875}
+CELL_START path=model.layers.0.self_attn.v_proj.bias seed=20260605
+CELL_RESULT={"success": true, "param_path": "model.layers.0.self_attn.v_proj.bias", "seed": 20260605, "final_train_delta": -1.3674321174621582, "final_dev_delta": -1.4306559562683105, "fd_signal_rate": 1.0, "unanimity_rate": 0.48333333333333334, "baseline_dev_accuracy": 0.875, "final_dev_accuracy": 0.75, "best_dev_accuracy": 0.875}
+EXHAUSTIVE_READINESS_RESULT_JSON=
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 340.263,
+  "dataset_source": "nyu-mll/glue/sst2",
+  "train_examples": 16,
+  "dev_examples": 16,
+  "parameterization": "real_model_float_parameter_exhaustive_matrix_before_lora",
+  "param_paths": [
+    "model.layers.0.self_attn.q_proj.bias",
+    "model.layers.0.self_attn.v_proj.bias"
+  ],
+  "seeds": [
+    20260604,
+    20260605
+  ],
+  "steps_per_cell": 60,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "aggregate_checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "dataset_nonempty": true,
+    "all_cells_success": true,
+    "multiple_params_tested": true,
+    "multiple_seeds_tested": true,
+    "all_restore_exact": true,
+    "all_fd_signal_rates_ok": true,
+    "no_dev_accuracy_regression_best": true
+  },
+  "cells": [
+    {
+      "success": true,
+      "param_path": "model.layers.0.self_attn.q_proj.bias",
+      "param_shape": [
+        896
+      ],
+      "param_dtype": "mlx.core.float16",
+      "seed": 20260604,
+      "steps": 60,
+      "mu": 0.05,
+      "lr": 0.05,
+      "clip": 25.0,
+      "checks": {
+        "fd_finite_rate_ok": true,
+        "fd_signal_rate_ok": true,
+        "fd_magnitude_ok": true,
+        "losses_remain_finite": true,
+        "best_train_not_worse": true,
+        "best_dev_not_catastrophic": true,
+        "dev_accuracy_not_worse_than_baseline": true,
+        "restore_train_exact": true,
+        "restore_dev_exact": true
+      },
+      "baseline_train_loss": 2.2877137660980225,
+      "final_train_loss": 2.2302030324935913,
+      "best_train_loss": 2.2302030324935913,
+      "final_train_delta": -0.05751073360443115,
+      "best_train_delta": -0.05751073360443115,
+      "baseline_dev_loss": 2.09908390045166,
+      "final_dev_loss": 2.043412685394287,
+      "best_dev_loss": 2.043412685394287,
+      "final_dev_delta": -0.05567121505737305,
+      "best_dev_delta": -0.05567121505737305,
+      "baseline_train_accuracy": 0.75,
+      "final_train_accuracy": 0.75,
+      "baseline_dev_accuracy": 0.875,
+      "final_dev_accuracy": 0.875,
+      "best_dev_accuracy": 0.875,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "fd_abs_max_max": 0.6747055053710938,
+      "fd_abs_max_mean": 0.37187544504801434,
+      "fd_abs_mean_mean": 0.12450905640920003,
+      "unanimity_rate": 0.43333333333333335,
+      "release_sign_counts": {
+        "positive": 28,
+        "negative": 32
+      },
+      "restore_train_abs_max": 0.0,
+      "restore_dev_abs_max": 0.0,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 2.285218119621277,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.096680998802185,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.4206657409667969,
+          "fd_abs_mean": 0.1054680347442627,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 20,
+          "train_loss": 2.2708137035369873,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.084900379180908,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.26943206787109375,
+          "fd_abs_mean": 0.11003851890563965,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 40,
+          "train_loss": 2.2501012086868286,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.065563440322876,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.5061912536621094,
+          "fd_abs_mean": 0.16715049743652344,
+          "release_sign": -1,
+          "unanimous": true
+        },
+        {
+          "step": 60,
+          "train_loss": 2.2302030324935913,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.043412685394287,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.3457450866699219,
+          "fd_abs_mean": 0.11253952980041504,
+          "release_sign": -1,
+          "unanimous": false
+        }
+      ],
+      "elapsed_seconds": 83.589
+    },
+    {
+      "success": true,
+      "param_path": "model.layers.0.self_attn.q_proj.bias",
+      "param_shape": [
+        896
+      ],
+      "param_dtype": "mlx.core.float16",
+      "seed": 20260605,
+      "steps": 60,
+      "mu": 0.05,
+      "lr": 0.05,
+      "clip": 25.0,
+      "checks": {
+        "fd_finite_rate_ok": true,
+        "fd_signal_rate_ok": true,
+        "fd_magnitude_ok": true,
+        "losses_remain_finite": true,
+        "best_train_not_worse": true,
+        "best_dev_not_catastrophic": true,
+        "dev_accuracy_not_worse_than_baseline": true,
+        "restore_train_exact": true,
+        "restore_dev_exact": true
+      },
+      "baseline_train_loss": 2.2877137660980225,
+      "final_train_loss": 2.2208731174468994,
+      "best_train_loss": 2.2208731174468994,
+      "final_train_delta": -0.06684064865112305,
+      "best_train_delta": -0.06684064865112305,
+      "baseline_dev_loss": 2.09908390045166,
+      "final_dev_loss": 2.0404711961746216,
+      "best_dev_loss": 2.0404711961746216,
+      "final_dev_delta": -0.058612704277038574,
+      "best_dev_delta": -0.058612704277038574,
+      "baseline_train_accuracy": 0.75,
+      "final_train_accuracy": 0.75,
+      "baseline_dev_accuracy": 0.875,
+      "final_dev_accuracy": 0.875,
+      "best_dev_accuracy": 0.875,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "fd_abs_max_max": 1.1207008361816406,
+      "fd_abs_max_mean": 0.3758544921875,
+      "fd_abs_mean_mean": 0.1200881799062093,
+      "unanimity_rate": 0.36666666666666664,
+      "release_sign_counts": {
+        "positive": 28,
+        "negative": 32
+      },
+      "restore_train_abs_max": 0.0,
+      "restore_dev_abs_max": 0.0,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 2.285922408103943,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.092685103416443,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.5897712707519531,
+          "fd_abs_mean": 0.12746810913085938,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 20,
+          "train_loss": 2.2604939937591553,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.079195499420166,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.7744789123535156,
+          "fd_abs_mean": 0.17275214195251465,
+          "release_sign": 1,
+          "unanimous": false
+        },
+        {
+          "step": 40,
+          "train_loss": 2.2514830827713013,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.0630886554718018,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.3499031066894531,
+          "fd_abs_mean": 0.09168028831481934,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 60,
+          "train_loss": 2.2208731174468994,
+          "train_accuracy": 0.75,
+          "dev_loss": 2.0404711961746216,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 0.3053474426269531,
+          "fd_abs_mean": 0.13196468353271484,
+          "release_sign": 1,
+          "unanimous": true
+        }
+      ],
+      "elapsed_seconds": 83.055
+    },
+    {
+      "success": true,
+      "param_path": "model.layers.0.self_attn.v_proj.bias",
+      "param_shape": [
+        128
+      ],
+      "param_dtype": "mlx.core.float16",
+      "seed": 20260604,
+      "steps": 60,
+      "mu": 0.05,
+      "lr": 0.05,
+      "clip": 25.0,
+      "checks": {
+        "fd_finite_rate_ok": true,
+        "fd_signal_rate_ok": true,
+        "fd_magnitude_ok": true,
+        "losses_remain_finite": true,
+        "best_train_not_worse": true,
+        "best_dev_not_catastrophic": true,
+        "dev_accuracy_not_worse_than_baseline": true,
+        "restore_train_exact": true,
+        "restore_dev_exact": true
+      },
+      "baseline_train_loss": 2.2877137660980225,
+      "final_train_loss": 0.7079635858535767,
+      "best_train_loss": 0.7079635858535767,
+      "final_train_delta": -1.5797501802444458,
+      "best_train_delta": -1.5797501802444458,
+      "baseline_dev_loss": 2.09908390045166,
+      "final_dev_loss": 0.5533380508422852,
+      "best_dev_loss": 0.5533380508422852,
+      "final_dev_delta": -1.545745849609375,
+      "best_dev_delta": -1.545745849609375,
+      "baseline_train_accuracy": 0.75,
+      "final_train_accuracy": 0.75,
+      "baseline_dev_accuracy": 0.875,
+      "final_dev_accuracy": 0.8125,
+      "best_dev_accuracy": 0.875,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "fd_abs_max_max": 23.736515045166016,
+      "fd_abs_max_mean": 9.350943883260092,
+      "fd_abs_mean_mean": 2.991247812906901,
+      "unanimity_rate": 0.5166666666666667,
+      "release_sign_counts": {
+        "positive": 28,
+        "negative": 32
+      },
+      "restore_train_abs_max": 0.0,
+      "restore_dev_abs_max": 0.0,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 2.2042826414108276,
+          "train_accuracy": 0.75,
+          "dev_loss": 1.9138613939285278,
+          "dev_accuracy": 0.75,
+          "fd_abs_max": 5.325508117675781,
+          "fd_abs_mean": 2.3155593872070312,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 20,
+          "train_loss": 1.289542317390442,
+          "train_accuracy": 0.75,
+          "dev_loss": 1.255084753036499,
+          "dev_accuracy": 0.8125,
+          "fd_abs_max": 6.018562316894531,
+          "fd_abs_mean": 2.6880717277526855,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 40,
+          "train_loss": 1.1344767808914185,
+          "train_accuracy": 0.75,
+          "dev_loss": 1.0314667224884033,
+          "dev_accuracy": 0.875,
+          "fd_abs_max": 3.5178756713867188,
+          "fd_abs_mean": 1.4138007164001465,
+          "release_sign": 1,
+          "unanimous": false
+        },
+        {
+          "step": 60,
+          "train_loss": 0.7079635858535767,
+          "train_accuracy": 0.75,
+          "dev_loss": 0.5533380508422852,
+          "dev_accuracy": 0.8125,
+          "fd_abs_max": 12.299385070800781,
+          "fd_abs_mean": 4.080835580825806,
+          "release_sign": 1,
+          "unanimous": false
+        }
+      ],
+      "elapsed_seconds": 83.062
+    },
+    {
+      "success": true,
+      "param_path": "model.layers.0.self_attn.v_proj.bias",
+      "param_shape": [
+        128
+      ],
+      "param_dtype": "mlx.core.float16",
+      "seed": 20260605,
+      "steps": 60,
+      "mu": 0.05,
+      "lr": 0.05,
+      "clip": 25.0,
+      "checks": {
+        "fd_finite_rate_ok": true,
+        "fd_signal_rate_ok": true,
+        "fd_magnitude_ok": true,
+        "losses_remain_finite": true,
+        "best_train_not_worse": true,
+        "best_dev_not_catastrophic": true,
+        "dev_accuracy_not_worse_than_baseline": true,
+        "restore_train_exact": true,
+        "restore_dev_exact": true
+      },
+      "baseline_train_loss": 2.2877137660980225,
+      "final_train_loss": 0.9202816486358643,
+      "best_train_loss": 0.8710795640945435,
+      "final_train_delta": -1.3674321174621582,
+      "best_train_delta": -1.416634202003479,
+      "baseline_dev_loss": 2.09908390045166,
+      "final_dev_loss": 0.6684279441833496,
+      "best_dev_loss": 0.6684279441833496,
+      "final_dev_delta": -1.4306559562683105,
+      "best_dev_delta": -1.4306559562683105,
+      "baseline_train_accuracy": 0.75,
+      "final_train_accuracy": 0.8125,
+      "baseline_dev_accuracy": 0.875,
+      "final_dev_accuracy": 0.75,
+      "best_dev_accuracy": 0.875,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "fd_abs_max_max": 21.718425750732422,
+      "fd_abs_max_mean": 9.736382802327475,
+      "fd_abs_mean_mean": 3.0564271807670593,
+      "unanimity_rate": 0.48333333333333334,
+      "release_sign_counts": {
+        "positive": 41,
+        "negative": 19
+      },
+      "restore_train_abs_max": 0.0,
+      "restore_dev_abs_max": 0.0,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 1.8639276027679443,
+          "train_accuracy": 0.75,
+          "dev_loss": 1.6517024040222168,
+          "dev_accuracy": 0.8125,
+          "fd_abs_max": 17.463054656982422,
+          "fd_abs_mean": 8.709173202514648,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 20,
+          "train_loss": 1.2156856060028076,
+          "train_accuracy": 0.6875,
+          "dev_loss": 1.1002787351608276,
+          "dev_accuracy": 0.625,
+          "fd_abs_max": 12.961883544921875,
+          "fd_abs_mean": 4.642550945281982,
+          "release_sign": -1,
+          "unanimous": false
+        },
+        {
+          "step": 40,
+          "train_loss": 0.8710795640945435,
+          "train_accuracy": 0.75,
+          "dev_loss": 0.704043984413147,
+          "dev_accuracy": 0.8125,
+          "fd_abs_max": 18.246726989746094,
+          "fd_abs_mean": 4.346554279327393,
+          "release_sign": 1,
+          "unanimous": true
+        },
+        {
+          "step": 60,
+          "train_loss": 0.9202816486358643,
+          "train_accuracy": 0.8125,
+          "dev_loss": 0.6684279441833496,
+          "dev_accuracy": 0.75,
+          "fd_abs_max": 11.628646850585938,
+          "fd_abs_mean": 2.317413091659546,
+          "release_sign": 1,
+          "unanimous": false
+        }
+      ],
+      "elapsed_seconds": 83.064
+    }
+  ],
+  "verdict": "Ready for a larger real-parameter PACZero run if success=true. Still not ready to claim full PACZero-LoRA reproduction until the same matrix passes on actual LoRA adapter tensors."
+}
