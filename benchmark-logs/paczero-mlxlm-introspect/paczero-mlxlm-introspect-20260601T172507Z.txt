@@ -1,0 +1,41 @@
+# PACZero MLX-LM introspection smoke
+This discovers model/module paths for the next real adapter hook.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+python=3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+INTROSPECT_RESULT_JSON=
+{
+  "success": false,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 4.151,
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "found_modules": true,
+    "found_candidate_targets": false
+  },
+  "model_type": "Model",
+  "tokenizer_type": "TokenizerWrapper",
+  "top_level_children": [
+    "args",
+    "model_type"
+  ],
+  "module_count_sampled": 2,
+  "candidate_target_count_sampled": 0,
+  "candidate_targets_head": [],
+  "modules_head": [
+    {
+      "path": "model",
+      "type": "Model",
+      "module": "<class 'mlx_lm.models.qwen2.Model'>"
+    },
+    {
+      "path": "model.args",
+      "type": "ModelArgs",
+      "module": "<class 'mlx_lm.models.qwen2.ModelArgs'>"
+    }
+  ],
+  "note": "Use candidate target paths to choose a real layer for the first custom PACZero adapter perturbation smoke."
+}
