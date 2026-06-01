@@ -1,0 +1,118 @@
+name: PACZero MLX-LM extended readiness smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: "Number of readiness ZPL steps"
+        required: false
+        default: "40"
+      lr:
+        description: "Sign-update learning rate"
+        required: false
+        default: "0.05"
+      mu:
+        description: "Finite-difference perturbation scale"
+        required: false
+        default: "0.05"
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/paczero_mlxlm_readiness_smoke.py"
+      - ".github/workflows/paczero-mlxlm-readiness-smoke.yml"
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  readiness-smoke:
+    name: Extended real-parameter PACZero readiness smoke
+    runs-on: macos-26
+    timeout-minutes: 90
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-readiness]') }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONWARNINGS: "ignore"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      HF_XET_HIGH_PERFORMANCE: "1"
+      READINESS_STEPS: ${{ github.event.inputs.steps || '40' }}
+      READINESS_LR: ${{ github.event.inputs.lr || '0.05' }}
+      READINESS_MU: ${{ github.event.inputs.mu || '0.05' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MLX-LM dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer safetensors numpy
+
+      - name: Run extended readiness smoke
+        run: |
+          mkdir -p benchmark-logs/paczero-mlxlm-readiness-smoke benchmark-results
+          stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
+          log_file="benchmark-logs/paczero-mlxlm-readiness-smoke/paczero-mlxlm-readiness-smoke-${stamp}.txt"
+          latest_file="benchmark-logs/paczero-mlxlm-readiness-smoke/paczero-mlxlm-readiness-smoke-latest.txt"
+          result_file="benchmark-results/paczero_mlxlm_readiness_smoke_results.json"
+          echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
+          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
+          echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
+          set -o pipefail
+          python scripts/paczero_mlxlm_readiness_smoke.py \
+            --model mlx-community/Qwen2.5-0.5B-Instruct-4bit \
+            --param-path model.layers.0.self_attn.q_proj.bias \
+            --steps "${READINESS_STEPS}" \
+            --mu "${READINESS_MU}" \
+            --lr "${READINESS_LR}" \
+            --clip 25.0 \
+            --eval-every 10 \
+            --json-out "$result_file" \
+            2>&1 | tee "$log_file"
+          cp "$log_file" "$latest_file"
+
+      - name: Add summary
+        if: always()
+        run: |
+          echo "# PACZero MLX-LM extended readiness smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "${LOG_FILE:-}" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 240 "$LOG_FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit readiness smoke output
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmark-logs/paczero-mlxlm-readiness-smoke/ benchmark-results/paczero_mlxlm_readiness_smoke_results.json || true
+          if git diff --cached --quiet; then
+            echo "No PACZero readiness smoke output changes to commit."
+          else
+            git commit -m "Add PACZero MLX-LM readiness smoke output [skip ci] [skip paczero-readiness]"
+            git push
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paczero-mlxlm-readiness-smoke-results
+          path: |
+            benchmark-logs/paczero-mlxlm-readiness-smoke
+            benchmark-results/paczero_mlxlm_readiness_smoke_results.json
+          if-no-files-found: warn
