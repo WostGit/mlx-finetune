@@ -1,0 +1,71 @@
+{
+  "dataset_choice": "sst2",
+  "dataset_source": "Hugging Face datasets: nyu-mll/glue sst2, train split",
+  "full_train_examples": 67349,
+  "actual_train_examples": 67349,
+  "run_mode": "full",
+  "full_dataset": true,
+  "batch_size": 1,
+  "num_layers": 8,
+  "models": [
+    "mlx-community/Qwen2.5-0.5B-Instruct-4bit"
+  ],
+  "result_slug": "qwen2.5-0.5b-4bit",
+  "result_prefix": "paczero_full",
+  "results": [
+    {
+      "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+      "model_slug": "qwen2.5-0.5b-4bit",
+      "returncode": 0,
+      "success": true,
+      "run_mode": "full",
+      "full_dataset": true,
+      "elapsed_seconds": 6751.726,
+      "elapsed_hours": 1.875,
+      "seconds_per_sample": 0.10025,
+      "actual_train_examples": 67349,
+      "full_train_examples": 67349,
+      "avg_tokens_per_sample": 47.987,
+      "parsed": {
+        "first_loss": 5.769,
+        "last_loss": 0.792,
+        "max_iteration": 67349,
+        "tokens_per_second_last": 461.044,
+        "tokens_per_second_mean": 483.299,
+        "trained_tokens_last": 3231849,
+        "tail_30_lines": [
+          "Iter 65000: Saved adapter weights to benchmark-results/qwen2.5-0.5b-4bit/adapters/adapters.safetensors and benchmark-results/qwen2.5-0.5b-4bit/adapters/0065000_adapters.safetensors.",
+          "Iter 65100: Train loss 0.815, Learning Rate 1.000e-05, It/sec 10.302, Tokens/sec 489.471, Trained Tokens 3123966, Peak mem 0.608 GB",
+          "Iter 65200: Train loss 0.838, Learning Rate 1.000e-05, It/sec 10.157, Tokens/sec 494.856, Trained Tokens 3128838, Peak mem 0.608 GB",
+          "Iter 65300: Train loss 0.883, Learning Rate 1.000e-05, It/sec 9.892, Tokens/sec 487.284, Trained Tokens 3133764, Peak mem 0.608 GB",
+          "Iter 65400: Train loss 0.761, Learning Rate 1.000e-05, It/sec 10.375, Tokens/sec 494.466, Trained Tokens 3138530, Peak mem 0.608 GB",
+          "Iter 65500: Train loss 0.825, Learning Rate 1.000e-05, It/sec 10.016, Tokens/sec 494.998, Trained Tokens 3143472, Peak mem 0.608 GB",
+          "Iter 65600: Train loss 0.734, Learning Rate 1.000e-05, It/sec 10.113, Tokens/sec 464.687, Trained Tokens 3148067, Peak mem 0.608 GB",
+          "Iter 65700: Train loss 0.820, Learning Rate 1.000e-05, It/sec 10.189, Tokens/sec 492.041, Trained Tokens 3152896, Peak mem 0.608 GB",
+          "Iter 65800: Train loss 0.847, Learning Rate 1.000e-05, It/sec 10.048, Tokens/sec 484.838, Trained Tokens 3157721, Peak mem 0.608 GB",
+          "Iter 65900: Train loss 0.817, Learning Rate 1.000e-05, It/sec 10.082, Tokens/sec 486.146, Trained Tokens 3162543, Peak mem 0.608 GB",
+          "Iter 66000: Train loss 0.820, Learning Rate 1.000e-05, It/sec 9.955, Tokens/sec 477.718, Trained Tokens 3167342, Peak mem 0.608 GB",
+          "Iter 66100: Train loss 0.807, Learning Rate 1.000e-05, It/sec 10.244, Tokens/sec 494.568, Trained Tokens 3172170, Peak mem 0.608 GB",
+          "Iter 66200: Train loss 0.776, Learning Rate 1.000e-05, It/sec 10.155, Tokens/sec 480.749, Trained Tokens 3176904, Peak mem 0.608 GB",
+          "Iter 66300: Train loss 0.783, Learning Rate 1.000e-05, It/sec 10.228, Tokens/sec 477.036, Trained Tokens 3181568, Peak mem 0.608 GB",
+          "Iter 66400: Train loss 0.831, Learning Rate 1.000e-05, It/sec 9.975, Tokens/sec 489.668, Trained Tokens 3186477, Peak mem 0.608 GB",
+          "Iter 66500: Train loss 0.785, Learning Rate 1.000e-05, It/sec 9.605, Tokens/sec 452.317, Trained Tokens 3191186, Peak mem 0.608 GB",
+          "Iter 66600: Train loss 0.808, Learning Rate 1.000e-05, It/sec 7.964, Tokens/sec 380.063, Trained Tokens 3195958, Peak mem 0.608 GB",
+          "Iter 66700: Train loss 0.764, Learning Rate 1.000e-05, It/sec 8.385, Tokens/sec 404.581, Trained Tokens 3200783, Peak mem 0.608 GB",
+          "Iter 66800: Train loss 0.760, Learning Rate 1.000e-05, It/sec 9.548, Tokens/sec 446.739, Trained Tokens 3205462, Peak mem 0.608 GB",
+          "Iter 66900: Train loss 0.741, Learning Rate 1.000e-05, It/sec 9.926, Tokens/sec 463.446, Trained Tokens 3210131, Peak mem 0.608 GB",
+          "Iter 67000: Train loss 0.798, Learning Rate 1.000e-05, It/sec 9.664, Tokens/sec 459.921, Trained Tokens 3214890, Peak mem 0.608 GB",
+          "Iter 67100: Train loss 0.866, Learning Rate 1.000e-05, It/sec 9.770, Tokens/sec 478.237, Trained Tokens 3219785, Peak mem 0.608 GB",
+          "Iter 67200: Train loss 0.817, Learning Rate 1.000e-05, It/sec 9.887, Tokens/sec 476.656, Trained Tokens 3224606, Peak mem 0.608 GB",
+          "Iter 67300: Train loss 0.811, Learning Rate 1.000e-05, It/sec 8.963, Tokens/sec 438.296, Trained Tokens 3229496, Peak mem 0.608 GB",
+          "",
+          "Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]",
+          "Calculating loss...: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 15.51it/s]",
+          "Iter 67349: Val loss 0.846, Val took 0.069s",
+          "Iter 67349: Train loss 0.792, Learning Rate 1.000e-05, It/sec 19.594, Tokens/sec 461.044, Trained Tokens 3231849, Peak mem 0.608 GB",
+          "Saved final weights to benchmark-results/qwen2.5-0.5b-4bit/adapters/adapters.safetensors."
+        ]
+      }
+    }
+  ]
+}
