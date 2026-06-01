@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 5.277,
+  "cross_entropy": "manual_logsumexp_minus_selected_target_logit",
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "all_losses_finite": true,
+    "all_losses_positive": true,
+    "all_prediction_lengths_positive": true
+  },
+  "num_examples": 3,
+  "loss_mean": 5.48046875,
+  "loss_min": 5.1015625,
+  "loss_max": 5.71875,
+  "samples": [
+    {
+      "tokens": 38,
+      "prediction_tokens": 37,
+      "loss": 5.71875,
+      "token_loss_min": 0.0,
+      "token_loss_max": 19.5625,
+      "token_loss_mean": 5.72191722972973,
+      "index": 0,
+      "assistant_label": "positive"
+    },
+    {
+      "tokens": 42,
+      "prediction_tokens": 41,
+      "loss": 5.1015625,
+      "token_loss_min": 0.0,
+      "token_loss_max": 19.5625,
+      "token_loss_mean": 5.105564024390244,
+      "index": 1,
+      "assistant_label": "negative"
+    },
+    {
+      "tokens": 38,
+      "prediction_tokens": 37,
+      "loss": 5.62109375,
+      "token_loss_min": 0.0,
+      "token_loss_max": 19.5625,
+      "token_loss_mean": 5.624577702702703,
+      "index": 2,
+      "assistant_label": "positive"
+    }
+  ],
+  "note": "Real MLX-LM per-sample loss extraction smoke. Next step is applying finite-difference perturbations to a real adapter parameter vector."
+}
