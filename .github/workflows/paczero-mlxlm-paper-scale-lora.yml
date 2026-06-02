@@ -1,0 +1,131 @@
+name: PACZero MLX-LM paper-scale LoRA
+
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: "PACZero-ZPL minibatch steps"
+        required: false
+        default: "1000"
+      batch_examples:
+        description: "Examples per two-point FD minibatch"
+        required: false
+        default: "32"
+      eval_examples:
+        description: "Dev examples used for periodic checkpoint selection"
+        required: false
+        default: "256"
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/paczero_mlxlm_paper_scale_lora.py"
+      - ".github/workflows/paczero-mlxlm-paper-scale-lora.yml"
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  paper-scale-lora:
+    name: Paper-scale runnable PACZero-LoRA
+    runs-on: macos-26
+    timeout-minutes: 360
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-paper-scale-lora]') }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONWARNINGS: "ignore"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      HF_XET_HIGH_PERFORMANCE: "1"
+      STEPS: ${{ github.event.inputs.steps || '1000' }}
+      BATCH_EXAMPLES: ${{ github.event.inputs.batch_examples || '32' }}
+      EVAL_EXAMPLES: ${{ github.event.inputs.eval_examples || '256' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MLX-LM dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer safetensors numpy datasets
+
+      - name: Run paper-scale PACZero-LoRA
+        run: |
+          mkdir -p benchmark-logs/paczero-mlxlm-paper-scale-lora benchmark-results benchmark-results/paczero-paper-scale-lora-adapters
+          stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
+          log_file="benchmark-logs/paczero-mlxlm-paper-scale-lora/paczero-paper-scale-lora-${stamp}.txt"
+          latest_file="benchmark-logs/paczero-mlxlm-paper-scale-lora/paczero-paper-scale-lora-latest.txt"
+          result_file="benchmark-results/paczero_mlxlm_paper_scale_lora_results.json"
+          adapter_dir="benchmark-results/paczero-paper-scale-lora-adapters"
+          echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
+          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
+          echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
+          echo "ADAPTER_DIR=$adapter_dir" >> "$GITHUB_ENV"
+          set -o pipefail
+          python scripts/paczero_mlxlm_paper_scale_lora.py \
+            --model mlx-community/Qwen2.5-0.5B-Instruct-4bit \
+            --targets model.layers.0.self_attn.q_proj,model.layers.0.self_attn.v_proj \
+            --hidden-size 896 \
+            --rank 4 \
+            --alpha 8.0 \
+            --seed 20260608 \
+            --steps "${STEPS}" \
+            --batch-examples "${BATCH_EXAMPLES}" \
+            --train-limit 0 \
+            --dev-limit 0 \
+            --mu 0.05 \
+            --lr 0.05 \
+            --clip 25.0 \
+            --eval-every 100 \
+            --eval-examples "${EVAL_EXAMPLES}" \
+            --json-out "$result_file" \
+            --adapter-dir "$adapter_dir" \
+            2>&1 | tee "$log_file"
+          cp "$log_file" "$latest_file"
+
+      - name: Add summary
+        if: always()
+        run: |
+          echo "# PACZero MLX-LM paper-scale LoRA" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Adapter dir: \`${ADAPTER_DIR:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "${LOG_FILE:-}" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 320 "$LOG_FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit paper-scale PACZero-LoRA output
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmark-logs/paczero-mlxlm-paper-scale-lora/ benchmark-results/paczero_mlxlm_paper_scale_lora_results.json benchmark-results/paczero-paper-scale-lora-adapters/ || true
+          if git diff --cached --quiet; then
+            echo "No paper-scale PACZero-LoRA output changes to commit."
+          else
+            git commit -m "Add paper-scale PACZero-LoRA output [skip ci] [skip paczero-paper-scale-lora]"
+            git push
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paczero-mlxlm-paper-scale-lora-results
+          path: |
+            benchmark-logs/paczero-mlxlm-paper-scale-lora
+            benchmark-results/paczero_mlxlm_paper_scale_lora_results.json
+            benchmark-results/paczero-paper-scale-lora-adapters
+          if-no-files-found: warn
