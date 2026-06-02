@@ -1,0 +1,222 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 7009.842,
+  "dataset_source": "nyu-mll/glue/sst2",
+  "train_population_examples": 67349,
+  "dev_population_examples": 872,
+  "eval_examples_per_checkpoint": 256,
+  "parameterization": "paper_scale_minibatch_multi_target_custom_lora_paczero_zpl",
+  "targets": [
+    "model.layers.0.self_attn.q_proj",
+    "model.layers.0.self_attn.v_proj"
+  ],
+  "target_shapes": [
+    {
+      "path": "model.layers.0.self_attn.q_proj",
+      "input_dim": 896,
+      "output_dim": 896,
+      "rank": 4,
+      "alpha": 8.0
+    },
+    {
+      "path": "model.layers.0.self_attn.v_proj",
+      "input_dim": 896,
+      "output_dim": 128,
+      "rank": 4,
+      "alpha": 8.0
+    }
+  ],
+  "theta_size": 11264,
+  "seed": 20260608,
+  "steps": 1000,
+  "batch_examples": 32,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "loaded_model": true,
+    "loaded_tokenizer": true,
+    "dataset_full_train_population": true,
+    "dataset_full_dev_population": true,
+    "multiple_lora_targets": true,
+    "theta_size_positive": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "best_eval_accuracy_not_worse": true,
+    "best_full_dev_accuracy_not_worse": true,
+    "adapters_saved": true
+  },
+  "baseline_eval_subset": {
+    "loss": 2.251823216676712,
+    "accuracy": 0.796875
+  },
+  "baseline_full_dev": {
+    "loss": 2.2743375826319423,
+    "accuracy": 0.8096330275229358
+  },
+  "final_eval_subset": {
+    "loss": 0.5211194977164268,
+    "accuracy": 0.859375
+  },
+  "final_full_dev": {
+    "loss": 0.5268049940056757,
+    "accuracy": 0.8486238532110092
+  },
+  "best_checkpoint": {
+    "step": 1000,
+    "eval_loss": 0.5211194977164268,
+    "eval_accuracy": 0.859375,
+    "full_dev_loss": 0.5268049940056757,
+    "full_dev_accuracy": 0.8486238532110092
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 1.3805389404296875,
+  "fd_abs_max_mean": 0.461915225982666,
+  "fd_abs_mean_mean": 0.1347287791967392,
+  "unanimity_rate": 0.65,
+  "release_sign_counts": {
+    "positive": 499,
+    "negative": 501
+  },
+  "adapter_files": [
+    {
+      "path": "benchmark-results/paczero-paper-scale-lora-adapters/layer_0_self_attn_q_proj.npz",
+      "bytes": 29652,
+      "A_shape": [
+        4,
+        896
+      ],
+      "B_shape": [
+        896,
+        4
+      ]
+    },
+    {
+      "path": "benchmark-results/paczero-paper-scale-lora-adapters/layer_0_self_attn_v_proj.npz",
+      "bytes": 17364,
+      "A_shape": [
+        4,
+        896
+      ],
+      "B_shape": [
+        128,
+        4
+      ]
+    }
+  ],
+  "history": [
+    {
+      "step": 1,
+      "eval_loss": 2.2377492263913155,
+      "eval_accuracy": 0.796875,
+      "fd_abs_max": 0.4312896728515625,
+      "fd_abs_mean": 0.1418858766555786,
+      "release_sign": 1,
+      "unanimous": true,
+      "examples_seen_approx": 32
+    },
+    {
+      "step": 100,
+      "eval_loss": 2.1163521334528923,
+      "eval_accuracy": 0.796875,
+      "fd_abs_max": 0.4226875305175781,
+      "fd_abs_mean": 0.12836873531341553,
+      "release_sign": -1,
+      "unanimous": false,
+      "examples_seen_approx": 3200
+    },
+    {
+      "step": 200,
+      "eval_loss": 1.925301544368267,
+      "eval_accuracy": 0.76953125,
+      "fd_abs_max": 0.5782127380371094,
+      "fd_abs_mean": 0.16871273517608643,
+      "release_sign": 1,
+      "unanimous": true,
+      "examples_seen_approx": 6400
+    },
+    {
+      "step": 300,
+      "eval_loss": 1.735071174800396,
+      "eval_accuracy": 0.75390625,
+      "fd_abs_max": 0.190582275390625,
+      "fd_abs_mean": 0.08843183517456055,
+      "release_sign": 1,
+      "unanimous": false,
+      "examples_seen_approx": 9600
+    },
+    {
+      "step": 400,
+      "eval_loss": 1.5369834378361702,
+      "eval_accuracy": 0.734375,
+      "fd_abs_max": 0.3224945068359375,
+      "fd_abs_mean": 0.09524226188659668,
+      "release_sign": 1,
+      "unanimous": true,
+      "examples_seen_approx": 12800
+    },
+    {
+      "step": 500,
+      "eval_loss": 1.3403165340423584,
+      "eval_accuracy": 0.69140625,
+      "fd_abs_max": 0.289459228515625,
+      "fd_abs_mean": 0.09352684020996094,
+      "release_sign": -1,
+      "unanimous": false,
+      "examples_seen_approx": 16000
+    },
+    {
+      "step": 600,
+      "eval_loss": 1.128425046801567,
+      "eval_accuracy": 0.69921875,
+      "fd_abs_max": 0.3879547119140625,
+      "fd_abs_mean": 0.10831356048583984,
+      "release_sign": -1,
+      "unanimous": true,
+      "examples_seen_approx": 19200
+    },
+    {
+      "step": 700,
+      "eval_loss": 0.9274357631802559,
+      "eval_accuracy": 0.7421875,
+      "fd_abs_max": 0.45562744140625,
+      "fd_abs_mean": 0.15410125255584717,
+      "release_sign": 1,
+      "unanimous": true,
+      "examples_seen_approx": 22400
+    },
+    {
+      "step": 800,
+      "eval_loss": 0.7280640378594398,
+      "eval_accuracy": 0.79296875,
+      "fd_abs_max": 0.3164482116699219,
+      "fd_abs_mean": 0.14004051685333252,
+      "release_sign": -1,
+      "unanimous": true,
+      "examples_seen_approx": 25600
+    },
+    {
+      "step": 900,
+      "eval_loss": 0.6251914501190186,
+      "eval_accuracy": 0.8046875,
+      "fd_abs_max": 0.3215980529785156,
+      "fd_abs_mean": 0.1066368818283081,
+      "release_sign": 1,
+      "unanimous": false,
+      "examples_seen_approx": 28800
+    },
+    {
+      "step": 1000,
+      "eval_loss": 0.5211194977164268,
+      "eval_accuracy": 0.859375,
+      "fd_abs_max": 0.2570915222167969,
+      "fd_abs_mean": 0.10500431060791016,
+      "release_sign": 1,
+      "unanimous": true,
+      "examples_seen_approx": 32000
+    }
+  ],
+  "verdict": "Runnable paper-scale PACZero-LoRA approximation: full SST-2 population with minibatch FD and multiple LoRA targets. A literal full-batch FD over all training examples per step is not practical on GitHub-hosted macOS runners."
+}
