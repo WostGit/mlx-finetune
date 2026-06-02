@@ -1,0 +1,197 @@
+# PACZero-LoRA reproduction run
+Actual custom LoRA A/B tensors are attached to a real MLX-LM Qwen projection and updated with PACZero-ZPL.
+model=mlx-community/Qwen2.5-0.5B-Instruct-4bit
+target_path=model.layers.0.self_attn.q_proj
+rank=4 alpha=8.0 seed=20260607 steps=200
+python=3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]
+package_mlx=0.31.2
+package_mlx-lm=0.31.3
+package_datasets=4.8.5
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/67349 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 67349/67349 [00:00<00:00, 1520462.57 examples/s]
+Generating validation split:   0%|          | 0/872 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 872/872 [00:00<00:00, 415239.91 examples/s]
+Generating test split:   0%|          | 0/1821 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1821/1821 [00:00<00:00, 1304496.60 examples/s]
+PACZERO_LORA_EVAL={"step": 1, "train_loss": 2.4549765288829803, "train_accuracy": 0.734375, "dev_loss": 2.1160823702812195, "dev_accuracy": 0.875, "fd_abs_max": 0.5940055847167969, "fd_abs_mean": 0.12926161289215088, "release_sign": -1, "unanimous": false}
+PACZERO_LORA_EVAL={"step": 25, "train_loss": 2.4466706216335297, "train_accuracy": 0.734375, "dev_loss": 2.106771618127823, "dev_accuracy": 0.875, "fd_abs_max": 0.43453216552734375, "fd_abs_mean": 0.12667149305343628, "release_sign": -1, "unanimous": true}
+PACZERO_LORA_EVAL={"step": 50, "train_loss": 2.4506134390830994, "train_accuracy": 0.734375, "dev_loss": 2.112068325281143, "dev_accuracy": 0.890625, "fd_abs_max": 0.3386497497558594, "fd_abs_mean": 0.10051310062408447, "release_sign": -1, "unanimous": false}
+PACZERO_LORA_EVAL={"step": 75, "train_loss": 2.444399803876877, "train_accuracy": 0.734375, "dev_loss": 2.098392814397812, "dev_accuracy": 0.890625, "fd_abs_max": 0.32665252685546875, "fd_abs_mean": 0.11561483144760132, "release_sign": -1, "unanimous": true}
+PACZERO_LORA_EVAL={"step": 100, "train_loss": 2.44707190990448, "train_accuracy": 0.734375, "dev_loss": 2.1094599664211273, "dev_accuracy": 0.875, "fd_abs_max": 0.332794189453125, "fd_abs_mean": 0.09760946035385132, "release_sign": -1, "unanimous": false}
+PACZERO_LORA_EVAL={"step": 125, "train_loss": 2.447328895330429, "train_accuracy": 0.734375, "dev_loss": 2.1011712551116943, "dev_accuracy": 0.890625, "fd_abs_max": 0.4010200500488281, "fd_abs_mean": 0.0921332836151123, "release_sign": -1, "unanimous": true}
+PACZERO_LORA_EVAL={"step": 150, "train_loss": 2.442995071411133, "train_accuracy": 0.734375, "dev_loss": 2.107305258512497, "dev_accuracy": 0.875, "fd_abs_max": 0.3073883056640625, "fd_abs_mean": 0.10391771793365479, "release_sign": 1, "unanimous": true}
+PACZERO_LORA_EVAL={"step": 175, "train_loss": 2.450992703437805, "train_accuracy": 0.734375, "dev_loss": 2.1120472848415375, "dev_accuracy": 0.890625, "fd_abs_max": 0.36937713623046875, "fd_abs_mean": 0.11244148015975952, "release_sign": 1, "unanimous": false}
+PACZERO_LORA_EVAL={"step": 200, "train_loss": 2.4480684995651245, "train_accuracy": 0.734375, "dev_loss": 2.106354534626007, "dev_accuracy": 0.875, "fd_abs_max": 0.34648895263671875, "fd_abs_mean": 0.10301828384399414, "release_sign": 1, "unanimous": true}
+PACZERO_LORA_REPRODUCTION_RESULT_JSON=
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "elapsed_seconds": 2603.477,
+  "dataset_source": "nyu-mll/glue/sst2",
+  "train_examples": 64,
+  "dev_examples": 64,
+  "parameterization": "actual_custom_lora_ab_tensors_paczero_zpl",
+  "target_path": "model.layers.0.self_attn.q_proj",
+  "input_dim": 896,
+  "output_dim": 896,
+  "rank": 4,
+  "alpha": 8.0,
+  "theta_size": 7168,
+  "seed": 20260607,
+  "steps": 200,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "attached_lora_wrapper": true,
+    "theta_size_positive": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "fd_magnitude_ok": true,
+    "losses_remain_finite": true,
+    "best_dev_accuracy_not_worse": true,
+    "best_dev_loss_not_worse_when_accuracy_ties": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 2.4536520540714264,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.1159488558769226,
+    "dev_accuracy": 0.875
+  },
+  "final": {
+    "train_loss": 2.4480684995651245,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.106354534626007,
+    "dev_accuracy": 0.875
+  },
+  "best_checkpoint": {
+    "step": 75,
+    "train_loss": 2.444399803876877,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.098392814397812,
+    "dev_accuracy": 0.890625
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.7021713256835938,
+  "fd_abs_max_mean": 0.40802745819091796,
+  "fd_abs_mean_mean": 0.11262652277946472,
+  "unanimity_rate": 0.535,
+  "release_sign_counts": {
+    "positive": 92,
+    "negative": 108
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-lora-adapters/qwen_qproj_lora_rank4.npz",
+    "bytes": 29652,
+    "A_shape": [
+      4,
+      896
+    ],
+    "B_shape": [
+      896,
+      4
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 2.4549765288829803,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.1160823702812195,
+      "dev_accuracy": 0.875,
+      "fd_abs_max": 0.5940055847167969,
+      "fd_abs_mean": 0.12926161289215088,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 25,
+      "train_loss": 2.4466706216335297,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.106771618127823,
+      "dev_accuracy": 0.875,
+      "fd_abs_max": 0.43453216552734375,
+      "fd_abs_mean": 0.12667149305343628,
+      "release_sign": -1,
+      "unanimous": true
+    },
+    {
+      "step": 50,
+      "train_loss": 2.4506134390830994,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.112068325281143,
+      "dev_accuracy": 0.890625,
+      "fd_abs_max": 0.3386497497558594,
+      "fd_abs_mean": 0.10051310062408447,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 75,
+      "train_loss": 2.444399803876877,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.098392814397812,
+      "dev_accuracy": 0.890625,
+      "fd_abs_max": 0.32665252685546875,
+      "fd_abs_mean": 0.11561483144760132,
+      "release_sign": -1,
+      "unanimous": true
+    },
+    {
+      "step": 100,
+      "train_loss": 2.44707190990448,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.1094599664211273,
+      "dev_accuracy": 0.875,
+      "fd_abs_max": 0.332794189453125,
+      "fd_abs_mean": 0.09760946035385132,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 125,
+      "train_loss": 2.447328895330429,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.1011712551116943,
+      "dev_accuracy": 0.890625,
+      "fd_abs_max": 0.4010200500488281,
+      "fd_abs_mean": 0.0921332836151123,
+      "release_sign": -1,
+      "unanimous": true
+    },
+    {
+      "step": 150,
+      "train_loss": 2.442995071411133,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.107305258512497,
+      "dev_accuracy": 0.875,
+      "fd_abs_max": 0.3073883056640625,
+      "fd_abs_mean": 0.10391771793365479,
+      "release_sign": 1,
+      "unanimous": true
+    },
+    {
+      "step": 175,
+      "train_loss": 2.450992703437805,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.1120472848415375,
+      "dev_accuracy": 0.890625,
+      "fd_abs_max": 0.36937713623046875,
+      "fd_abs_mean": 0.11244148015975952,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 200,
+      "train_loss": 2.4480684995651245,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.106354534626007,
+      "dev_accuracy": 0.875,
+      "fd_abs_max": 0.34648895263671875,
+      "fd_abs_mean": 0.10301828384399414,
+      "release_sign": 1,
+      "unanimous": true
+    }
+  ],
+  "verdict": "Full custom PACZero-LoRA reproduction on one Qwen projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters."
+}
