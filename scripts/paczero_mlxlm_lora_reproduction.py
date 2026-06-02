@@ -14,7 +14,7 @@ import numpy as np
 from mlx_lm import load
 
 from paczero_core import assert_balanced_membership, make_balanced_membership, paczero_zpl_release
-from paczero_mlxlm_exhaustive_readiness import eval_dataset, eval_losses_with_value, get_path, load_sst2_rows, set_path
+from paczero_mlxlm_exhaustive_readiness import eval_dataset, get_path, load_sst2_rows, set_path
 
 
 class PACZeroLoRALinear:
@@ -41,7 +41,6 @@ class PACZeroLoRALinear:
         return base_out + delta.astype(base_out.dtype)
 
     def __getattr__(self, name: str) -> Any:
-        # Preserve access to base attributes such as weight/scales/biases if MLX-LM internals inspect them.
         return getattr(self.base, name)
 
     def theta(self) -> mx.array:
@@ -56,15 +55,63 @@ class PACZeroLoRALinear:
         return np.array(self.A.tolist(), dtype=np.float32), np.array(self.B.tolist(), dtype=np.float32)
 
 
-def infer_linear_dims(module: Any) -> tuple[int, int]:
+def _optional_int_attr(module: Any, *names: str) -> int | None:
+    for name in names:
+        try:
+            value = getattr(module, name)
+        except Exception:
+            continue
+        if value is None:
+            continue
+        try:
+            return int(value)
+        except Exception:
+            pass
+    return None
+
+
+def infer_linear_dims(module: Any, target_path: str) -> tuple[int, int, dict]:
+    """Infer LoRA input/output dims for MLX-LM Linear or QuantizedLinear.
+
+    Qwen q_proj exposes a float bias, but Llama q_proj is biasless.  Quantized
+    weights are packed, so weight.shape[1] is not reliably the input dimension.
+    For q_proj/o_proj-style self-attention projections in these compact models,
+    input and output dimensions are the hidden size.  We infer output from bias,
+    explicit attrs, or packed weight.shape[0], then use explicit input attrs or
+    the square-projection fallback.
+    """
+
+    debug: dict[str, Any] = {"module_type": type(module).__name__, "target_path": target_path}
+    input_dim = _optional_int_attr(module, "input_dims", "input_dim", "in_features", "in_dim")
+    output_dim = _optional_int_attr(module, "output_dims", "output_dim", "out_features", "out_dim")
+
     bias = getattr(module, "bias", None)
-    if bias is None or not hasattr(bias, "shape"):
-        raise ValueError("Cannot infer output dim: target module has no bias")
-    output_dim = int(bias.shape[0])
-    # QuantizedLinear packed weight for Qwen has shape [out_dim, in_dim / packing].
-    # Prefer common Qwen hidden size from output dim when q_proj/o_proj, otherwise use output dim fallback.
-    input_dim = output_dim
-    return input_dim, output_dim
+    if bias is not None and hasattr(bias, "shape"):
+        output_dim = int(bias.shape[0])
+        debug["output_source"] = "bias.shape[0]"
+        debug["bias_shape"] = list(bias.shape)
+
+    weight = getattr(module, "weight", None)
+    if weight is not None and hasattr(weight, "shape"):
+        debug["weight_shape"] = list(weight.shape)
+        debug["weight_dtype"] = str(getattr(weight, "dtype", "unknown"))
+        if output_dim is None and len(weight.shape) >= 1:
+            output_dim = int(weight.shape[0])
+            debug["output_source"] = "weight.shape[0]"
+
+    # For q_proj in Qwen/Llama hidden-size projections, input_dim == output_dim.
+    # This is the correct fallback for biasless Llama q_proj with packed uint32 weights.
+    if input_dim is None and output_dim is not None:
+        input_dim = output_dim
+        debug["input_source"] = "square_projection_fallback"
+    elif input_dim is not None:
+        debug["input_source"] = "module_attr"
+
+    if output_dim is None or input_dim is None:
+        raise ValueError(f"Cannot infer LoRA dims for {target_path}; debug={debug}")
+    debug["input_dim"] = input_dim
+    debug["output_dim"] = output_dim
+    return input_dim, output_dim, debug
 
 
 def evaluate_lora(model: Any, tokenizer: Any, train_rows: list[tuple[str, str]], dev_rows: list[tuple[str, str]]) -> dict:
@@ -112,12 +159,12 @@ def main() -> int:
     parser.add_argument("--clip", type=float, default=25.0)
     parser.add_argument("--eval-every", type=int, default=25)
     parser.add_argument("--json-out", type=Path, default=Path("benchmark-results/paczero_mlxlm_lora_reproduction_results.json"))
-    parser.add_argument("--adapter-out", type=Path, default=Path("benchmark-results/paczero-lora-adapters/qwen_qproj_lora_rank4.npz"))
+    parser.add_argument("--adapter-out", type=Path, default=Path("benchmark-results/paczero-lora-adapters/qproj_lora_rank4.npz"))
     args = parser.parse_args()
 
     start = time.perf_counter()
     print("# PACZero-LoRA reproduction run")
-    print("Actual custom LoRA A/B tensors are attached to a real MLX-LM Qwen projection and updated with PACZero-ZPL.")
+    print("Actual custom LoRA A/B tensors are attached to a real MLX-LM projection and updated with PACZero-ZPL.")
     print(f"model={args.model}")
     print(f"target_path={args.target_path}")
     print(f"rank={args.rank} alpha={args.alpha} seed={args.seed} steps={args.steps}")
@@ -132,7 +179,8 @@ def main() -> int:
     train_rows, dev_rows, dataset_source = load_sst2_rows(args.train_examples, args.dev_examples)
 
     base_module = get_path(model, args.target_path)
-    input_dim, output_dim = infer_linear_dims(base_module)
+    input_dim, output_dim, dim_debug = infer_linear_dims(base_module, args.target_path)
+    print("LORA_DIMENSION_INFERENCE=" + json.dumps(dim_debug))
     lora = PACZeroLoRALinear(base_module, input_dim=input_dim, output_dim=output_dim, rank=args.rank, alpha=args.alpha, seed=args.seed)
     set_path(model, args.target_path, lora)
 
@@ -228,6 +276,7 @@ def main() -> int:
         "dev_examples": len(dev_rows),
         "parameterization": "actual_custom_lora_ab_tensors_paczero_zpl",
         "target_path": args.target_path,
+        "dimension_inference": dim_debug,
         "input_dim": input_dim,
         "output_dim": output_dim,
         "rank": args.rank,
@@ -251,7 +300,7 @@ def main() -> int:
         "release_sign_counts": sign_counts,
         "adapter_file": adapter_info,
         "history": history,
-        "verdict": "Full custom PACZero-LoRA reproduction on one Qwen projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters.",
+        "verdict": "Full custom PACZero-LoRA reproduction on one projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters.",
     }
     args.json_out.parent.mkdir(parents=True, exist_ok=True)
     args.json_out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
