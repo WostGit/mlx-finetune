@@ -1,0 +1,187 @@
+{
+  "success": true,
+  "model": "mlx-community/Llama-3.2-1B-Instruct-4bit",
+  "elapsed_seconds": 5696.588,
+  "dataset_source": "nyu-mll/glue/sst2",
+  "train_examples": 64,
+  "dev_examples": 64,
+  "parameterization": "actual_custom_lora_ab_tensors_paczero_zpl",
+  "target_path": "model.layers.0.self_attn.q_proj",
+  "dimension_inference": {
+    "module_type": "QuantizedLinear",
+    "target_path": "model.layers.0.self_attn.q_proj",
+    "weight_shape": [
+      2048,
+      256
+    ],
+    "weight_dtype": "mlx.core.uint32",
+    "output_source": "weight.shape[0]",
+    "input_source": "square_projection_fallback",
+    "input_dim": 2048,
+    "output_dim": 2048
+  },
+  "input_dim": 2048,
+  "output_dim": 2048,
+  "rank": 4,
+  "alpha": 8.0,
+  "theta_size": 16384,
+  "seed": 20260608,
+  "steps": 200,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "attached_lora_wrapper": true,
+    "theta_size_positive": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "fd_magnitude_ok": true,
+    "losses_remain_finite": true,
+    "best_dev_accuracy_not_worse": true,
+    "best_dev_loss_not_worse_when_accuracy_ties": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 1.6096431910991669,
+    "train_accuracy": 0.90625,
+    "dev_loss": 1.8567462861537933,
+    "dev_accuracy": 0.828125
+  },
+  "final": {
+    "train_loss": 1.6091697812080383,
+    "train_accuracy": 0.90625,
+    "dev_loss": 1.8558137714862823,
+    "dev_accuracy": 0.828125
+  },
+  "best_checkpoint": {
+    "step": 25,
+    "train_loss": 1.6095565855503082,
+    "train_accuracy": 0.90625,
+    "dev_loss": 1.8542274832725525,
+    "dev_accuracy": 0.828125
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.2987480163574219,
+  "fd_abs_max_mean": 0.18994998931884766,
+  "fd_abs_mean_mean": 0.05431661307811737,
+  "unanimity_rate": 0.415,
+  "release_sign_counts": {
+    "positive": 101,
+    "negative": 99
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-lora-adapters/llama-3.2-1b-4bit/qproj_lora_rank4.npz",
+    "bytes": 66516,
+    "A_shape": [
+      4,
+      2048
+    ],
+    "B_shape": [
+      2048,
+      4
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 1.6088121831417084,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8553573191165924,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.17862319946289062,
+      "fd_abs_mean": 0.0546497106552124,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 25,
+      "train_loss": 1.6095565855503082,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8542274832725525,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.15918731689453125,
+      "fd_abs_mean": 0.04837155342102051,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 50,
+      "train_loss": 1.6094619929790497,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8555512428283691,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.16674041748046875,
+      "fd_abs_mean": 0.04520893096923828,
+      "release_sign": 1,
+      "unanimous": true
+    },
+    {
+      "step": 75,
+      "train_loss": 1.607845515012741,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8576999604701996,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.11907577514648438,
+      "fd_abs_mean": 0.03953903913497925,
+      "release_sign": -1,
+      "unanimous": true
+    },
+    {
+      "step": 100,
+      "train_loss": 1.610803633928299,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.857840746641159,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.18491744995117188,
+      "fd_abs_mean": 0.05099177360534668,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 125,
+      "train_loss": 1.6105963289737701,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8592079877853394,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.18938064575195312,
+      "fd_abs_mean": 0.04988223314285278,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 150,
+      "train_loss": 1.6080435812473297,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8554800152778625,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.2987480163574219,
+      "fd_abs_mean": 0.05949884653091431,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 175,
+      "train_loss": 1.6096396744251251,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8548827767372131,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.2312469482421875,
+      "fd_abs_mean": 0.05375266075134277,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 200,
+      "train_loss": 1.6091697812080383,
+      "train_accuracy": 0.90625,
+      "dev_loss": 1.8558137714862823,
+      "dev_accuracy": 0.828125,
+      "fd_abs_max": 0.2647972106933594,
+      "fd_abs_mean": 0.05233496427536011,
+      "release_sign": -1,
+      "unanimous": true
+    }
+  ],
+  "verdict": "Full custom PACZero-LoRA reproduction on one projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters."
+}
