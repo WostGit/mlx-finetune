@@ -1,12 +1,28 @@
 {
   "success": true,
   "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
-  "elapsed_seconds": 2626.929,
+  "elapsed_seconds": 2685.063,
   "dataset_source": "nyu-mll/glue/sst2",
   "train_examples": 64,
   "dev_examples": 64,
   "parameterization": "actual_custom_lora_ab_tensors_paczero_zpl",
   "target_path": "model.layers.0.self_attn.q_proj",
+  "dimension_inference": {
+    "module_type": "QuantizedLinear",
+    "target_path": "model.layers.0.self_attn.q_proj",
+    "output_source": "bias.shape[0]",
+    "bias_shape": [
+      896
+    ],
+    "weight_shape": [
+      896,
+      112
+    ],
+    "weight_dtype": "mlx.core.uint32",
+    "input_source": "square_projection_fallback",
+    "input_dim": 896,
+    "output_dim": 896
+  },
   "input_dim": 896,
   "output_dim": 896,
   "rank": 4,
@@ -170,5 +186,5 @@
       "unanimous": true
     }
   ],
-  "verdict": "Full custom PACZero-LoRA reproduction on one Qwen projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters."
+  "verdict": "Full custom PACZero-LoRA reproduction on one projection if success=true. This trains actual LoRA A/B tensors, not base-model bias parameters."
 }
