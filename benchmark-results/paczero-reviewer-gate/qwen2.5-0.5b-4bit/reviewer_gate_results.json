@@ -1,0 +1,223 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "slug": "qwen2.5-0.5b-4bit",
+  "elapsed_seconds": 8739.574,
+  "dataset_source": "nyu-mll/glue/sst2 train split plus disjoint validation dev/eval slices",
+  "train_examples": 128,
+  "dev_examples": 128,
+  "eval_examples": 500,
+  "parameterization": "reviewer_gate_actual_lora_ab_paczero_zpl",
+  "target_path": "model.layers.0.self_attn.q_proj",
+  "dimension_inference": {
+    "module_type": "QuantizedLinear",
+    "target_path": "model.layers.0.self_attn.q_proj",
+    "output_source": "bias.shape[0]",
+    "bias_shape": [
+      896
+    ],
+    "weight_shape": [
+      896,
+      112
+    ],
+    "weight_dtype": "mlx.core.uint32",
+    "input_source": "square_projection_fallback",
+    "input_dim": 896,
+    "output_dim": 896
+  },
+  "input_dim": 896,
+  "output_dim": 896,
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 14336,
+  "seed": 20260609,
+  "steps": 300,
+  "num_subsets": 126,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "attached_lora_wrapper": true,
+    "paper_style_num_subsets": true,
+    "paper_style_lora_rank_alpha": true,
+    "has_disjoint_eval_split": true,
+    "theta_size_positive": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "fd_magnitude_ok": true,
+    "losses_remain_finite": true,
+    "best_dev_accuracy_not_worse": true,
+    "best_eval_reported": true,
+    "privacy_membership_balanced": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 2.4920954406261444,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.26984903216362,
+    "dev_accuracy": 0.8359375,
+    "eval_loss": 2.2312490615844727,
+    "eval_accuracy": 0.812
+  },
+  "final": {
+    "train_loss": 2.4911418855190277,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.263358622789383,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.225766632080078,
+    "eval_accuracy": 0.812
+  },
+  "best_checkpoint_by_dev": {
+    "step": 100,
+    "train_loss": 2.4888607412576675,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.2602793276309967,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2219512557983396,
+    "eval_accuracy": 0.812
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 2.4888607412576675,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.2602793276309967,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2219512557983396,
+    "eval_accuracy": 0.812
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.8716011047363281,
+  "fd_abs_max_mean": 0.46333014170328773,
+  "fd_abs_mean_mean": 0.11403410385052364,
+  "privacy_accounting": {
+    "mechanism": "PACZero-ZPL-style sign release",
+    "claim_scope": "conceptual ZPL transcript accounting for this implementation; not differential privacy",
+    "not_differential_privacy": true,
+    "mutual_information_claim_under_zpl_rule": "I(S_star; Y_1:T)=0 when disagreement releases are independent uniform random signs and unanimous signs are subset-independent",
+    "num_subsets_M": 126,
+    "examples_per_column_expected": 63,
+    "membership_column_counts_unique": [
+      63
+    ],
+    "membership_balanced": true,
+    "steps": 300,
+    "unanimous_steps": 161,
+    "disagreement_steps": 139,
+    "disagreement_releases_randomized": 139,
+    "unanimity_rate": 0.5366666666666666,
+    "disagreement_rate": 0.4633333333333333,
+    "release_sign_counts": {
+      "positive": 164,
+      "negative": 136
+    },
+    "clip": 25.0,
+    "membership_seed": 20260626,
+    "rng_seed": 20260609
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-reviewer-gate-adapters/qwen2.5-0.5b-4bit/qproj_lora_rank8_alpha16.npz",
+    "bytes": 58324,
+    "A_shape": [
+      8,
+      896
+    ],
+    "B_shape": [
+      896,
+      8
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 2.4934865832328796,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.270288035273552,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2304393463134766,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.38097381591796875,
+      "fd_abs_mean": 0.10242477059364319,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 50,
+      "train_loss": 2.487958386540413,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.261500984430313,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2213997497558595,
+      "eval_accuracy": 0.814,
+      "fd_abs_max": 0.3911399841308594,
+      "fd_abs_mean": 0.10553523898124695,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 100,
+      "train_loss": 2.4888607412576675,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.2602793276309967,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2219512557983396,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.47458648681640625,
+      "fd_abs_mean": 0.11463150382041931,
+      "release_sign": 1,
+      "unanimous": false
+    },
+    {
+      "step": 150,
+      "train_loss": 2.4911671578884125,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.2635069340467453,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2241047439575197,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.513153076171875,
+      "fd_abs_mean": 0.10627210140228271,
+      "release_sign": -1,
+      "unanimous": false
+    },
+    {
+      "step": 200,
+      "train_loss": 2.4917932897806168,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.267622634768486,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.228266330718994,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.3988075256347656,
+      "fd_abs_mean": 0.11029690504074097,
+      "release_sign": 1,
+      "unanimous": true
+    },
+    {
+      "step": 250,
+      "train_loss": 2.491117462515831,
+      "train_accuracy": 0.7265625,
+      "dev_loss": 2.267795741558075,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2301812858581544,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.4946136474609375,
+      "fd_abs_mean": 0.1025882363319397,
+      "release_sign": -1,
+      "unanimous": true
+    },
+    {
+      "step": 300,
+      "train_loss": 2.4911418855190277,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.263358622789383,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.225766632080078,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.391693115234375,
+      "fd_abs_mean": 0.10468840599060059,
+      "release_sign": 1,
+      "unanimous": false
+    }
+  ],
+  "verdict": "Reviewer-risk medium gate: closes M, LoRA config, held-out eval, and privacy-reporting gaps. Still smaller than full 1000/500/1000 paper scale unless train/dev/eval inputs are increased."
+}
