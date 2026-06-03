@@ -1,0 +1,4316 @@
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "slug": "qwen2.5-0.5b-4bit",
+  "elapsed_seconds": 5868.369,
+  "dataset_source": "nyu-mll/glue/sst2 train split plus disjoint validation dev/eval slices",
+  "train_examples": 128,
+  "dev_examples": 128,
+  "eval_examples": 500,
+  "parameterization": "reviewer_gate_actual_lora_ab_paczero_zpl_with_strict_privacy_audit",
+  "target_path": "model.layers.0.self_attn.q_proj",
+  "dimension_inference": {
+    "module_type": "QuantizedLinear",
+    "target_path": "model.layers.0.self_attn.q_proj",
+    "output_source": "bias.shape[0]",
+    "bias_shape": [
+      896
+    ],
+    "weight_shape": [
+      896,
+      112
+    ],
+    "weight_dtype": "mlx.core.uint32",
+    "input_source": "square_projection_fallback",
+    "input_dim": 896,
+    "output_dim": 896
+  },
+  "input_dim": 896,
+  "output_dim": 896,
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 14336,
+  "seed": 20260609,
+  "steps": 200,
+  "num_subsets": 126,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "attached_lora_wrapper": true,
+    "paper_style_num_subsets": true,
+    "paper_style_lora_rank_alpha": true,
+    "has_disjoint_eval_split": true,
+    "theta_size_positive": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "fd_magnitude_ok": true,
+    "losses_remain_finite": true,
+    "best_dev_accuracy_not_worse": true,
+    "best_eval_reported": true,
+    "privacy_membership_balanced": true,
+    "privacy_transcript_audit_passed": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 2.4920954406261444,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.26984903216362,
+    "dev_accuracy": 0.8359375,
+    "eval_loss": 2.2312490615844727,
+    "eval_accuracy": 0.812
+  },
+  "final": {
+    "train_loss": 2.4917932897806168,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.267622634768486,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.228266330718994,
+    "eval_accuracy": 0.812
+  },
+  "best_checkpoint_by_dev": {
+    "step": 100,
+    "train_loss": 2.4888607412576675,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.2602793276309967,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2219512557983396,
+    "eval_accuracy": 0.812
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 2.4888607412576675,
+    "train_accuracy": 0.734375,
+    "dev_loss": 2.2602793276309967,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2219512557983396,
+    "eval_accuracy": 0.812
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.8716011047363281,
+  "fd_abs_max_mean": 0.462117862701416,
+  "fd_abs_mean_mean": 0.11369402557611466,
+  "privacy_accounting": {
+    "mechanism": "PACZero-ZPL audited sign release",
+    "claim_scope": "implementation-level transcript audit for the ZPL release rule; not differential privacy",
+    "not_differential_privacy": true,
+    "mutual_information_claim_under_zpl_rule": "I(S_star; Y_1:T)=0 because every unanimous release is identical for all candidate subsets, and every disagreement release is an independent uniform random sign that never indexes S_star.",
+    "num_subsets_M": 126,
+    "examples_per_column_expected": 63,
+    "membership_column_counts_unique": [
+      63
+    ],
+    "membership_balanced": true,
+    "steps": 200,
+    "audited_steps": 200,
+    "unanimous_steps": 103,
+    "disagreement_steps": 97,
+    "disagreement_releases_randomized": 97,
+    "unanimity_rate": 0.515,
+    "disagreement_rate": 0.485,
+    "release_sign_counts": {
+      "positive": 108,
+      "negative": 92
+    },
+    "clip": 25.0,
+    "membership_seed": 20260626,
+    "rng_seed": 20260609,
+    "privacy_audit": {
+      "all_unanimous_steps_subset_independent": true,
+      "all_disagreement_steps_randomized": true,
+      "secret_subset_never_indexed_for_release": true,
+      "release_rule_violation_count": 0,
+      "transcript_distribution_independent_of_secret_subset_by_construction": true,
+      "conclusion": "PASS: implemented ZPL transcript is independent of S_star by construction"
+    },
+    "privacy_trace": [
+      {
+        "step": 1,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 124,
+          "positive": 2
+        },
+        "subset_means_min": -0.056711435317993164,
+        "subset_means_max": 0.009229304426807469,
+        "subset_means_mean": -0.02411480816948933,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 2,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 12,
+          "positive": 114
+        },
+        "subset_means_min": -0.02114164418187635,
+        "subset_means_max": 0.045594172691231345,
+        "subset_means_mean": 0.015610641964971311,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 3,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 87,
+          "positive": 39
+        },
+        "subset_means_min": -0.05797704060872396,
+        "subset_means_max": 0.02531378609793527,
+        "subset_means_mean": -0.009527846307737392,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 4,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 116,
+          "positive": 10
+        },
+        "subset_means_min": -0.043098887459176484,
+        "subset_means_max": 0.011766221788194444,
+        "subset_means_mean": -0.012798061690780193,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 5,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.07029056549072266,
+        "subset_means_max": 0.13816935221354168,
+        "subset_means_mean": 0.1077002454811132,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 6,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.06784778171115452,
+        "subset_means_max": -0.006265478619074417,
+        "subset_means_mean": -0.032920378822275886,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 7,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.03595172234301297,
+        "subset_means_max": 0.10293190939384594,
+        "subset_means_mean": 0.06848395053060294,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 8,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 52,
+          "positive": 74
+        },
+        "subset_means_min": -0.026330947875976562,
+        "subset_means_max": 0.052192744924061334,
+        "subset_means_mean": 0.0025063870593821586,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 9,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.04656482387233425,
+        "subset_means_max": 0.12722721806278936,
+        "subset_means_mean": 0.08818841860338335,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 10,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 2,
+          "positive": 124
+        },
+        "subset_means_min": -0.011832923219915022,
+        "subset_means_max": 0.05765979572878045,
+        "subset_means_mean": 0.025977239270540534,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 11,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.01700815164817954,
+        "subset_means_max": 0.07493838457994058,
+        "subset_means_mean": 0.046212046585508,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 12,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.006029764811197917,
+        "subset_means_max": 0.07295677878639915,
+        "subset_means_mean": 0.03406090656475094,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 13,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.012690650092230903,
+        "subset_means_max": 0.07748098934397978,
+        "subset_means_mean": 0.043010249905159954,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 14,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.14581807454427084,
+        "subset_means_max": -0.067535400390625,
+        "subset_means_mean": -0.10203867526493467,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 15,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.09289360046386719,
+        "subset_means_max": -0.015262179904513888,
+        "subset_means_mean": -0.046547912762043016,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 16,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07274246215820312,
+        "subset_means_max": -0.009644826253255209,
+        "subset_means_mean": -0.04335224696181556,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 17,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.016695658365885418,
+        "subset_means_max": 0.08511178633745979,
+        "subset_means_mean": 0.051238781533413935,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 18,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.0819104293297077,
+        "subset_means_max": -0.03194085482893319,
+        "subset_means_mean": -0.062189122917413485,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 19,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.008431310239045517,
+        "subset_means_max": 0.08463844886192909,
+        "subset_means_mean": 0.03610981423442473,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 20,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 121,
+          "positive": 5
+        },
+        "subset_means_min": -0.05992677476671007,
+        "subset_means_max": 0.003581191554214015,
+        "subset_means_mean": -0.025781799381369902,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 21,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.031248463524712458,
+        "subset_means_max": 0.09043737558218148,
+        "subset_means_mean": 0.057814517213538724,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 22,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.03633039968985098,
+        "subset_means_max": 0.09564307428175403,
+        "subset_means_mean": 0.06257071430447535,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 23,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 2,
+          "positive": 124
+        },
+        "subset_means_min": -0.006569096299468494,
+        "subset_means_max": 0.0779512193467882,
+        "subset_means_mean": 0.03277289547846669,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 24,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.06665260561050908,
+        "subset_means_max": 0.02612565693102385,
+        "subset_means_mean": -0.020892913003702215,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 25,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.0805295523950609,
+        "subset_means_max": -0.00629659284625137,
+        "subset_means_mean": -0.040049737430101116,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 26,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.021267594962284482,
+        "subset_means_max": 0.09407731353259477,
+        "subset_means_mean": 0.05543010433873524,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 27,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 19,
+          "positive": 107
+        },
+        "subset_means_min": -0.018811739408052884,
+        "subset_means_max": 0.04176624485703766,
+        "subset_means_mean": 0.010928080460140583,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 28,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 123,
+          "positive": 3
+        },
+        "subset_means_min": -0.06883167085193452,
+        "subset_means_max": 0.005926624421150454,
+        "subset_means_mean": -0.030885714533021028,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 29,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.05276275403571851,
+        "subset_means_max": 0.11179972503144862,
+        "subset_means_mean": 0.08276009864921928,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 30,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.03740380027077415,
+        "subset_means_max": 0.10326915317111546,
+        "subset_means_mean": 0.06542611348121778,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 31,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 7,
+          "positive": 119
+        },
+        "subset_means_min": -0.01793447530494546,
+        "subset_means_max": 0.049274707662648166,
+        "subset_means_mean": 0.02247387649198931,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 32,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.005069339976591223,
+        "subset_means_max": 0.06131599689352101,
+        "subset_means_mean": 0.03799665091398686,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 33,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 49,
+          "positive": 77
+        },
+        "subset_means_min": -0.02341161455426897,
+        "subset_means_max": 0.05066601735241008,
+        "subset_means_mean": 0.004711416839024803,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 34,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 113,
+          "positive": 13
+        },
+        "subset_means_min": -0.042714476585388184,
+        "subset_means_max": 0.017554283142089844,
+        "subset_means_mean": -0.012963546587723394,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 35,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.11321037046370967,
+        "subset_means_max": -0.04150941636827257,
+        "subset_means_mean": -0.0794824962338584,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 36,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07373124361038208,
+        "subset_means_max": -0.005080930648311492,
+        "subset_means_mean": -0.037615606398079586,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 37,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.045608173717151985,
+        "subset_means_max": 0.10076307481335055,
+        "subset_means_mean": 0.07023910737785538,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 38,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 4,
+          "positive": 122
+        },
+        "subset_means_min": -0.004937489827473958,
+        "subset_means_max": 0.053661487720630785,
+        "subset_means_mean": 0.02322480255233139,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 39,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.03094632860640405,
+        "subset_means_max": 0.08658167141586987,
+        "subset_means_mean": 0.05700350543072898,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 40,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 123,
+          "positive": 3
+        },
+        "subset_means_min": -0.052817951549183235,
+        "subset_means_max": 0.01973278117629717,
+        "subset_means_mean": -0.02421004293888566,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 41,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02484923142653245,
+        "subset_means_max": 0.08687241872151692,
+        "subset_means_mean": 0.05224286633356038,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 42,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.026844024658203125,
+        "subset_means_max": 0.0926806131998698,
+        "subset_means_mean": 0.0671205753605358,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 43,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -8.604261610243056e-05,
+        "subset_means_max": 0.06229643388227983,
+        "subset_means_mean": 0.03128361022743839,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 44,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.0018418629964192708,
+        "subset_means_max": 0.0677289460834704,
+        "subset_means_mean": 0.027311237791432897,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 45,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.014689551459418403,
+        "subset_means_max": 0.07761565732284331,
+        "subset_means_mean": 0.039574185962715974,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 46,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 90,
+          "positive": 36
+        },
+        "subset_means_min": -0.030951323332609953,
+        "subset_means_max": 0.01864286569448618,
+        "subset_means_mean": -0.005465488179238323,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 47,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.09530844511809172,
+        "subset_means_max": -0.024351997980995785,
+        "subset_means_mean": -0.05956652586837608,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 48,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02082911404696378,
+        "subset_means_max": 0.0664491795781833,
+        "subset_means_mean": 0.04606064074698385,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 49,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 4,
+          "positive": 122
+        },
+        "subset_means_min": -0.009634422533439867,
+        "subset_means_max": 0.0482806824801261,
+        "subset_means_mean": 0.020733618255119653,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 50,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 20,
+          "positive": 106
+        },
+        "subset_means_min": -0.01388817502741228,
+        "subset_means_max": 0.037226974964141846,
+        "subset_means_mean": 0.011799603364711744,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 51,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 106,
+          "positive": 20
+        },
+        "subset_means_min": -0.04041495689978966,
+        "subset_means_max": 0.018785376297800166,
+        "subset_means_mean": -0.012211090522580046,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 52,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 99,
+          "positive": 27
+        },
+        "subset_means_min": -0.04818598429361979,
+        "subset_means_max": 0.03256599858122052,
+        "subset_means_mean": -0.010717860402812477,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 53,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08347408588115986,
+        "subset_means_max": -0.025847920200280976,
+        "subset_means_mean": -0.050862748675868846,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 54,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 38,
+          "positive": 88
+        },
+        "subset_means_min": -0.04088585193340595,
+        "subset_means_max": 0.03636821623771421,
+        "subset_means_mean": 0.0044248211668671605,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 55,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 67,
+          "positive": 59
+        },
+        "subset_means_min": -0.0342375232327369,
+        "subset_means_max": 0.022032030167118195,
+        "subset_means_mean": -0.0019181380131695475,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 56,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 92,
+          "positive": 34
+        },
+        "subset_means_min": -0.03849029541015625,
+        "subset_means_max": 0.025275977882179054,
+        "subset_means_mean": -0.0065355162593884195,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 57,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.06300630240604796,
+        "subset_means_max": 1.3033548990885416e-05,
+        "subset_means_mean": -0.03347382212592786,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 58,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 65,
+          "positive": 61
+        },
+        "subset_means_min": -0.030062945921029618,
+        "subset_means_max": 0.03311803264002646,
+        "subset_means_mean": 0.0007574857011436776,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 59,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.017887050822629768,
+        "subset_means_max": 0.07839541965060765,
+        "subset_means_mean": 0.041260706165476516,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 60,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0340425968170166,
+        "subset_means_max": 0.09787291288375854,
+        "subset_means_mean": 0.06709318761859634,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 61,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.0022532145182291665,
+        "subset_means_max": 0.0687508663888705,
+        "subset_means_mean": 0.034778549333641065,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 62,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.018459558486938477,
+        "subset_means_max": 0.07961407042386238,
+        "subset_means_mean": 0.05066113804174144,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 63,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 2,
+          "positive": 124
+        },
+        "subset_means_min": -0.008032614724677905,
+        "subset_means_max": 0.056313297204804005,
+        "subset_means_mean": 0.026816392966723404,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 64,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.0752924256405588,
+        "subset_means_max": 0.0007632740756921601,
+        "subset_means_mean": -0.03980514612836567,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 65,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 84,
+          "positive": 42
+        },
+        "subset_means_min": -0.031955785918654056,
+        "subset_means_max": 0.030853907267252605,
+        "subset_means_mean": -0.003523541166331258,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 66,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.05379754988873591,
+        "subset_means_max": 0.01615957780317827,
+        "subset_means_mean": -0.015752529907579603,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 67,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02784208817915483,
+        "subset_means_max": 0.10100717897768374,
+        "subset_means_mean": 0.06190815369284802,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 68,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.07470399141311646,
+        "subset_means_max": 0.13593104348253848,
+        "subset_means_mean": 0.10111011162735574,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 69,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.01816820742479011,
+        "subset_means_max": 0.0804169394753196,
+        "subset_means_mean": 0.05136370480385371,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 70,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 65,
+          "positive": 61
+        },
+        "subset_means_min": -0.03892779350280762,
+        "subset_means_max": 0.03323357680748249,
+        "subset_means_mean": -0.0009741950015435516,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 71,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 50,
+          "positive": 76
+        },
+        "subset_means_min": -0.027541034626510908,
+        "subset_means_max": 0.041848902116742054,
+        "subset_means_mean": 0.003439146215191954,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 72,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0006498370254248904,
+        "subset_means_max": 0.07529735565185547,
+        "subset_means_mean": 0.04156694850276567,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 73,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 6,
+          "positive": 120
+        },
+        "subset_means_min": -0.009630276606633114,
+        "subset_means_max": 0.05332469940185547,
+        "subset_means_mean": 0.02418348142808293,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 74,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 12,
+          "positive": 114
+        },
+        "subset_means_min": -0.014518479169425318,
+        "subset_means_max": 0.038553435226966595,
+        "subset_means_mean": 0.016609024831516175,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 75,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.029051601886749268,
+        "subset_means_max": 0.09903490543365479,
+        "subset_means_mean": 0.06266034209480209,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 76,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 100,
+          "positive": 26
+        },
+        "subset_means_min": -0.03288050166896132,
+        "subset_means_max": 0.02741206776012074,
+        "subset_means_mean": -0.00702360946651716,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 77,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08134335279464722,
+        "subset_means_max": -0.01873107183547247,
+        "subset_means_mean": -0.05132188564961913,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 78,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 9,
+          "positive": 117
+        },
+        "subset_means_min": -0.02007501775568182,
+        "subset_means_max": 0.05249992745821593,
+        "subset_means_mean": 0.015911120791648647,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 79,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07710421526873554,
+        "subset_means_max": -0.00978178448147244,
+        "subset_means_mean": -0.044739120782557006,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 80,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02286060436351879,
+        "subset_means_max": 0.09402626439144737,
+        "subset_means_mean": 0.055838204753560716,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 81,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.05229465545169891,
+        "subset_means_max": 0.1110705013932853,
+        "subset_means_mean": 0.0809167990592455,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 82,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.048725903034210205,
+        "subset_means_max": 0.10689689999534971,
+        "subset_means_mean": 0.07636407160664987,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 83,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 25,
+          "positive": 101
+        },
+        "subset_means_min": -0.03060966730117798,
+        "subset_means_max": 0.047838889946371824,
+        "subset_means_mean": 0.012571570478412182,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 84,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.00671422040020978,
+        "subset_means_max": 0.06887579863926149,
+        "subset_means_mean": 0.03618354695779066,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 85,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.025769134065998133,
+        "subset_means_max": 0.10139656066894531,
+        "subset_means_mean": 0.0627243409400919,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 86,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 13,
+          "positive": 113
+        },
+        "subset_means_min": -0.015501346228257665,
+        "subset_means_max": 0.05232083595405191,
+        "subset_means_mean": 0.016696374285549404,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 87,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02555089838364545,
+        "subset_means_max": 0.07979551951090495,
+        "subset_means_mean": 0.05500746389907562,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 88,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.09129338794284397,
+        "subset_means_max": -0.033262844743399786,
+        "subset_means_mean": -0.05674109754555261,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 89,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.08953813646660476,
+        "subset_means_max": 0.15211659093056956,
+        "subset_means_mean": 0.12309597133094616,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 90,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 110,
+          "positive": 16
+        },
+        "subset_means_min": -0.05309307213985559,
+        "subset_means_max": 0.019756252482786018,
+        "subset_means_mean": -0.013108099320881523,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 91,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.05337930494739163,
+        "subset_means_max": 0.0014977088341346155,
+        "subset_means_mean": -0.02750382741051593,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 92,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.04693658728348581,
+        "subset_means_max": 0.12494087219238281,
+        "subset_means_mean": 0.081565475752405,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 93,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 60,
+          "positive": 66
+        },
+        "subset_means_min": -0.03254443407058716,
+        "subset_means_max": 0.029879118266858552,
+        "subset_means_mean": 0.0005505921321935693,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 94,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08107711528909617,
+        "subset_means_max": -0.010229647159576416,
+        "subset_means_mean": -0.04141765360156593,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 95,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 116,
+          "positive": 10
+        },
+        "subset_means_min": -0.04576835079469543,
+        "subset_means_max": 0.01702712132380559,
+        "subset_means_mean": -0.020190231821484026,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 96,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.11678725954086061,
+        "subset_means_max": -0.056406218430091595,
+        "subset_means_mean": -0.08858046568850837,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 97,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 5,
+          "positive": 121
+        },
+        "subset_means_min": -0.009222570455299233,
+        "subset_means_max": 0.05873918533325195,
+        "subset_means_mean": 0.02305065607835123,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 98,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.025818383515770756,
+        "subset_means_max": 0.09971968332926433,
+        "subset_means_mean": 0.0559661751950272,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 99,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 71,
+          "positive": 55
+        },
+        "subset_means_min": -0.038084763746995196,
+        "subset_means_max": 0.026686928488991478,
+        "subset_means_mean": -0.002942334636543865,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 100,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 100,
+          "positive": 26
+        },
+        "subset_means_min": -0.04502843637935451,
+        "subset_means_max": 0.026486919772240422,
+        "subset_means_mean": -0.010253103675698335,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 101,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.0028952236833243534,
+        "subset_means_max": 0.05949723093133224,
+        "subset_means_mean": 0.028371263432983653,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 102,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 58,
+          "positive": 68
+        },
+        "subset_means_min": -0.021711316025047972,
+        "subset_means_max": 0.029095447424686317,
+        "subset_means_mean": 0.0013172264865990249,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 103,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.05449953946200284,
+        "subset_means_max": 0.018008810574891138,
+        "subset_means_mean": -0.013564279226594209,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 104,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 91,
+          "positive": 35
+        },
+        "subset_means_min": -0.04678993894342791,
+        "subset_means_max": 0.025809659796246026,
+        "subset_means_mean": -0.007558327466066774,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 105,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 9,
+          "positive": 117
+        },
+        "subset_means_min": -0.010545478676849941,
+        "subset_means_max": 0.0571441650390625,
+        "subset_means_mean": 0.01908143974941712,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 106,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 77,
+          "positive": 49
+        },
+        "subset_means_min": -0.03352876693483383,
+        "subset_means_max": 0.028716087341308594,
+        "subset_means_mean": -0.003745947591907902,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 107,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 102,
+          "positive": 24
+        },
+        "subset_means_min": -0.04630923271179199,
+        "subset_means_max": 0.019714793220895234,
+        "subset_means_mean": -0.011303304576205786,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 108,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08971102097455193,
+        "subset_means_max": -0.022380053997039795,
+        "subset_means_mean": -0.0615403865654539,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 109,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 113,
+          "positive": 13
+        },
+        "subset_means_min": -0.0422998202049126,
+        "subset_means_max": 0.01603685576340248,
+        "subset_means_mean": -0.01454505214663575,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 110,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 15,
+          "positive": 111
+        },
+        "subset_means_min": -0.013348207635394597,
+        "subset_means_max": 0.05107848370661501,
+        "subset_means_mean": 0.015519304409774367,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 111,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 52,
+          "positive": 74
+        },
+        "subset_means_min": -0.03303620123094128,
+        "subset_means_max": 0.0424088372124566,
+        "subset_means_mean": 0.0032799520907214825,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 112,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.061453457536368536,
+        "subset_means_max": 0.015976799858940974,
+        "subset_means_mean": -0.02851583222356463,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 113,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10297493856461322,
+        "subset_means_max": -0.030592484907670456,
+        "subset_means_mean": -0.0715719049279807,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 114,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 41,
+          "positive": 85
+        },
+        "subset_means_min": -0.02245777058151533,
+        "subset_means_max": 0.04296318959381621,
+        "subset_means_mean": 0.005562431930815079,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 115,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.004609914926382212,
+        "subset_means_max": 0.06659889221191406,
+        "subset_means_mean": 0.03615655989979393,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 116,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 84,
+          "positive": 42
+        },
+        "subset_means_min": -0.029941612566021125,
+        "subset_means_max": 0.025808061872209822,
+        "subset_means_mean": -0.002687185283751138,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 117,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 91,
+          "positive": 35
+        },
+        "subset_means_min": -0.05561117398536811,
+        "subset_means_max": 0.031085836476293104,
+        "subset_means_mean": -0.008876697058648844,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 118,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.021419525146484375,
+        "subset_means_max": 0.08298314850905845,
+        "subset_means_mean": 0.05026881033148295,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 119,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08078090480116547,
+        "subset_means_max": -0.004721655361894248,
+        "subset_means_mean": -0.04372729578430811,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 120,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.18502447340223524,
+        "subset_means_max": -0.13069212436676025,
+        "subset_means_mean": -0.1548684906086975,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 121,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 9,
+          "positive": 117
+        },
+        "subset_means_min": -0.011036694049835205,
+        "subset_means_max": 0.04876207422327112,
+        "subset_means_mean": 0.015736694553872752,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 122,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10226922876694623,
+        "subset_means_max": -0.035669092546429554,
+        "subset_means_mean": -0.07341168979458178,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 123,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.14625032069319385,
+        "subset_means_max": -0.08627405706441628,
+        "subset_means_mean": -0.11490541966367457,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 124,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 124,
+          "positive": 2
+        },
+        "subset_means_min": -0.06099575855692879,
+        "subset_means_max": 0.005733120825982863,
+        "subset_means_mean": -0.029371048443424724,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 125,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.025768564708197293,
+        "subset_means_max": 0.09673813642081568,
+        "subset_means_mean": 0.05627054667657561,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 126,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0023168325424194336,
+        "subset_means_max": 0.07064011137364275,
+        "subset_means_mean": 0.03430437280202038,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 127,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 81,
+          "positive": 45
+        },
+        "subset_means_min": -0.035797953605651855,
+        "subset_means_max": 0.03164582333322299,
+        "subset_means_mean": -0.004006935577845763,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 128,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.043898113703323624,
+        "subset_means_max": 0.09508165819891568,
+        "subset_means_mean": 0.0694553122155855,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 129,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.0756269261456918,
+        "subset_means_max": -0.001618472012606534,
+        "subset_means_mean": -0.03821266391982097,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 130,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.04921999844637784,
+        "subset_means_max": 0.11106520891189575,
+        "subset_means_mean": 0.08026450750813854,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 131,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10717465327336238,
+        "subset_means_max": -0.05250567481631324,
+        "subset_means_mean": -0.0788217158210705,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 132,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 114,
+          "positive": 12
+        },
+        "subset_means_min": -0.03559306516485699,
+        "subset_means_max": 0.015963641079989346,
+        "subset_means_mean": -0.015548810409219902,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 133,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07018042392418032,
+        "subset_means_max": -0.015566276781486742,
+        "subset_means_mean": -0.03974889219815982,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 134,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.032684520139532575,
+        "subset_means_max": 0.10350719574959047,
+        "subset_means_mean": 0.0716752259788419,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 135,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0923998602505388,
+        "subset_means_max": 0.16405510179924243,
+        "subset_means_mean": 0.13208196099014263,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 136,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.05479145050048828,
+        "subset_means_max": 0.017021826977999706,
+        "subset_means_mean": -0.020208915903827326,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 137,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0010252780601626536,
+        "subset_means_max": 0.05417231855721309,
+        "subset_means_mean": 0.026698466044679937,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 138,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.03089932427890059,
+        "subset_means_max": 0.0857605472687752,
+        "subset_means_mean": 0.056372991520409046,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 139,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 14,
+          "positive": 112
+        },
+        "subset_means_min": -0.015249394658786147,
+        "subset_means_max": 0.05009229065941983,
+        "subset_means_mean": 0.015905509842763618,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 140,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07070080987338362,
+        "subset_means_max": -0.008809831407335069,
+        "subset_means_mean": -0.03936560936019355,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 141,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.04396216074625651,
+        "subset_means_max": 0.02850179319028501,
+        "subset_means_mean": -0.017321576986453396,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 142,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 61,
+          "positive": 65
+        },
+        "subset_means_min": -0.040028393268585205,
+        "subset_means_max": 0.03445095486111111,
+        "subset_means_mean": 0.00048582564550250107,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 143,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0450445810953776,
+        "subset_means_max": 0.11822579123757103,
+        "subset_means_mean": 0.07739725890895048,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 144,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.05354209024398053,
+        "subset_means_max": 0.0011295080184936523,
+        "subset_means_mean": -0.02518398178751732,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 145,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 3,
+          "positive": 123
+        },
+        "subset_means_min": -0.003716395451472356,
+        "subset_means_max": 0.05346454557825307,
+        "subset_means_mean": 0.026864948704811802,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 146,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10507007814803214,
+        "subset_means_max": -0.026992729731968472,
+        "subset_means_mean": -0.06372167014909438,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 147,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 28,
+          "positive": 98
+        },
+        "subset_means_min": -0.01862189349006204,
+        "subset_means_max": 0.03802699427450857,
+        "subset_means_mean": 0.008931894982177935,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 148,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 59,
+          "positive": 67
+        },
+        "subset_means_min": -0.02186865176794664,
+        "subset_means_max": 0.028055631197415866,
+        "subset_means_mean": 0.0013422385505975412,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 149,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07896584979558395,
+        "subset_means_max": -0.0021664301554361978,
+        "subset_means_mean": -0.043665028917014244,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 150,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.06318473815917969,
+        "subset_means_max": 0.013246716193433077,
+        "subset_means_mean": -0.02654066029597216,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 151,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.021318262273615055,
+        "subset_means_max": 0.07858380404385654,
+        "subset_means_mean": 0.049458273458063216,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 152,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 87,
+          "positive": 39
+        },
+        "subset_means_min": -0.04422104149533991,
+        "subset_means_max": 0.030424091177926937,
+        "subset_means_mean": -0.00506000702037448,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 153,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.07063379827535378,
+        "subset_means_max": -0.004303728947873975,
+        "subset_means_mean": -0.0322589965768365,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 154,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 51,
+          "positive": 75
+        },
+        "subset_means_min": -0.03076027179586476,
+        "subset_means_max": 0.03633860884041622,
+        "subset_means_mean": 0.0037740662247064747,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 155,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 23,
+          "positive": 103
+        },
+        "subset_means_min": -0.01621282325600678,
+        "subset_means_max": 0.04242995689655173,
+        "subset_means_mean": 0.010880269207703368,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 156,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08508831262588501,
+        "subset_means_max": -0.028996076740202357,
+        "subset_means_mean": -0.061169287755388796,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 157,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08290598942683293,
+        "subset_means_max": -0.029185555197975853,
+        "subset_means_mean": -0.05347894643832746,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 158,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.06197337446541622,
+        "subset_means_max": -0.0013444688585069445,
+        "subset_means_mean": -0.024857351375824913,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 159,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.011604376006544683,
+        "subset_means_max": 0.07542552370013612,
+        "subset_means_mean": 0.04566992042145255,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 160,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.09517184170809659,
+        "subset_means_max": -0.031732462220272775,
+        "subset_means_mean": -0.0607127829307978,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 161,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.00033300431048283814,
+        "subset_means_max": 0.08656245011549729,
+        "subset_means_mean": 0.03404213397968197,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 162,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10532437838040866,
+        "subset_means_max": -0.03226126393964214,
+        "subset_means_mean": -0.0695019537434387,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 163,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02198921059662441,
+        "subset_means_max": 0.08066929561991087,
+        "subset_means_mean": 0.04912172983061398,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 164,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.11030320198305192,
+        "subset_means_max": -0.044997244170217804,
+        "subset_means_mean": -0.08165206173895359,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 165,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 96,
+          "positive": 30
+        },
+        "subset_means_min": -0.028783162434895832,
+        "subset_means_max": 0.020445390181107956,
+        "subset_means_mean": -0.007474520846591653,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 166,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 118,
+          "positive": 8
+        },
+        "subset_means_min": -0.05637553700229578,
+        "subset_means_max": 0.008396292632480836,
+        "subset_means_mean": -0.021932051015344237,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 167,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.02059079598689425,
+        "subset_means_max": 0.0992820222499007,
+        "subset_means_mean": 0.06487572666560379,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 168,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.01014169657005454,
+        "subset_means_max": 0.07786664095791904,
+        "subset_means_mean": 0.04910947264993761,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 169,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.01319128891517376,
+        "subset_means_max": 0.06778823004828559,
+        "subset_means_mean": 0.039623183663916935,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 170,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 114,
+          "positive": 12
+        },
+        "subset_means_min": -0.04537123220938223,
+        "subset_means_max": 0.01398059300013951,
+        "subset_means_mean": -0.01747774089332243,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 171,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 3,
+          "positive": 123
+        },
+        "subset_means_min": -0.01257556979939089,
+        "subset_means_max": 0.06081022065261315,
+        "subset_means_mean": 0.030740330501853503,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 172,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 3,
+          "positive": 123
+        },
+        "subset_means_min": -0.008465449015299479,
+        "subset_means_max": 0.05396018593998279,
+        "subset_means_mean": 0.023966445860324585,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 173,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0010960896809895833,
+        "subset_means_max": 0.070317920885588,
+        "subset_means_mean": 0.03422674757558444,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 174,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 7,
+          "positive": 119
+        },
+        "subset_means_min": -0.01060840061732701,
+        "subset_means_max": 0.04351898475929543,
+        "subset_means_mean": 0.02033817948528437,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 175,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08139918832217946,
+        "subset_means_max": -0.022145024052372685,
+        "subset_means_mean": -0.05485951448975904,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 176,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 56,
+          "positive": 70
+        },
+        "subset_means_min": -0.02661559541346663,
+        "subset_means_max": 0.03303643428918087,
+        "subset_means_mean": 0.0021242917902947623,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 177,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08090911373015373,
+        "subset_means_max": -0.022662236140324518,
+        "subset_means_mean": -0.05199875006752412,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 178,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10212268469468602,
+        "subset_means_max": -0.050828754901885986,
+        "subset_means_mean": -0.07411351725924384,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 179,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 3,
+          "positive": 123
+        },
+        "subset_means_min": -0.009949154324001737,
+        "subset_means_max": 0.05082811628069196,
+        "subset_means_mean": 0.025147331961928688,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 180,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.015241155084573998,
+        "subset_means_max": 0.07282447814941406,
+        "subset_means_mean": 0.04701378808803406,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 181,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.029531347340550917,
+        "subset_means_max": 0.09077134679575435,
+        "subset_means_mean": 0.06206340245343957,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 182,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 1,
+          "positive": 125
+        },
+        "subset_means_min": -0.0035698687443967724,
+        "subset_means_max": 0.07953528201941287,
+        "subset_means_mean": 0.039935325642193834,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 183,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 116,
+          "positive": 10
+        },
+        "subset_means_min": -0.043814688017874054,
+        "subset_means_max": 0.015649497509002686,
+        "subset_means_mean": -0.018937441493207988,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 184,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 33,
+          "positive": 93
+        },
+        "subset_means_min": -0.02454012632369995,
+        "subset_means_max": 0.03893211239674052,
+        "subset_means_mean": 0.007686330676130437,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 185,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 97,
+          "positive": 29
+        },
+        "subset_means_min": -0.046207361054002194,
+        "subset_means_max": 0.030352493812297952,
+        "subset_means_mean": -0.0077793613130970685,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 186,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.025588035583496094,
+        "subset_means_max": 0.08299121150264034,
+        "subset_means_mean": 0.05261670804396957,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 187,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.10059674580891927,
+        "subset_means_max": -0.03937869004800286,
+        "subset_means_mean": -0.06877917282321151,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 188,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 33,
+          "positive": 93
+        },
+        "subset_means_min": -0.022268295288085938,
+        "subset_means_max": 0.03670999559305482,
+        "subset_means_mean": 0.007166872944805206,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 189,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0072347416597254134,
+        "subset_means_max": 0.06326613887663811,
+        "subset_means_mean": 0.03489384579155534,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 190,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 80,
+          "positive": 46
+        },
+        "subset_means_min": -0.03588334569391215,
+        "subset_means_max": 0.02738267183303833,
+        "subset_means_mean": -0.0034365840605687426,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 191,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 111,
+          "positive": 15
+        },
+        "subset_means_min": -0.04757329037314967,
+        "subset_means_max": 0.01111297607421875,
+        "subset_means_mean": -0.01574402656213249,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 192,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.09725914626825051,
+        "subset_means_max": -0.04483648446890024,
+        "subset_means_mean": -0.07300463722189945,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 193,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.054384469985961914,
+        "subset_means_max": -0.00046327379014756944,
+        "subset_means_mean": -0.03209654157668395,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 194,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.0773145282079303,
+        "subset_means_max": -0.03163463664504717,
+        "subset_means_mean": -0.05345374005063366,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 195,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 84,
+          "positive": 42
+        },
+        "subset_means_min": -0.04501065900248866,
+        "subset_means_max": 0.027959144721596926,
+        "subset_means_mean": -0.005721241199917878,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 196,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.04442646818340949,
+        "subset_means_max": 0.11712726793791119,
+        "subset_means_mean": 0.07703740533148962,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 197,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.0766589277881687,
+        "subset_means_max": -0.008548361356141137,
+        "subset_means_mean": -0.03542204871789521,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 198,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.028893563055223035,
+        "subset_means_max": 0.10213178746840533,
+        "subset_means_mean": 0.06543938107261331,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 199,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 44,
+          "positive": 82
+        },
+        "subset_means_min": -0.032919792279805224,
+        "subset_means_max": 0.0350173827140562,
+        "subset_means_mean": 0.005045275892458182,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 200,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.029967215753370715,
+        "subset_means_max": 0.08299220692027699,
+        "subset_means_mean": 0.05331542715977774,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ]
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-reviewer-strict-adapters/qwen2.5-0.5b-4bit/qproj_lora_rank8_alpha16_strict.npz",
+    "bytes": 58324,
+    "A_shape": [
+      8,
+      896
+    ],
+    "B_shape": [
+      896,
+      8
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 2.4934865832328796,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.270288035273552,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2304393463134766,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.38097381591796875,
+      "fd_abs_mean": 0.10242477059364319,
+      "release_sign": -1,
+      "zpl_branch": "disagreement_randomized",
+      "unanimous": false,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 50,
+      "train_loss": 2.487958386540413,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.261500984430313,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2213997497558595,
+      "eval_accuracy": 0.814,
+      "fd_abs_max": 0.3911399841308594,
+      "fd_abs_mean": 0.10553523898124695,
+      "release_sign": 1,
+      "zpl_branch": "disagreement_randomized",
+      "unanimous": false,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 100,
+      "train_loss": 2.4888607412576675,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.2602793276309967,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2219512557983396,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.47458648681640625,
+      "fd_abs_mean": 0.11463150382041931,
+      "release_sign": 1,
+      "zpl_branch": "disagreement_randomized",
+      "unanimous": false,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 150,
+      "train_loss": 2.4911671578884125,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.2635069340467453,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2241047439575197,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.513153076171875,
+      "fd_abs_mean": 0.10627210140228271,
+      "release_sign": -1,
+      "zpl_branch": "disagreement_randomized",
+      "unanimous": false,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 200,
+      "train_loss": 2.4917932897806168,
+      "train_accuracy": 0.734375,
+      "dev_loss": 2.267622634768486,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.228266330718994,
+      "eval_accuracy": 0.812,
+      "fd_abs_max": 0.3988075256347656,
+      "fd_abs_mean": 0.11029690504074097,
+      "release_sign": 1,
+      "zpl_branch": "unanimous_subset_independent",
+      "unanimous": true,
+      "privacy_rule_violations_so_far": 0
+    }
+  ],
+  "verdict": "Reviewer-proof ZPL gate: audits every release for subset-independent transcript construction supporting I(S_star;Y_1:T)=0 under the implemented ZPL rule. Still smaller than full 1000/500/1000 paper scale unless train/dev/eval inputs are increased."
+}
