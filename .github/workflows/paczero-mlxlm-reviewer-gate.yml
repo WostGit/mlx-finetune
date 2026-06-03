@@ -1,4 +1,4 @@
-name: PACZero MLX-LM reviewer-risk gate
+name: PACZero MLX-LM reviewer-proof strict privacy audit
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       steps:
         description: "PACZero-ZPL LoRA steps per model"
         required: false
-        default: "300"
+        default: "200"
       train_examples:
         description: "Number of SST-2 train examples per model"
         required: false
@@ -34,11 +34,11 @@ defaults:
     shell: bash
 
 jobs:
-  reviewer-gate:
-    name: Reviewer gate ${{ matrix.slug }}
+  reviewer-strict-audit:
+    name: Strict ZPL audit ${{ matrix.slug }}
     runs-on: macos-26
-    timeout-minutes: 360
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-reviewer-gate]') }}
+    timeout-minutes: 420
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-reviewer-strict]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -57,7 +57,7 @@ jobs:
       PYTHONWARNINGS: "ignore"
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
       HF_XET_HIGH_PERFORMANCE: "1"
-      STEPS: ${{ github.event.inputs.steps || '300' }}
+      STEPS: ${{ github.event.inputs.steps || '200' }}
       TRAIN_EXAMPLES: ${{ github.event.inputs.train_examples || '128' }}
       DEV_EXAMPLES: ${{ github.event.inputs.dev_examples || '128' }}
       EVAL_EXAMPLES: ${{ github.event.inputs.eval_examples || '500' }}
@@ -76,16 +76,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer safetensors numpy datasets
 
-      - name: Run reviewer-risk gate for ${{ matrix.slug }}
+      - name: Run strict ZPL privacy audit for ${{ matrix.slug }}
         run: |
-          mkdir -p "benchmark-logs/paczero-mlxlm-reviewer-gate/${{ matrix.slug }}" \
-                   "benchmark-results/paczero-reviewer-gate/${{ matrix.slug }}" \
-                   "benchmark-results/paczero-reviewer-gate-adapters/${{ matrix.slug }}"
+          mkdir -p "benchmark-logs/paczero-mlxlm-reviewer-strict/${{ matrix.slug }}" \
+                   "benchmark-results/paczero-reviewer-strict/${{ matrix.slug }}" \
+                   "benchmark-results/paczero-reviewer-strict-adapters/${{ matrix.slug }}"
           stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
-          log_file="benchmark-logs/paczero-mlxlm-reviewer-gate/${{ matrix.slug }}/reviewer-gate-${stamp}.txt"
-          latest_file="benchmark-logs/paczero-mlxlm-reviewer-gate/${{ matrix.slug }}/reviewer-gate-latest.txt"
-          result_file="benchmark-results/paczero-reviewer-gate/${{ matrix.slug }}/reviewer_gate_results.json"
-          adapter_file="benchmark-results/paczero-reviewer-gate-adapters/${{ matrix.slug }}/qproj_lora_rank8_alpha16.npz"
+          log_file="benchmark-logs/paczero-mlxlm-reviewer-strict/${{ matrix.slug }}/strict-audit-${stamp}.txt"
+          latest_file="benchmark-logs/paczero-mlxlm-reviewer-strict/${{ matrix.slug }}/strict-audit-latest.txt"
+          result_file="benchmark-results/paczero-reviewer-strict/${{ matrix.slug }}/strict_privacy_audit_results.json"
+          adapter_file="benchmark-results/paczero-reviewer-strict-adapters/${{ matrix.slug }}/qproj_lora_rank8_alpha16_strict.npz"
           echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
           echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
           echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
@@ -115,10 +115,10 @@ jobs:
       - name: Add summary
         if: always()
         run: |
-          echo "# PACZero-LoRA reviewer gate: ${{ matrix.slug }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "# PACZero-LoRA strict ZPL privacy audit: ${{ matrix.slug }}" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Model: \`${{ matrix.model }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "M: \`126\`, LoRA: rank 8 alpha 16" >> "$GITHUB_STEP_SUMMARY"
+          echo "M: \`126\`, LoRA: rank 8 alpha 16, strict transcript audit enabled" >> "$GITHUB_STEP_SUMMARY"
           echo "Log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Adapter file: \`${ADAPTER_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
@@ -129,23 +129,23 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Commit reviewer gate output for ${{ matrix.slug }}
+      - name: Commit strict audit output for ${{ matrix.slug }}
         if: always()
         run: |
           set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "benchmark-logs/paczero-mlxlm-reviewer-gate/${{ matrix.slug }}/" \
-                  "benchmark-results/paczero-reviewer-gate/${{ matrix.slug }}/" \
-                  "benchmark-results/paczero-reviewer-gate-adapters/${{ matrix.slug }}/" || true
+          git add "benchmark-logs/paczero-mlxlm-reviewer-strict/${{ matrix.slug }}/" \
+                  "benchmark-results/paczero-reviewer-strict/${{ matrix.slug }}/" \
+                  "benchmark-results/paczero-reviewer-strict-adapters/${{ matrix.slug }}/" || true
           if git diff --cached --quiet; then
-            echo "No reviewer gate output changes to commit for ${{ matrix.slug }}."
+            echo "No strict reviewer audit output changes to commit for ${{ matrix.slug }}."
             exit 0
           fi
-          git commit -m "Add PACZero reviewer gate output for ${{ matrix.slug }} [skip ci] [skip paczero-reviewer-gate]"
+          git commit -m "Add strict PACZero reviewer audit output for ${{ matrix.slug }} [skip ci] [skip paczero-reviewer-strict]"
           for attempt in 1 2 3 4 5; do
             if git push; then
-              echo "Pushed reviewer gate output for ${{ matrix.slug }} on attempt ${attempt}."
+              echo "Pushed strict reviewer audit output for ${{ matrix.slug }} on attempt ${attempt}."
               exit 0
             fi
             echo "Push failed for ${{ matrix.slug }}; rebasing and retrying attempt ${attempt}..."
@@ -156,9 +156,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: paczero-reviewer-gate-${{ matrix.slug }}
+          name: paczero-reviewer-strict-${{ matrix.slug }}
           path: |
-            benchmark-logs/paczero-mlxlm-reviewer-gate/${{ matrix.slug }}
-            benchmark-results/paczero-reviewer-gate/${{ matrix.slug }}
-            benchmark-results/paczero-reviewer-gate-adapters/${{ matrix.slug }}
+            benchmark-logs/paczero-mlxlm-reviewer-strict/${{ matrix.slug }}
+            benchmark-results/paczero-reviewer-strict/${{ matrix.slug }}
+            benchmark-results/paczero-reviewer-strict-adapters/${{ matrix.slug }}
           if-no-files-found: warn
