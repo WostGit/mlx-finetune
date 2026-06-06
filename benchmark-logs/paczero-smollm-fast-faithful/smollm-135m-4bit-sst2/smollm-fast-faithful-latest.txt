@@ -1,0 +1,798 @@
+# PACZero MLX faithful adaptation audit
+This run explicitly targets the reviewer objections: both PACZero tasks, q/v projection fidelity, M=126, rank=8/alpha=16, and strict ZPL transcript audit.
+VERBOSE::paper_fidelity_reference={"mechanism": "PACZero-ZPL", "paper_lora_alpha": 16, "paper_lora_rank": 8, "paper_lora_targets": "q_proj and v_proj in OPT attention modules", "paper_scale_reference": {"dev": 500, "eval": 1000, "train": 1000, "zpl_steps": 1000}, "paper_tasks": ["sst2", "squad"], "paper_zpl_M": 126, "this_is_not_exact_opt_reproduction": true}
+VERBOSE::cli_args={"adapter_out": "benchmark-results/paczero-smollm-fast-faithful-adapters/smollm-135m-4bit-sst2/qv_lora_rank8_alpha16.npz", "alpha": 16.0, "clip": 25.0, "dev_examples": 8, "eval_every": 5, "eval_examples": 16, "json_out": "benchmark-results/paczero-smollm-fast-faithful/smollm-135m-4bit-sst2/smollm_fast_faithful_results.json", "layers": "1", "lr": 0.05, "model": "mlx-community/SmolLM-135M-4bit", "mu": 0.05, "num_subsets": 126, "projections": "q_proj,v_proj", "rank": 8, "seed": 20260613, "slug": "smollm-135m-4bit", "steps": 20, "task": "sst2", "train_examples": 8}
+VERBOSE::python="3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]"
+VERBOSE::package_mlx="0.31.2"
+VERBOSE::package_mlx-lm="0.31.3"
+VERBOSE::package_datasets="5.0.0"
+VERBOSE::package_numpy="2.4.6"
+VERBOSE::projection_fidelity={"faithful_projection_set": true, "paper_targets": "q_proj + v_proj", "requested": ["q_proj", "v_proj"]}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/67349 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 67349/67349 [00:00<00:00, 1293730.53 examples/s]
+Generating validation split:   0%|          | 0/872 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 872/872 [00:00<00:00, 374047.16 examples/s]
+Generating test split:   0%|          | 0/1821 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1821/1821 [00:00<00:00, 910566.00 examples/s]
+VERBOSE::dataset_loaded={"dev": 8, "eval": 16, "source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices", "task": "sst2", "train": 8}
+VERBOSE::dataset_caveat="SST-2 uses label-only positive/negative scoring accuracy."
+VERBOSE::resolved_lora_targets={"count": 2, "layers_arg": "1", "targets": ["model.layers.0.self_attn.q_proj", "model.layers.0.self_attn.v_proj"]}
+VERBOSE::attached_lora_targets=[{"dimension_inference": {"input_dim": 576, "input_source": "packed_quantized_weight.shape[1]*8", "module_type": "QuantizedLinear", "output_dim": 576, "output_source": "weight.shape[0]", "quantized_input_inference": {"dense_input_dim": 576, "packed_input_dim": 72, "reason": "uint32_4bit_packed_weight", "values_per_uint32": 8}, "target_path": "model.layers.0.self_attn.q_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [576, 72]}, "input_dim": 576, "output_dim": 576, "target_path": "model.layers.0.self_attn.q_proj", "theta_size": 9216}, {"dimension_inference": {"input_dim": 576, "input_source": "packed_quantized_weight.shape[1]*8", "module_type": "QuantizedLinear", "output_dim": 192, "output_source": "weight.shape[0]", "quantized_input_inference": {"dense_input_dim": 576, "packed_input_dim": 72, "reason": "uint32_4bit_packed_weight", "values_per_uint32": 8}, "target_path": "model.layers.0.self_attn.v_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [192, 72]}, "input_dim": 576, "output_dim": 192, "target_path": "model.layers.0.self_attn.v_proj", "theta_size": 6144}]
+VERBOSE::combined_lora_theta={"slices": [[0, 9216], [9216, 15360]], "theta_size": 15360}
+VERBOSE::baseline_metrics={"dev_accuracy": 0.5, "dev_loss": 4.3982930183410645, "dev_loss_max": 5.336252212524414, "dev_loss_min": 3.9206809997558594, "eval_accuracy": 0.5, "eval_loss": 5.325968503952026, "eval_loss_max": 7.054501533508301, "eval_loss_min": 3.6150474548339844, "train_accuracy": 0.375, "train_loss": 5.034183979034424, "train_loss_max": 6.243013381958008, "train_loss_min": 4.171041488647461}
+VERBOSE::membership_audit={"expected": 63, "shape": [126, 8], "unique_column_counts": [63]}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.399179458618164, "dev_loss_max": 5.340002059936523, "dev_loss_min": 3.93243408203125, "eval_accuracy": 0.5, "eval_loss": 5.324259579181671, "eval_loss_max": 7.056943893432617, "eval_loss_min": 3.611225128173828, "fd_abs_max": 0.21024703979492188, "fd_abs_mean": 0.10204553604125977, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 1, "train_accuracy": 0.375, "train_loss": 5.04052197933197, "train_loss_max": 6.245326995849609, "train_loss_min": 4.1520233154296875, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 1, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 1, "subset_independent_by_construction": true, "subset_means_max": 0.150299072265625, "subset_means_mean": -0.019117392470056324, "subset_means_min": -0.21024703979492188, "subset_sign_counts": {"negative": 85, "positive": 41}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 1, "secret_index_use_count": 0, "step": 1, "unanimous_count": 0}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.398401975631714, "dev_loss_max": 5.346330642700195, "dev_loss_min": 3.918201446533203, "eval_accuracy": 0.5, "eval_loss": 5.3289101123809814, "eval_loss_max": 7.064508438110352, "eval_loss_min": 3.6098709106445312, "fd_abs_max": 0.2941608428955078, "fd_abs_mean": 0.14735937118530273, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 5, "train_accuracy": 0.375, "train_loss": 5.0357139110565186, "train_loss_max": 6.233997344970703, "train_loss_min": 4.158884048461914, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 5, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 5, "subset_independent_by_construction": true, "subset_means_max": 0.18707275390625, "subset_means_mean": 0.010914252909042578, "subset_means_min": -0.2941608428955078, "subset_sign_counts": {"negative": 55, "positive": 71}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 5, "secret_index_use_count": 0, "step": 5, "unanimous_count": 0}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.396150231361389, "dev_loss_max": 5.326454162597656, "dev_loss_min": 3.92291259765625, "eval_accuracy": 0.5, "eval_loss": 5.329714059829712, "eval_loss_max": 7.064818382263184, "eval_loss_min": 3.606830596923828, "fd_abs_max": 0.19073486328125, "fd_abs_mean": 0.09962797164916992, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 10, "train_accuracy": 0.375, "train_loss": 5.036590576171875, "train_loss_max": 6.249645233154297, "train_loss_min": 4.160520553588867, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 10, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 10, "subset_independent_by_construction": true, "subset_means_max": 0.07035255432128906, "subset_means_mean": -0.01639883732669568, "subset_means_min": -0.19073486328125, "subset_sign_counts": {"negative": 79, "positive": 47}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 10, "secret_index_use_count": 0, "step": 10, "unanimous_count": 0}
+VERBOSE::new_best_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.396150231361389, "dev_loss_max": 5.326454162597656, "dev_loss_min": 3.92291259765625, "eval_accuracy": 0.5, "eval_loss": 5.329714059829712, "eval_loss_max": 7.064818382263184, "eval_loss_min": 3.606830596923828, "step": 10, "train_accuracy": 0.375, "train_loss": 5.036590576171875, "train_loss_max": 6.249645233154297, "train_loss_min": 4.160520553588867}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.399462699890137, "dev_loss_max": 5.339000701904297, "dev_loss_min": 3.9321517944335938, "eval_accuracy": 0.5, "eval_loss": 5.332645893096924, "eval_loss_max": 7.059839248657227, "eval_loss_min": 3.6310863494873047, "fd_abs_max": 0.1551055908203125, "fd_abs_mean": 0.08291959762573242, "privacy_rule_violations_so_far": 0, "release_sign": -1, "step": 15, "train_accuracy": 0.375, "train_loss": 5.036992311477661, "train_loss_max": 6.238594055175781, "train_loss_min": 4.155305862426758, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 14, "last_audit": {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 15, "subset_independent_by_construction": true, "subset_means_max": 0.1551055908203125, "subset_means_mean": -0.026693446115391418, "subset_means_min": -0.12667020161946616, "subset_sign_counts": {"negative": 93, "positive": 33}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 14, "secret_index_use_count": 0, "step": 15, "unanimous_count": 1}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.5, "dev_loss": 4.397989749908447, "dev_loss_max": 5.333757400512695, "dev_loss_min": 3.927570343017578, "eval_accuracy": 0.5, "eval_loss": 5.329108655452728, "eval_loss_max": 7.0556488037109375, "eval_loss_min": 3.613636016845703, "fd_abs_max": 0.20069122314453125, "fd_abs_mean": 0.06010890007019043, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 20, "train_accuracy": 0.375, "train_loss": 5.039306640625, "train_loss_max": 6.24791145324707, "train_loss_min": 4.167301177978516, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 19, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 20, "subset_independent_by_construction": true, "subset_means_max": 0.0998687744140625, "subset_means_mean": 0.03230253143555634, "subset_means_min": -0.06498336791992188, "subset_sign_counts": {"negative": 18, "positive": 108}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 19, "secret_index_use_count": 0, "step": 20, "unanimous_count": 1}
+VERBOSE::final_payload_summary={"checks": {"adapter_saved": true, "faithful_projection_set_q_and_v": true, "fd_finite_rate_ok": true, "fd_signal_rate_ok": true, "has_at_least_two_lora_targets": true, "has_disjoint_eval_split": true, "paper_style_lora_rank_alpha": true, "paper_style_num_subsets": true, "privacy_transcript_audit_passed": true, "utility_selection_not_worse_than_baseline_on_selection_metric": true}, "elapsed_seconds": 25.069, "model": "mlx-community/SmolLM-135M-4bit", "privacy_accounting": {"audited_steps": 20, "claim_scope": "implementation-level transcript audit; not differential privacy", "disagreement_releases_randomized": 19, "disagreement_steps": 19, "examples_per_column_expected": 63, "mechanism": "PACZero-ZPL audited sign release", "membership_balanced": true, "membership_column_counts_unique": [63], "mutual_information_claim_under_zpl_rule": "I(S_star;Y_1:T)=0 because unanimous releases are identical for all candidate subsets and disagreement releases are independent RNG signs that never index S_star.", "not_differential_privacy": true, "num_subsets_M": 126, "privacy_audit": {"all_disagreement_steps_randomized": true, "all_unanimous_steps_subset_independent": true, "conclusion": "PASS", "release_rule_violation_count": 0, "secret_subset_never_indexed_for_release": true, "transcript_distribution_independent_of_secret_subset_by_construction": true}, "privacy_trace_full_saved_in_log": true, "privacy_trace_head": [{"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 1, "subset_independent_by_construction": true, "subset_means_max": 0.150299072265625, "subset_means_mean": -0.019117392470056324, "subset_means_min": -0.21024703979492188, "subset_sign_counts": {"negative": 85, "positive": 41}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 2, "subset_independent_by_construction": true, "subset_means_max": 0.10766983032226562, "subset_means_mean": -0.006953347026625999, "subset_means_min": -0.10679244995117188, "subset_sign_counts": {"negative": 75, "positive": 51}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 3, "subset_independent_by_construction": true, "subset_means_max": 0.12563705444335938, "subset_means_mean": 0.04872472648447604, "subset_means_min": -0.015459060668945312, "subset_sign_counts": {"negative": 2, "positive": 124}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 4, "subset_independent_by_construction": true, "subset_means_max": 0.0801849365234375, "subset_means_mean": -0.03384316003601928, "subset_means_min": -0.1683807373046875, "subset_sign_counts": {"negative": 100, "positive": 26}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 5, "subset_independent_by_construction": true, "subset_means_max": 0.18707275390625, "subset_means_mean": 0.010914252909042578, "subset_means_min": -0.2941608428955078, "subset_sign_counts": {"negative": 55, "positive": 71}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 6, "subset_independent_by_construction": true, "subset_means_max": 0.0014273325602213542, "subset_means_mean": -0.06297790175212303, "subset_means_min": -0.15254497528076172, "subset_sign_counts": {"negative": 124, "positive": 2}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 7, "subset_independent_by_construction": true, "subset_means_max": 0.09668350219726562, "subset_means_mean": 0.008554241914958191, "subset_means_min": -0.08563041687011719, "subset_sign_counts": {"negative": 50, "positive": 76}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 8, "subset_independent_by_construction": true, "subset_means_max": 0.015188852945963541, "subset_means_mean": -0.07279840753732625, "subset_means_min": -0.16984939575195312, "subset_sign_counts": {"negative": 120, "positive": 6}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 9, "subset_independent_by_construction": true, "subset_means_max": 0.09859085083007812, "subset_means_mean": 0.022638736398311973, "subset_means_min": -0.061206817626953125, "subset_sign_counts": {"negative": 20, "positive": 106}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 10, "subset_independent_by_construction": true, "subset_means_max": 0.07035255432128906, "subset_means_mean": -0.01639883732669568, "subset_means_min": -0.19073486328125, "subset_sign_counts": {"negative": 79, "positive": 47}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}], "privacy_trace_tail": [{"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 11, "subset_independent_by_construction": true, "subset_means_max": 0.07429758707682292, "subset_means_mean": -0.010568014167964412, "subset_means_min": -0.11105537414550781, "subset_sign_counts": {"negative": 79, "positive": 47}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 12, "subset_independent_by_construction": true, "subset_means_max": 0.0816790262858073, "subset_means_mean": 0.04152618018587881, "subset_means_min": -0.023860931396484375, "subset_sign_counts": {"negative": 3, "positive": 123}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": -1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 13, "subset_independent_by_construction": true, "subset_means_max": -0.020809173583984375, "subset_means_mean": -0.07842969642114388, "subset_means_min": -0.1384258270263672, "subset_sign_counts": {"negative": 126, "positive": 0}, "unanimous": true, "unique_subset_signs": [-1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 14, "subset_independent_by_construction": true, "subset_means_max": 0.08319854736328125, "subset_means_mean": -0.05061941451406443, "subset_means_min": -0.13143539428710938, "subset_sign_counts": {"negative": 120, "positive": 6}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 15, "subset_independent_by_construction": true, "subset_means_max": 0.1551055908203125, "subset_means_mean": -0.026693446115391418, "subset_means_min": -0.12667020161946616, "subset_sign_counts": {"negative": 93, "positive": 33}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 16, "subset_independent_by_construction": true, "subset_means_max": 0.23159027099609375, "subset_means_mean": 0.03644864377160912, "subset_means_min": -0.2722930908203125, "subset_sign_counts": {"negative": 27, "positive": 99}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 17, "subset_independent_by_construction": true, "subset_means_max": 0.11943817138671875, "subset_means_mean": 0.005191517434873459, "subset_means_min": -0.15455245971679688, "subset_sign_counts": {"negative": 55, "positive": 71}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 18, "subset_independent_by_construction": true, "subset_means_max": 0.03009478251139323, "subset_means_mean": -0.049754304950740055, "subset_means_min": -0.13315200805664062, "subset_sign_counts": {"negative": 118, "positive": 8}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 19, "subset_independent_by_construction": true, "subset_means_max": 0.13551712036132812, "subset_means_mean": -0.047060468660010055, "subset_means_min": -0.2654266357421875, "subset_sign_counts": {"negative": 99, "positive": 27}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 20, "subset_independent_by_construction": true, "subset_means_max": 0.0998687744140625, "subset_means_mean": 0.03230253143555634, "subset_means_min": -0.06498336791992188, "subset_sign_counts": {"negative": 18, "positive": 108}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}], "release_sign_counts": {"negative": 10, "positive": 10}, "steps": 20, "unanimous_steps": 1}, "success": true, "task": "sst2"}
+FAITHFUL_ADAPTATION_RESULT_JSON=
+{
+  "success": true,
+  "model": "mlx-community/SmolLM-135M-4bit",
+  "slug": "smollm-135m-4bit",
+  "task": "sst2",
+  "elapsed_seconds": 25.069,
+  "dataset_source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices",
+  "train_examples": 8,
+  "dev_examples": 8,
+  "eval_examples": 16,
+  "paper_fidelity_reference": {
+    "mechanism": "PACZero-ZPL",
+    "paper_zpl_M": 126,
+    "paper_lora_rank": 8,
+    "paper_lora_alpha": 16,
+    "paper_lora_targets": "q_proj and v_proj in OPT attention modules",
+    "paper_tasks": [
+      "sst2",
+      "squad"
+    ],
+    "paper_scale_reference": {
+      "train": 1000,
+      "dev": 500,
+      "eval": 1000,
+      "zpl_steps": 1000
+    },
+    "this_is_not_exact_opt_reproduction": true
+  },
+  "parameterization": "faithful_adaptation_qv_lora_paczero_zpl_strict_audit",
+  "target_paths": [
+    "model.layers.0.self_attn.q_proj",
+    "model.layers.0.self_attn.v_proj"
+  ],
+  "target_infos": [
+    {
+      "target_path": "model.layers.0.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.0.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    }
+  ],
+  "layers": "1",
+  "projections": [
+    "q_proj",
+    "v_proj"
+  ],
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 15360,
+  "seed": 20260613,
+  "steps": 20,
+  "num_subsets": 126,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "paper_style_num_subsets": true,
+    "paper_style_lora_rank_alpha": true,
+    "faithful_projection_set_q_and_v": true,
+    "has_at_least_two_lora_targets": true,
+    "has_disjoint_eval_split": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "privacy_transcript_audit_passed": true,
+    "utility_selection_not_worse_than_baseline_on_selection_metric": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 5.034183979034424,
+    "train_loss_min": 4.171041488647461,
+    "train_loss_max": 6.243013381958008,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.3982930183410645,
+    "dev_loss_min": 3.9206809997558594,
+    "dev_loss_max": 5.336252212524414,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.325968503952026,
+    "eval_loss_min": 3.6150474548339844,
+    "eval_loss_max": 7.054501533508301,
+    "eval_accuracy": 0.5
+  },
+  "final": {
+    "train_loss": 5.039306640625,
+    "train_loss_min": 4.167301177978516,
+    "train_loss_max": 6.24791145324707,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.397989749908447,
+    "dev_loss_min": 3.927570343017578,
+    "dev_loss_max": 5.333757400512695,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.329108655452728,
+    "eval_loss_min": 3.613636016845703,
+    "eval_loss_max": 7.0556488037109375,
+    "eval_accuracy": 0.5
+  },
+  "best_checkpoint": {
+    "step": 10,
+    "train_loss": 5.036590576171875,
+    "train_loss_min": 4.160520553588867,
+    "train_loss_max": 6.249645233154297,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.396150231361389,
+    "dev_loss_min": 3.92291259765625,
+    "dev_loss_max": 5.326454162597656,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.329714059829712,
+    "eval_loss_min": 3.606830596923828,
+    "eval_loss_max": 7.064818382263184,
+    "eval_accuracy": 0.5
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 5.036590576171875,
+    "train_loss_min": 4.160520553588867,
+    "train_loss_max": 6.249645233154297,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.396150231361389,
+    "dev_loss_min": 3.92291259765625,
+    "dev_loss_max": 5.326454162597656,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.329714059829712,
+    "eval_loss_min": 3.606830596923828,
+    "eval_loss_max": 7.064818382263184,
+    "eval_accuracy": 0.5
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.2941608428955078,
+  "fd_abs_max_mean": 0.17703723907470703,
+  "fd_abs_mean_mean": 0.08644974231719971,
+  "privacy_accounting": {
+    "mechanism": "PACZero-ZPL audited sign release",
+    "claim_scope": "implementation-level transcript audit; not differential privacy",
+    "not_differential_privacy": true,
+    "mutual_information_claim_under_zpl_rule": "I(S_star;Y_1:T)=0 because unanimous releases are identical for all candidate subsets and disagreement releases are independent RNG signs that never index S_star.",
+    "num_subsets_M": 126,
+    "examples_per_column_expected": 63,
+    "membership_column_counts_unique": [
+      63
+    ],
+    "membership_balanced": true,
+    "steps": 20,
+    "audited_steps": 20,
+    "unanimous_steps": 1,
+    "disagreement_steps": 19,
+    "disagreement_releases_randomized": 19,
+    "release_sign_counts": {
+      "positive": 10,
+      "negative": 10
+    },
+    "privacy_audit": {
+      "all_unanimous_steps_subset_independent": true,
+      "all_disagreement_steps_randomized": true,
+      "secret_subset_never_indexed_for_release": true,
+      "release_rule_violation_count": 0,
+      "transcript_distribution_independent_of_secret_subset_by_construction": true,
+      "conclusion": "PASS"
+    },
+    "privacy_trace_head": [
+      {
+        "step": 1,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 85,
+          "positive": 41
+        },
+        "subset_means_min": -0.21024703979492188,
+        "subset_means_max": 0.150299072265625,
+        "subset_means_mean": -0.019117392470056324,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 2,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 75,
+          "positive": 51
+        },
+        "subset_means_min": -0.10679244995117188,
+        "subset_means_max": 0.10766983032226562,
+        "subset_means_mean": -0.006953347026625999,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 3,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 2,
+          "positive": 124
+        },
+        "subset_means_min": -0.015459060668945312,
+        "subset_means_max": 0.12563705444335938,
+        "subset_means_mean": 0.04872472648447604,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 4,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 100,
+          "positive": 26
+        },
+        "subset_means_min": -0.1683807373046875,
+        "subset_means_max": 0.0801849365234375,
+        "subset_means_mean": -0.03384316003601928,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 5,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 55,
+          "positive": 71
+        },
+        "subset_means_min": -0.2941608428955078,
+        "subset_means_max": 0.18707275390625,
+        "subset_means_mean": 0.010914252909042578,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 6,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 124,
+          "positive": 2
+        },
+        "subset_means_min": -0.15254497528076172,
+        "subset_means_max": 0.0014273325602213542,
+        "subset_means_mean": -0.06297790175212303,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 7,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 50,
+          "positive": 76
+        },
+        "subset_means_min": -0.08563041687011719,
+        "subset_means_max": 0.09668350219726562,
+        "subset_means_mean": 0.008554241914958191,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 8,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 120,
+          "positive": 6
+        },
+        "subset_means_min": -0.16984939575195312,
+        "subset_means_max": 0.015188852945963541,
+        "subset_means_mean": -0.07279840753732625,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 9,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 20,
+          "positive": 106
+        },
+        "subset_means_min": -0.061206817626953125,
+        "subset_means_max": 0.09859085083007812,
+        "subset_means_mean": 0.022638736398311973,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 10,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 79,
+          "positive": 47
+        },
+        "subset_means_min": -0.19073486328125,
+        "subset_means_max": 0.07035255432128906,
+        "subset_means_mean": -0.01639883732669568,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_tail": [
+      {
+        "step": 11,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 79,
+          "positive": 47
+        },
+        "subset_means_min": -0.11105537414550781,
+        "subset_means_max": 0.07429758707682292,
+        "subset_means_mean": -0.010568014167964412,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 12,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 3,
+          "positive": 123
+        },
+        "subset_means_min": -0.023860931396484375,
+        "subset_means_max": 0.0816790262858073,
+        "subset_means_mean": 0.04152618018587881,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 13,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.1384258270263672,
+        "subset_means_max": -0.020809173583984375,
+        "subset_means_mean": -0.07842969642114388,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 14,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 120,
+          "positive": 6
+        },
+        "subset_means_min": -0.13143539428710938,
+        "subset_means_max": 0.08319854736328125,
+        "subset_means_mean": -0.05061941451406443,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 15,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 93,
+          "positive": 33
+        },
+        "subset_means_min": -0.12667020161946616,
+        "subset_means_max": 0.1551055908203125,
+        "subset_means_mean": -0.026693446115391418,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 16,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 27,
+          "positive": 99
+        },
+        "subset_means_min": -0.2722930908203125,
+        "subset_means_max": 0.23159027099609375,
+        "subset_means_mean": 0.03644864377160912,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 17,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 55,
+          "positive": 71
+        },
+        "subset_means_min": -0.15455245971679688,
+        "subset_means_max": 0.11943817138671875,
+        "subset_means_mean": 0.005191517434873459,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 18,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 118,
+          "positive": 8
+        },
+        "subset_means_min": -0.13315200805664062,
+        "subset_means_max": 0.03009478251139323,
+        "subset_means_mean": -0.049754304950740055,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 19,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 99,
+          "positive": 27
+        },
+        "subset_means_min": -0.2654266357421875,
+        "subset_means_max": 0.13551712036132812,
+        "subset_means_mean": -0.047060468660010055,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 20,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 18,
+          "positive": 108
+        },
+        "subset_means_min": -0.06498336791992188,
+        "subset_means_max": 0.0998687744140625,
+        "subset_means_mean": 0.03230253143555634,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_full_saved_in_log": true
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-smollm-fast-faithful-adapters/smollm-135m-4bit-sst2/qv_lora_rank8_alpha16.npz",
+    "bytes": 64408,
+    "adapter_count": 2,
+    "adapter_shapes": [
+      {
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      }
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 5.04052197933197,
+      "train_loss_min": 4.1520233154296875,
+      "train_loss_max": 6.245326995849609,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.399179458618164,
+      "dev_loss_min": 3.93243408203125,
+      "dev_loss_max": 5.340002059936523,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.324259579181671,
+      "eval_loss_min": 3.611225128173828,
+      "eval_loss_max": 7.056943893432617,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.21024703979492188,
+      "fd_abs_mean": 0.10204553604125977,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 5,
+      "train_loss": 5.0357139110565186,
+      "train_loss_min": 4.158884048461914,
+      "train_loss_max": 6.233997344970703,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.398401975631714,
+      "dev_loss_min": 3.918201446533203,
+      "dev_loss_max": 5.346330642700195,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.3289101123809814,
+      "eval_loss_min": 3.6098709106445312,
+      "eval_loss_max": 7.064508438110352,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.2941608428955078,
+      "fd_abs_mean": 0.14735937118530273,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 10,
+      "train_loss": 5.036590576171875,
+      "train_loss_min": 4.160520553588867,
+      "train_loss_max": 6.249645233154297,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.396150231361389,
+      "dev_loss_min": 3.92291259765625,
+      "dev_loss_max": 5.326454162597656,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.329714059829712,
+      "eval_loss_min": 3.606830596923828,
+      "eval_loss_max": 7.064818382263184,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.19073486328125,
+      "fd_abs_mean": 0.09962797164916992,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 15,
+      "train_loss": 5.036992311477661,
+      "train_loss_min": 4.155305862426758,
+      "train_loss_max": 6.238594055175781,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.399462699890137,
+      "dev_loss_min": 3.9321517944335938,
+      "dev_loss_max": 5.339000701904297,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.332645893096924,
+      "eval_loss_min": 3.6310863494873047,
+      "eval_loss_max": 7.059839248657227,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.1551055908203125,
+      "fd_abs_mean": 0.08291959762573242,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 20,
+      "train_loss": 5.039306640625,
+      "train_loss_min": 4.167301177978516,
+      "train_loss_max": 6.24791145324707,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.397989749908447,
+      "dev_loss_min": 3.927570343017578,
+      "dev_loss_max": 5.333757400512695,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.329108655452728,
+      "eval_loss_min": 3.613636016845703,
+      "eval_loss_max": 7.0556488037109375,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.20069122314453125,
+      "fd_abs_mean": 0.06010890007019043,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    }
+  ],
+  "limitations": [
+    "Default workflow is medium/smoke scale unless inputs are increased to 1000/500/1000 and 1000 steps.",
+    "Qwen/Llama MLX models are adaptations, not exact OPT-1.3B/OPT-6.7B reproduction.",
+    "SQuAD metric here is gold-answer label-likelihood loss, not generated EM/F1.",
+    "Use --layers all for all-layer q/v coverage; default CI uses initial layer count for runtime."
+  ]
+}
