@@ -107,15 +107,24 @@ jobs:
       - name: Commit PACZero-LoRA output
         if: always()
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add benchmark-logs/paczero-mlxlm-lora-reproduction/ benchmark-results/paczero_mlxlm_lora_reproduction_results.json benchmark-results/paczero-lora-adapters/ || true
           if git diff --cached --quiet; then
             echo "No PACZero-LoRA reproduction output changes to commit."
-          else
-            git commit -m "Add PACZero-LoRA reproduction output [skip ci] [skip paczero-lora-reproduction]"
-            git push
+            exit 0
           fi
+          git commit -m "Add PACZero-LoRA reproduction output [skip ci] [skip paczero-lora-reproduction]"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed PACZero-LoRA reproduction output on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push failed; rebasing and retrying attempt ${attempt}..."
+            git pull --rebase --autostash origin main
+          done
+          git push
 
       - uses: actions/upload-artifact@v4
         if: always()
