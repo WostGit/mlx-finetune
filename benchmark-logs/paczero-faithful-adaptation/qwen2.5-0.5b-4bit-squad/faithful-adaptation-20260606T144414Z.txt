@@ -1,0 +1,53 @@
+# PACZero MLX faithful adaptation audit
+This run explicitly targets the reviewer objections: both PACZero tasks, q/v projection fidelity, M=126, rank=8/alpha=16, and strict ZPL transcript audit.
+VERBOSE::paper_fidelity_reference={"mechanism": "PACZero-ZPL", "paper_lora_alpha": 16, "paper_lora_rank": 8, "paper_lora_targets": "q_proj and v_proj in OPT attention modules", "paper_scale_reference": {"dev": 500, "eval": 1000, "train": 1000, "zpl_steps": 1000}, "paper_tasks": ["sst2", "squad"], "paper_zpl_M": 126, "this_is_not_exact_opt_reproduction": true}
+VERBOSE::cli_args={"adapter_out": "benchmark-results/paczero-faithful-adaptation-adapters/qwen2.5-0.5b-4bit-squad/qv_lora_rank8_alpha16.npz", "alpha": 16.0, "clip": 25.0, "dev_examples": 32, "eval_every": 25, "eval_examples": 128, "json_out": "benchmark-results/paczero-faithful-adaptation/qwen2.5-0.5b-4bit-squad/faithful_adaptation_results.json", "layers": "1", "lr": 0.05, "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit", "mu": 0.05, "num_subsets": 126, "projections": "q_proj,v_proj", "rank": 8, "seed": 20260612, "slug": "qwen2.5-0.5b-4bit", "steps": 100, "task": "squad", "train_examples": 32}
+VERBOSE::python="3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]"
+VERBOSE::package_mlx="0.31.2"
+VERBOSE::package_mlx-lm="0.31.3"
+VERBOSE::package_datasets="5.0.0"
+VERBOSE::package_numpy="2.4.6"
+VERBOSE::projection_fidelity={"faithful_projection_set": true, "paper_targets": "q_proj + v_proj", "requested": ["q_proj", "v_proj"]}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/87599 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 87599/87599 [00:00<00:00, 1044952.62 examples/s]
+Generating validation split:   0%|          | 0/10570 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 10570/10570 [00:00<00:00, 1681731.02 examples/s]
+VERBOSE::dataset_loaded={"dev": 32, "eval": 128, "source": "rajpurkar/squad train plus disjoint validation dev/eval slices", "task": "squad", "train": 32}
+VERBOSE::dataset_caveat="SQuAD uses label-only gold-answer likelihood in this MLX audit; it is not generated EM/F1 unless a separate generation evaluator is added."
+VERBOSE::resolved_lora_targets={"count": 2, "layers_arg": "1", "targets": ["model.layers.0.self_attn.q_proj", "model.layers.0.self_attn.v_proj"]}
+VERBOSE::attached_lora_targets=[{"dimension_inference": {"bias_shape": [896], "input_dim": 896, "input_source": "square_projection_fallback", "module_type": "QuantizedLinear", "output_dim": 896, "output_source": "bias.shape[0]", "target_path": "model.layers.0.self_attn.q_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [896, 112]}, "input_dim": 896, "output_dim": 896, "target_path": "model.layers.0.self_attn.q_proj", "theta_size": 14336}, {"dimension_inference": {"bias_shape": [128], "input_dim": 128, "input_source": "square_projection_fallback", "module_type": "QuantizedLinear", "output_dim": 128, "output_source": "bias.shape[0]", "target_path": "model.layers.0.self_attn.v_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [128, 112]}, "input_dim": 128, "output_dim": 128, "target_path": "model.layers.0.self_attn.v_proj", "theta_size": 2048}]
+VERBOSE::combined_lora_theta={"slices": [[0, 14336], [14336, 16384]], "theta_size": 16384}
+Traceback (most recent call last):
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_faithful_adaptation.py", line 493, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_faithful_adaptation.py", line 327, in main
+    baseline = evaluate_all(model, tokenizer, args.task, train_rows, dev_rows, eval_rows)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_faithful_adaptation.py", line 152, in evaluate_all
+    out.update(evaluate_task(model, tokenizer, task, train_rows, "train"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_faithful_adaptation.py", line 133, in evaluate_task
+    loss = task_row_loss(model, tokenizer, task, row)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_faithful_adaptation.py", line 114, in task_row_loss
+    return label_only_loss(model, full_ids, len(prompt_ids))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_exhaustive_readiness.py", line 90, in label_only_loss
+    logits = model(x)
+             ^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/mlx_lm/models/qwen2.py", line 173, in __call__
+    out = self.model(inputs, cache, input_embeddings)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/mlx_lm/models/qwen2.py", line 153, in __call__
+    h = layer(h, mask, c)
+        ^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/mlx_lm/models/qwen2.py", line 117, in __call__
+    r = self.self_attn(self.input_layernorm(x), mask, cache)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/mlx_lm/models/qwen2.py", line 65, in __call__
+    queries, keys, values = self.q_proj(x), self.k_proj(x), self.v_proj(x)
+                                                            ^^^^^^^^^^^^^^
+  File "/Users/runner/work/mlx-finetune/mlx-finetune/scripts/paczero_mlxlm_lora_reproduction.py", line 39, in __call__
+    delta = (x_f32 @ mx.transpose(self.A)) @ mx.transpose(self.B)
+             ~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+ValueError: [matmul] Last dimension of first input with shape (1,204,896) must match second to last dimension of second input with shape (128,8).
