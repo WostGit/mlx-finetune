@@ -2,7 +2,7 @@
   "success": true,
   "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
   "slug": "qwen2.5-0.5b-4bit",
-  "elapsed_seconds": 5868.369,
+  "elapsed_seconds": 5741.459,
   "dataset_source": "nyu-mll/glue/sst2 train split plus disjoint validation dev/eval slices",
   "train_examples": 128,
   "dev_examples": 128,
@@ -21,7 +21,13 @@
       112
     ],
     "weight_dtype": "mlx.core.uint32",
-    "input_source": "square_projection_fallback",
+    "quantized_input_inference": {
+      "reason": "uint32_4bit_packed_weight",
+      "packed_input_dim": 112,
+      "values_per_uint32": 8,
+      "dense_input_dim": 896
+    },
+    "input_source": "packed_quantized_weight.shape[1]*8",
     "input_dim": 896,
     "output_dim": 896
   },
