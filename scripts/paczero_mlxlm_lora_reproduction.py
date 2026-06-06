@@ -36,8 +36,18 @@ class PACZeroLoRALinear:
     def __call__(self, x: mx.array) -> mx.array:
         base_out = self.base(x)
         x_f32 = x.astype(mx.float32)
+        if int(x_f32.shape[-1]) != self.input_dim:
+            raise ValueError(
+                f"LoRA input dimension mismatch: x.shape[-1]={int(x_f32.shape[-1])} "
+                f"but wrapper input_dim={self.input_dim}; base={type(self.base).__name__}"
+            )
         delta = (x_f32 @ mx.transpose(self.A)) @ mx.transpose(self.B)
         delta = delta * self.scale
+        if int(delta.shape[-1]) != int(base_out.shape[-1]):
+            raise ValueError(
+                f"LoRA output dimension mismatch: delta.shape[-1]={int(delta.shape[-1])} "
+                f"but base_out.shape[-1]={int(base_out.shape[-1])}; wrapper output_dim={self.output_dim}"
+            )
         return base_out + delta.astype(base_out.dtype)
 
     def __getattr__(self, name: str) -> Any:
@@ -70,15 +80,40 @@ def _optional_int_attr(module: Any, *names: str) -> int | None:
     return None
 
 
+def _infer_quantized_input_dim_from_weight(weight: Any, debug: dict[str, Any]) -> int | None:
+    """Infer dense input dim from MLX 4-bit QuantizedLinear packed weights.
+
+    MLX-LM 4-bit quantized linear weights are packed into uint32 values.  Each
+    uint32 stores 8 four-bit values, so a packed weight shape [out, in/8]
+    corresponds to dense input dimension weight.shape[1] * 8.  This matters for
+    grouped-query attention: q_proj may be square, but k_proj/v_proj can have
+    smaller output dims while still consuming the full hidden dimension.
+    """
+
+    if weight is None or not hasattr(weight, "shape") or len(weight.shape) < 2:
+        return None
+    dtype_text = str(getattr(weight, "dtype", ""))
+    shape = list(weight.shape)
+    if "uint32" in dtype_text:
+        debug["quantized_input_inference"] = {
+            "reason": "uint32_4bit_packed_weight",
+            "packed_input_dim": int(shape[1]),
+            "values_per_uint32": 8,
+            "dense_input_dim": int(shape[1]) * 8,
+        }
+        return int(shape[1]) * 8
+    return None
+
+
 def infer_linear_dims(module: Any, target_path: str) -> tuple[int, int, dict]:
     """Infer LoRA input/output dims for MLX-LM Linear or QuantizedLinear.
 
-    Qwen q_proj exposes a float bias, but Llama q_proj is biasless.  Quantized
-    weights are packed, so weight.shape[1] is not reliably the input dimension.
-    For q_proj/o_proj-style self-attention projections in these compact models,
-    input and output dimensions are the hidden size.  We infer output from bias,
-    explicit attrs, or packed weight.shape[0], then use explicit input attrs or
-    the square-projection fallback.
+    For dense Linear layers, explicit module attrs are preferred. For MLX-LM
+    4-bit QuantizedLinear, weight.shape is packed as [out_dim, in_dim / 8].
+    Therefore output_dim can come from weight.shape[0], while input_dim should
+    come from weight.shape[1] * 8 when attrs are unavailable. This handles both
+    square q_proj and grouped-query k/v projections such as SmolLM's v_proj
+    where output_dim != input_dim.
     """
 
     debug: dict[str, Any] = {"module_type": type(module).__name__, "target_path": target_path}
@@ -98,13 +133,15 @@ def infer_linear_dims(module: Any, target_path: str) -> tuple[int, int, dict]:
         if output_dim is None and len(weight.shape) >= 1:
             output_dim = int(weight.shape[0])
             debug["output_source"] = "weight.shape[0]"
+        packed_input_dim = _infer_quantized_input_dim_from_weight(weight, debug)
+        if input_dim is None and packed_input_dim is not None:
+            input_dim = packed_input_dim
+            debug["input_source"] = "packed_quantized_weight.shape[1]*8"
 
-    # For q_proj in Qwen/Llama hidden-size projections, input_dim == output_dim.
-    # This is the correct fallback for biasless Llama q_proj with packed uint32 weights.
     if input_dim is None and output_dim is not None:
         input_dim = output_dim
         debug["input_source"] = "square_projection_fallback"
-    elif input_dim is not None:
+    elif input_dim is not None and "input_source" not in debug:
         debug["input_source"] = "module_attr"
 
     if output_dim is None or input_dim is None:
