@@ -1,0 +1,801 @@
+# PACZero MLX faithful adaptation audit
+This run explicitly targets the reviewer objections: both PACZero tasks, q/v projection fidelity, M=126, rank=8/alpha=16, and strict ZPL transcript audit.
+VERBOSE::paper_fidelity_reference={"mechanism": "PACZero-ZPL", "paper_lora_alpha": 16, "paper_lora_rank": 8, "paper_lora_targets": "q_proj and v_proj in OPT attention modules", "paper_scale_reference": {"dev": 500, "eval": 1000, "train": 1000, "zpl_steps": 1000}, "paper_tasks": ["sst2", "squad"], "paper_zpl_M": 126, "this_is_not_exact_opt_reproduction": true}
+VERBOSE::cli_args={"adapter_out": "benchmark-results/paczero-faithful-adaptation-adapters/qwen2.5-0.5b-4bit-sst2/qv_lora_rank8_alpha16.npz", "alpha": 16.0, "clip": 25.0, "dev_examples": 32, "eval_every": 25, "eval_examples": 128, "json_out": "benchmark-results/paczero-faithful-adaptation/qwen2.5-0.5b-4bit-sst2/faithful_adaptation_results.json", "layers": "1", "lr": 0.05, "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit", "mu": 0.05, "num_subsets": 126, "projections": "q_proj,v_proj", "rank": 8, "seed": 20260611, "slug": "qwen2.5-0.5b-4bit", "steps": 100, "task": "sst2", "train_examples": 32}
+VERBOSE::python="3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]"
+VERBOSE::package_mlx="0.31.2"
+VERBOSE::package_mlx-lm="0.31.3"
+VERBOSE::package_datasets="5.0.0"
+VERBOSE::package_numpy="2.4.6"
+VERBOSE::projection_fidelity={"faithful_projection_set": true, "paper_targets": "q_proj + v_proj", "requested": ["q_proj", "v_proj"]}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/67349 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 67349/67349 [00:00<00:00, 1056221.37 examples/s]
+Generating validation split:   0%|          | 0/872 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 872/872 [00:00<00:00, 479663.36 examples/s]
+Generating test split:   0%|          | 0/1821 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1821/1821 [00:00<00:00, 1100234.45 examples/s]
+VERBOSE::dataset_loaded={"dev": 32, "eval": 128, "source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices", "task": "sst2", "train": 32}
+VERBOSE::dataset_caveat="SST-2 uses label-only positive/negative scoring accuracy."
+VERBOSE::resolved_lora_targets={"count": 2, "layers_arg": "1", "targets": ["model.layers.0.self_attn.q_proj", "model.layers.0.self_attn.v_proj"]}
+VERBOSE::attached_lora_targets=[{"dimension_inference": {"bias_shape": [896], "input_dim": 896, "input_source": "packed_quantized_weight.shape[1]*8", "module_type": "QuantizedLinear", "output_dim": 896, "output_source": "bias.shape[0]", "quantized_input_inference": {"dense_input_dim": 896, "packed_input_dim": 112, "reason": "uint32_4bit_packed_weight", "values_per_uint32": 8}, "target_path": "model.layers.0.self_attn.q_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [896, 112]}, "input_dim": 896, "output_dim": 896, "target_path": "model.layers.0.self_attn.q_proj", "theta_size": 14336}, {"dimension_inference": {"bias_shape": [128], "input_dim": 896, "input_source": "packed_quantized_weight.shape[1]*8", "module_type": "QuantizedLinear", "output_dim": 128, "output_source": "bias.shape[0]", "quantized_input_inference": {"dense_input_dim": 896, "packed_input_dim": 112, "reason": "uint32_4bit_packed_weight", "values_per_uint32": 8}, "target_path": "model.layers.0.self_attn.v_proj", "weight_dtype": "mlx.core.uint32", "weight_shape": [128, 112]}, "input_dim": 896, "output_dim": 128, "target_path": "model.layers.0.self_attn.v_proj", "theta_size": 8192}]
+VERBOSE::combined_lora_theta={"slices": [[0, 14336], [14336, 22528]], "theta_size": 22528}
+VERBOSE::baseline_metrics={"dev_accuracy": 0.84375, "dev_loss": 2.099367678165436, "dev_loss_max": 3.434000015258789, "dev_loss_min": 0.5367965698242188, "eval_accuracy": 0.8359375, "eval_loss": 2.244535118341446, "eval_loss_max": 7.867856979370117, "eval_loss_min": 0.43454933166503906, "train_accuracy": 0.71875, "train_loss": 2.421936571598053, "train_loss_max": 5.34619140625, "train_loss_min": 0.6582698822021484}
+VERBOSE::membership_audit={"expected": 63, "shape": [126, 32], "unique_column_counts": [63]}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.089934825897217, "dev_loss_max": 3.4037914276123047, "dev_loss_min": 0.5283432006835938, "eval_accuracy": 0.8359375, "eval_loss": 2.2312280237674713, "eval_loss_max": 7.82305908203125, "eval_loss_min": 0.4321308135986328, "fd_abs_max": 0.4274177551269531, "fd_abs_mean": 0.11551618576049805, "privacy_rule_violations_so_far": 0, "release_sign": -1, "step": 1, "train_accuracy": 0.71875, "train_loss": 2.4208908677101135, "train_loss_max": 5.335868835449219, "train_loss_min": 0.6603660583496094, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 1, "last_audit": {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 1, "subset_independent_by_construction": true, "subset_means_max": 0.002445807823768029, "subset_means_mean": -0.05805090372583969, "subset_means_min": -0.11127154032389323, "subset_sign_counts": {"negative": 125, "positive": 1}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 1, "secret_index_use_count": 0, "step": 1, "unanimous_count": 0}
+VERBOSE::new_best_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.089934825897217, "dev_loss_max": 3.4037914276123047, "dev_loss_min": 0.5283432006835938, "eval_accuracy": 0.8359375, "eval_loss": 2.2312280237674713, "eval_loss_max": 7.82305908203125, "eval_loss_min": 0.4321308135986328, "step": 1, "train_accuracy": 0.71875, "train_loss": 2.4208908677101135, "train_loss_max": 5.335868835449219, "train_loss_min": 0.6603660583496094}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0956003665924072, "dev_loss_max": 3.3993396759033203, "dev_loss_min": 0.5384235382080078, "eval_accuracy": 0.84375, "eval_loss": 2.2384540885686874, "eval_loss_max": 7.8447113037109375, "eval_loss_min": 0.4296436309814453, "fd_abs_max": 0.4416656494140625, "fd_abs_mean": 0.10865151882171631, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 25, "train_accuracy": 0.71875, "train_loss": 2.4165017008781433, "train_loss_max": 5.341596603393555, "train_loss_min": 0.6537189483642578, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 17, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 25, "subset_independent_by_construction": true, "subset_means_max": 0.02651623317173549, "subset_means_mean": -0.04063139430018182, "subset_means_min": -0.11522865295410156, "subset_sign_counts": {"negative": 121, "positive": 5}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 17, "secret_index_use_count": 0, "step": 25, "unanimous_count": 8}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0849627256393433, "dev_loss_max": 3.3825740814208984, "dev_loss_min": 0.5292148590087891, "eval_accuracy": 0.84375, "eval_loss": 2.227179542183876, "eval_loss_max": 7.856725692749023, "eval_loss_min": 0.4301471710205078, "fd_abs_max": 0.39997100830078125, "fd_abs_mean": 0.1181715726852417, "privacy_rule_violations_so_far": 0, "release_sign": 1, "step": 50, "train_accuracy": 0.71875, "train_loss": 2.4141024351119995, "train_loss_max": 5.36480712890625, "train_loss_min": 0.6504631042480469, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 34, "last_audit": {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 50, "subset_independent_by_construction": true, "subset_means_max": 0.029221852620442707, "subset_means_mean": -0.03039910541977883, "subset_means_min": -0.11400699615478516, "subset_sign_counts": {"negative": 105, "positive": 21}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 34, "secret_index_use_count": 0, "step": 50, "unanimous_count": 16}
+VERBOSE::new_best_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0849627256393433, "dev_loss_max": 3.3825740814208984, "dev_loss_min": 0.5292148590087891, "eval_accuracy": 0.84375, "eval_loss": 2.227179542183876, "eval_loss_max": 7.856725692749023, "eval_loss_min": 0.4301471710205078, "step": 50, "train_accuracy": 0.71875, "train_loss": 2.4141024351119995, "train_loss_max": 5.36480712890625, "train_loss_min": 0.6504631042480469}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0616739988327026, "dev_loss_max": 3.3694686889648438, "dev_loss_min": 0.5209217071533203, "eval_accuracy": 0.84375, "eval_loss": 2.2057136446237564, "eval_loss_max": 7.776834487915039, "eval_loss_min": 0.4257984161376953, "fd_abs_max": 0.4935646057128906, "fd_abs_mean": 0.1966768503189087, "privacy_rule_violations_so_far": 0, "release_sign": -1, "step": 75, "train_accuracy": 0.71875, "train_loss": 2.39112251996994, "train_loss_max": 5.278448104858398, "train_loss_min": 0.6432075500488281, "zpl_branch": "unanimous_subset_independent"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 52, "last_audit": {"branch": "unanimous_subset_independent", "release_sign": -1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 75, "subset_independent_by_construction": true, "subset_means_max": -0.1228533293071546, "subset_means_mean": -0.18101737663287057, "subset_means_min": -0.24666213989257812, "subset_sign_counts": {"negative": 126, "positive": 0}, "unanimous": true, "unique_subset_signs": [-1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 52, "secret_index_use_count": 0, "step": 75, "unanimous_count": 23}
+VERBOSE::new_best_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0616739988327026, "dev_loss_max": 3.3694686889648438, "dev_loss_min": 0.5209217071533203, "eval_accuracy": 0.84375, "eval_loss": 2.2057136446237564, "eval_loss_max": 7.776834487915039, "eval_loss_min": 0.4257984161376953, "step": 75, "train_accuracy": 0.71875, "train_loss": 2.39112251996994, "train_loss_max": 5.278448104858398, "train_loss_min": 0.6432075500488281}
+VERBOSE::eval_checkpoint={"dev_accuracy": 0.84375, "dev_loss": 2.0717188119888306, "dev_loss_max": 3.372072219848633, "dev_loss_min": 0.5278148651123047, "eval_accuracy": 0.8359375, "eval_loss": 2.2116102129220963, "eval_loss_max": 7.812694549560547, "eval_loss_min": 0.4273643493652344, "fd_abs_max": 0.2721595764160156, "fd_abs_mean": 0.0722503662109375, "privacy_rule_violations_so_far": 0, "release_sign": -1, "step": 100, "train_accuracy": 0.75, "train_loss": 2.401448667049408, "train_loss_max": 5.332847595214844, "train_loss_min": 0.6495552062988281, "zpl_branch": "disagreement_randomized"}
+VERBOSE::privacy_checkpoint={"disagreement_count": 70, "last_audit": {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 100, "subset_independent_by_construction": true, "subset_means_max": 0.030622482299804688, "subset_means_mean": -0.022691984234642276, "subset_means_min": -0.07043414645724827, "subset_sign_counts": {"negative": 115, "positive": 11}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, "privacy_violation_count": 0, "randomized_disagreement_count": 70, "secret_index_use_count": 0, "step": 100, "unanimous_count": 30}
+VERBOSE::final_payload_summary={"checks": {"adapter_saved": true, "faithful_projection_set_q_and_v": true, "fd_finite_rate_ok": true, "fd_signal_rate_ok": true, "has_at_least_two_lora_targets": true, "has_disjoint_eval_split": true, "paper_style_lora_rank_alpha": true, "paper_style_num_subsets": true, "privacy_transcript_audit_passed": true, "utility_selection_not_worse_than_baseline_on_selection_metric": true}, "elapsed_seconds": 389.004, "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit", "privacy_accounting": {"audited_steps": 100, "claim_scope": "implementation-level transcript audit; not differential privacy", "disagreement_releases_randomized": 70, "disagreement_steps": 70, "examples_per_column_expected": 63, "mechanism": "PACZero-ZPL audited sign release", "membership_balanced": true, "membership_column_counts_unique": [63], "mutual_information_claim_under_zpl_rule": "I(S_star;Y_1:T)=0 because unanimous releases are identical for all candidate subsets and disagreement releases are independent RNG signs that never index S_star.", "not_differential_privacy": true, "num_subsets_M": 126, "privacy_audit": {"all_disagreement_steps_randomized": true, "all_unanimous_steps_subset_independent": true, "conclusion": "PASS", "release_rule_violation_count": 0, "secret_subset_never_indexed_for_release": true, "transcript_distribution_independent_of_secret_subset_by_construction": true}, "privacy_trace_full_saved_in_log": true, "privacy_trace_head": [{"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 1, "subset_independent_by_construction": true, "subset_means_max": 0.002445807823768029, "subset_means_mean": -0.05805090372583969, "subset_means_min": -0.11127154032389323, "subset_sign_counts": {"negative": 125, "positive": 1}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": 1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 2, "subset_independent_by_construction": true, "subset_means_max": 0.2550360735724954, "subset_means_mean": 0.17591530596076807, "subset_means_min": 0.11989084879557292, "subset_sign_counts": {"negative": 0, "positive": 126}, "unanimous": true, "unique_subset_signs": [1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 3, "subset_independent_by_construction": true, "subset_means_max": 0.042552947998046875, "subset_means_mean": -0.022124079291461457, "subset_means_min": -0.10846710205078125, "subset_sign_counts": {"negative": 100, "positive": 26}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 4, "subset_independent_by_construction": true, "subset_means_max": 0.11552637273615057, "subset_means_mean": 0.03969472016575201, "subset_means_min": -0.010892323085239955, "subset_sign_counts": {"negative": 7, "positive": 119}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 5, "subset_independent_by_construction": true, "subset_means_max": 0.11260151863098145, "subset_means_mean": 0.02634236408732725, "subset_means_min": -0.040103912353515625, "subset_sign_counts": {"negative": 22, "positive": 104}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 6, "subset_independent_by_construction": true, "subset_means_max": 0.10593550545828682, "subset_means_mean": 0.04731323989084485, "subset_means_min": -0.022414525349934895, "subset_sign_counts": {"negative": 4, "positive": 122}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 7, "subset_independent_by_construction": true, "subset_means_max": 0.032976590670072116, "subset_means_mean": -0.015991606805503416, "subset_means_min": -0.06969451904296875, "subset_sign_counts": {"negative": 98, "positive": 28}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 8, "subset_independent_by_construction": true, "subset_means_max": 0.008856909615652902, "subset_means_mean": -0.045025003915892876, "subset_means_min": -0.11748886108398438, "subset_sign_counts": {"negative": 123, "positive": 3}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 9, "subset_independent_by_construction": true, "subset_means_max": 0.1383082071940104, "subset_means_mean": 0.06864538812535918, "subset_means_min": -0.003590217003455529, "subset_sign_counts": {"negative": 2, "positive": 124}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": -1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 10, "subset_independent_by_construction": true, "subset_means_max": -0.04570300762469952, "subset_means_mean": -0.09813581277446096, "subset_means_min": -0.17354516422047334, "subset_sign_counts": {"negative": 126, "positive": 0}, "unanimous": true, "unique_subset_signs": [-1], "violation_reasons": []}], "privacy_trace_tail": [{"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 91, "subset_independent_by_construction": true, "subset_means_max": 0.0686352069561298, "subset_means_mean": 0.018156633471533297, "subset_means_min": -0.03557938795823317, "subset_sign_counts": {"negative": 26, "positive": 100}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 92, "subset_independent_by_construction": true, "subset_means_max": 0.0885307788848877, "subset_means_mean": 0.03176729107590105, "subset_means_min": -0.022400942715731533, "subset_sign_counts": {"negative": 17, "positive": 109}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 93, "subset_independent_by_construction": true, "subset_means_max": 0.10364278157552083, "subset_means_mean": 0.03500926207672688, "subset_means_min": -0.058574676513671875, "subset_sign_counts": {"negative": 17, "positive": 109}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": -1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 94, "subset_independent_by_construction": true, "subset_means_max": -0.019963582356770832, "subset_means_mean": -0.09904137455314385, "subset_means_min": -0.1936164269080529, "subset_sign_counts": {"negative": 126, "positive": 0}, "unanimous": true, "unique_subset_signs": [-1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 95, "subset_independent_by_construction": true, "subset_means_max": 0.02468381609235491, "subset_means_mean": -0.030383875868068726, "subset_means_min": -0.09879493713378906, "subset_sign_counts": {"negative": 114, "positive": 12}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": 1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 96, "subset_independent_by_construction": true, "subset_means_max": 0.09753619923311121, "subset_means_mean": 0.041578043672559226, "subset_means_min": -0.03735224405924479, "subset_sign_counts": {"negative": 5, "positive": 121}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": -1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 97, "subset_independent_by_construction": true, "subset_means_max": -0.017117818196614582, "subset_means_mean": -0.053935058325991624, "subset_means_min": -0.08987069129943848, "subset_sign_counts": {"negative": 126, "positive": 0}, "unanimous": true, "unique_subset_signs": [-1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": 1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 98, "subset_independent_by_construction": true, "subset_means_max": 0.11831029256184895, "subset_means_mean": 0.0692651561014596, "subset_means_min": 0.0027620792388916016, "subset_sign_counts": {"negative": 0, "positive": 126}, "unanimous": true, "unique_subset_signs": [1], "violation_reasons": []}, {"branch": "unanimous_subset_independent", "release_sign": 1, "rng_derived_release": false, "secret_subset_index_used_for_release": false, "step": 99, "subset_independent_by_construction": true, "subset_means_max": 0.1518372126988002, "subset_means_mean": 0.09788218821849914, "subset_means_min": 0.0028582981654575895, "subset_sign_counts": {"negative": 0, "positive": 126}, "unanimous": true, "unique_subset_signs": [1], "violation_reasons": []}, {"branch": "disagreement_randomized", "release_sign": -1, "rng_derived_release": true, "secret_subset_index_used_for_release": false, "step": 100, "subset_independent_by_construction": true, "subset_means_max": 0.030622482299804688, "subset_means_mean": -0.022691984234642276, "subset_means_min": -0.07043414645724827, "subset_sign_counts": {"negative": 115, "positive": 11}, "unanimous": false, "unique_subset_signs": [-1, 1], "violation_reasons": []}], "release_sign_counts": {"negative": 53, "positive": 47}, "steps": 100, "unanimous_steps": 30}, "success": true, "task": "sst2"}
+FAITHFUL_ADAPTATION_RESULT_JSON=
+{
+  "success": true,
+  "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+  "slug": "qwen2.5-0.5b-4bit",
+  "task": "sst2",
+  "elapsed_seconds": 389.004,
+  "dataset_source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices",
+  "train_examples": 32,
+  "dev_examples": 32,
+  "eval_examples": 128,
+  "paper_fidelity_reference": {
+    "mechanism": "PACZero-ZPL",
+    "paper_zpl_M": 126,
+    "paper_lora_rank": 8,
+    "paper_lora_alpha": 16,
+    "paper_lora_targets": "q_proj and v_proj in OPT attention modules",
+    "paper_tasks": [
+      "sst2",
+      "squad"
+    ],
+    "paper_scale_reference": {
+      "train": 1000,
+      "dev": 500,
+      "eval": 1000,
+      "zpl_steps": 1000
+    },
+    "this_is_not_exact_opt_reproduction": true
+  },
+  "parameterization": "faithful_adaptation_qv_lora_paczero_zpl_strict_audit",
+  "target_paths": [
+    "model.layers.0.self_attn.q_proj",
+    "model.layers.0.self_attn.v_proj"
+  ],
+  "target_infos": [
+    {
+      "target_path": "model.layers.0.self_attn.q_proj",
+      "input_dim": 896,
+      "output_dim": 896,
+      "theta_size": 14336,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "output_source": "bias.shape[0]",
+        "bias_shape": [
+          896
+        ],
+        "weight_shape": [
+          896,
+          112
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 112,
+          "values_per_uint32": 8,
+          "dense_input_dim": 896
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 896,
+        "output_dim": 896
+      }
+    },
+    {
+      "target_path": "model.layers.0.self_attn.v_proj",
+      "input_dim": 896,
+      "output_dim": 128,
+      "theta_size": 8192,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "output_source": "bias.shape[0]",
+        "bias_shape": [
+          128
+        ],
+        "weight_shape": [
+          128,
+          112
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 112,
+          "values_per_uint32": 8,
+          "dense_input_dim": 896
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 896,
+        "output_dim": 128
+      }
+    }
+  ],
+  "layers": "1",
+  "projections": [
+    "q_proj",
+    "v_proj"
+  ],
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 22528,
+  "seed": 20260611,
+  "steps": 100,
+  "num_subsets": 126,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "paper_style_num_subsets": true,
+    "paper_style_lora_rank_alpha": true,
+    "faithful_projection_set_q_and_v": true,
+    "has_at_least_two_lora_targets": true,
+    "has_disjoint_eval_split": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "privacy_transcript_audit_passed": true,
+    "utility_selection_not_worse_than_baseline_on_selection_metric": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 2.421936571598053,
+    "train_loss_min": 0.6582698822021484,
+    "train_loss_max": 5.34619140625,
+    "train_accuracy": 0.71875,
+    "dev_loss": 2.099367678165436,
+    "dev_loss_min": 0.5367965698242188,
+    "dev_loss_max": 3.434000015258789,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.244535118341446,
+    "eval_loss_min": 0.43454933166503906,
+    "eval_loss_max": 7.867856979370117,
+    "eval_accuracy": 0.8359375
+  },
+  "final": {
+    "train_loss": 2.401448667049408,
+    "train_loss_min": 0.6495552062988281,
+    "train_loss_max": 5.332847595214844,
+    "train_accuracy": 0.75,
+    "dev_loss": 2.0717188119888306,
+    "dev_loss_min": 0.5278148651123047,
+    "dev_loss_max": 3.372072219848633,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2116102129220963,
+    "eval_loss_min": 0.4273643493652344,
+    "eval_loss_max": 7.812694549560547,
+    "eval_accuracy": 0.8359375
+  },
+  "best_checkpoint": {
+    "step": 75,
+    "train_loss": 2.39112251996994,
+    "train_loss_min": 0.6432075500488281,
+    "train_loss_max": 5.278448104858398,
+    "train_accuracy": 0.71875,
+    "dev_loss": 2.0616739988327026,
+    "dev_loss_min": 0.5209217071533203,
+    "dev_loss_max": 3.3694686889648438,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2057136446237564,
+    "eval_loss_min": 0.4257984161376953,
+    "eval_loss_max": 7.776834487915039,
+    "eval_accuracy": 0.84375
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 2.39112251996994,
+    "train_loss_min": 0.6432075500488281,
+    "train_loss_max": 5.278448104858398,
+    "train_accuracy": 0.71875,
+    "dev_loss": 2.0616739988327026,
+    "dev_loss_min": 0.5209217071533203,
+    "dev_loss_max": 3.3694686889648438,
+    "dev_accuracy": 0.84375,
+    "eval_loss": 2.2057136446237564,
+    "eval_loss_min": 0.4257984161376953,
+    "eval_loss_max": 7.776834487915039,
+    "eval_accuracy": 0.84375
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.7469940185546875,
+  "fd_abs_max_mean": 0.4015506744384766,
+  "fd_abs_mean_mean": 0.12423180341720581,
+  "privacy_accounting": {
+    "mechanism": "PACZero-ZPL audited sign release",
+    "claim_scope": "implementation-level transcript audit; not differential privacy",
+    "not_differential_privacy": true,
+    "mutual_information_claim_under_zpl_rule": "I(S_star;Y_1:T)=0 because unanimous releases are identical for all candidate subsets and disagreement releases are independent RNG signs that never index S_star.",
+    "num_subsets_M": 126,
+    "examples_per_column_expected": 63,
+    "membership_column_counts_unique": [
+      63
+    ],
+    "membership_balanced": true,
+    "steps": 100,
+    "audited_steps": 100,
+    "unanimous_steps": 30,
+    "disagreement_steps": 70,
+    "disagreement_releases_randomized": 70,
+    "release_sign_counts": {
+      "positive": 47,
+      "negative": 53
+    },
+    "privacy_audit": {
+      "all_unanimous_steps_subset_independent": true,
+      "all_disagreement_steps_randomized": true,
+      "secret_subset_never_indexed_for_release": true,
+      "release_rule_violation_count": 0,
+      "transcript_distribution_independent_of_secret_subset_by_construction": true,
+      "conclusion": "PASS"
+    },
+    "privacy_trace_head": [
+      {
+        "step": 1,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 125,
+          "positive": 1
+        },
+        "subset_means_min": -0.11127154032389323,
+        "subset_means_max": 0.002445807823768029,
+        "subset_means_mean": -0.05805090372583969,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 2,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.11989084879557292,
+        "subset_means_max": 0.2550360735724954,
+        "subset_means_mean": 0.17591530596076807,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 3,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 100,
+          "positive": 26
+        },
+        "subset_means_min": -0.10846710205078125,
+        "subset_means_max": 0.042552947998046875,
+        "subset_means_mean": -0.022124079291461457,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 4,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 7,
+          "positive": 119
+        },
+        "subset_means_min": -0.010892323085239955,
+        "subset_means_max": 0.11552637273615057,
+        "subset_means_mean": 0.03969472016575201,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 5,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 22,
+          "positive": 104
+        },
+        "subset_means_min": -0.040103912353515625,
+        "subset_means_max": 0.11260151863098145,
+        "subset_means_mean": 0.02634236408732725,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 6,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 4,
+          "positive": 122
+        },
+        "subset_means_min": -0.022414525349934895,
+        "subset_means_max": 0.10593550545828682,
+        "subset_means_mean": 0.04731323989084485,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 7,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 98,
+          "positive": 28
+        },
+        "subset_means_min": -0.06969451904296875,
+        "subset_means_max": 0.032976590670072116,
+        "subset_means_mean": -0.015991606805503416,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 8,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 123,
+          "positive": 3
+        },
+        "subset_means_min": -0.11748886108398438,
+        "subset_means_max": 0.008856909615652902,
+        "subset_means_mean": -0.045025003915892876,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 9,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 2,
+          "positive": 124
+        },
+        "subset_means_min": -0.003590217003455529,
+        "subset_means_max": 0.1383082071940104,
+        "subset_means_mean": 0.06864538812535918,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 10,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.17354516422047334,
+        "subset_means_max": -0.04570300762469952,
+        "subset_means_mean": -0.09813581277446096,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_tail": [
+      {
+        "step": 91,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 26,
+          "positive": 100
+        },
+        "subset_means_min": -0.03557938795823317,
+        "subset_means_max": 0.0686352069561298,
+        "subset_means_mean": 0.018156633471533297,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 92,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 17,
+          "positive": 109
+        },
+        "subset_means_min": -0.022400942715731533,
+        "subset_means_max": 0.0885307788848877,
+        "subset_means_mean": 0.03176729107590105,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 93,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 17,
+          "positive": 109
+        },
+        "subset_means_min": -0.058574676513671875,
+        "subset_means_max": 0.10364278157552083,
+        "subset_means_mean": 0.03500926207672688,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 94,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.1936164269080529,
+        "subset_means_max": -0.019963582356770832,
+        "subset_means_mean": -0.09904137455314385,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 95,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 114,
+          "positive": 12
+        },
+        "subset_means_min": -0.09879493713378906,
+        "subset_means_max": 0.02468381609235491,
+        "subset_means_mean": -0.030383875868068726,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 96,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 5,
+          "positive": 121
+        },
+        "subset_means_min": -0.03735224405924479,
+        "subset_means_max": 0.09753619923311121,
+        "subset_means_mean": 0.041578043672559226,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 97,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.08987069129943848,
+        "subset_means_max": -0.017117818196614582,
+        "subset_means_mean": -0.053935058325991624,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 98,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0027620792388916016,
+        "subset_means_max": 0.11831029256184895,
+        "subset_means_mean": 0.0692651561014596,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 99,
+        "branch": "unanimous_subset_independent",
+        "release_sign": 1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 0,
+          "positive": 126
+        },
+        "subset_means_min": 0.0028582981654575895,
+        "subset_means_max": 0.1518372126988002,
+        "subset_means_mean": 0.09788218821849914,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 100,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 115,
+          "positive": 11
+        },
+        "subset_means_min": -0.07043414645724827,
+        "subset_means_max": 0.030622482299804688,
+        "subset_means_mean": -0.022691984234642276,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_full_saved_in_log": true
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-faithful-adaptation-adapters/qwen2.5-0.5b-4bit-sst2/qv_lora_rank8_alpha16.npz",
+    "bytes": 93080,
+    "adapter_count": 2,
+    "adapter_shapes": [
+      {
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "A_shape": [
+          8,
+          896
+        ],
+        "B_shape": [
+          896,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "A_shape": [
+          8,
+          896
+        ],
+        "B_shape": [
+          128,
+          8
+        ]
+      }
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 2.4208908677101135,
+      "train_loss_min": 0.6603660583496094,
+      "train_loss_max": 5.335868835449219,
+      "train_accuracy": 0.71875,
+      "dev_loss": 2.089934825897217,
+      "dev_loss_min": 0.5283432006835938,
+      "dev_loss_max": 3.4037914276123047,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2312280237674713,
+      "eval_loss_min": 0.4321308135986328,
+      "eval_loss_max": 7.82305908203125,
+      "eval_accuracy": 0.8359375,
+      "fd_abs_max": 0.4274177551269531,
+      "fd_abs_mean": 0.11551618576049805,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 25,
+      "train_loss": 2.4165017008781433,
+      "train_loss_min": 0.6537189483642578,
+      "train_loss_max": 5.341596603393555,
+      "train_accuracy": 0.71875,
+      "dev_loss": 2.0956003665924072,
+      "dev_loss_min": 0.5384235382080078,
+      "dev_loss_max": 3.3993396759033203,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2384540885686874,
+      "eval_loss_min": 0.4296436309814453,
+      "eval_loss_max": 7.8447113037109375,
+      "eval_accuracy": 0.84375,
+      "fd_abs_max": 0.4416656494140625,
+      "fd_abs_mean": 0.10865151882171631,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 50,
+      "train_loss": 2.4141024351119995,
+      "train_loss_min": 0.6504631042480469,
+      "train_loss_max": 5.36480712890625,
+      "train_accuracy": 0.71875,
+      "dev_loss": 2.0849627256393433,
+      "dev_loss_min": 0.5292148590087891,
+      "dev_loss_max": 3.3825740814208984,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.227179542183876,
+      "eval_loss_min": 0.4301471710205078,
+      "eval_loss_max": 7.856725692749023,
+      "eval_accuracy": 0.84375,
+      "fd_abs_max": 0.39997100830078125,
+      "fd_abs_mean": 0.1181715726852417,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 75,
+      "train_loss": 2.39112251996994,
+      "train_loss_min": 0.6432075500488281,
+      "train_loss_max": 5.278448104858398,
+      "train_accuracy": 0.71875,
+      "dev_loss": 2.0616739988327026,
+      "dev_loss_min": 0.5209217071533203,
+      "dev_loss_max": 3.3694686889648438,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2057136446237564,
+      "eval_loss_min": 0.4257984161376953,
+      "eval_loss_max": 7.776834487915039,
+      "eval_accuracy": 0.84375,
+      "fd_abs_max": 0.4935646057128906,
+      "fd_abs_mean": 0.1966768503189087,
+      "zpl_branch": "unanimous_subset_independent",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 100,
+      "train_loss": 2.401448667049408,
+      "train_loss_min": 0.6495552062988281,
+      "train_loss_max": 5.332847595214844,
+      "train_accuracy": 0.75,
+      "dev_loss": 2.0717188119888306,
+      "dev_loss_min": 0.5278148651123047,
+      "dev_loss_max": 3.372072219848633,
+      "dev_accuracy": 0.84375,
+      "eval_loss": 2.2116102129220963,
+      "eval_loss_min": 0.4273643493652344,
+      "eval_loss_max": 7.812694549560547,
+      "eval_accuracy": 0.8359375,
+      "fd_abs_max": 0.2721595764160156,
+      "fd_abs_mean": 0.0722503662109375,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    }
+  ],
+  "limitations": [
+    "Default workflow is medium/smoke scale unless inputs are increased to 1000/500/1000 and 1000 steps.",
+    "Qwen/Llama MLX models are adaptations, not exact OPT-1.3B/OPT-6.7B reproduction.",
+    "SQuAD metric here is gold-answer label-likelihood loss, not generated EM/F1.",
+    "Use --layers all for all-layer q/v coverage; default CI uses initial layer count for runtime."
+  ]
+}
