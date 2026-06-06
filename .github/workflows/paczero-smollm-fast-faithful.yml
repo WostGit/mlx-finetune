@@ -1,0 +1,175 @@
+name: PACZero SmolLM fast faithful audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: "PACZero-ZPL steps per task"
+        required: false
+        default: "20"
+      train_examples:
+        description: "Training examples per task"
+        required: false
+        default: "8"
+      dev_examples:
+        description: "Dev examples per task"
+        required: false
+        default: "8"
+      eval_examples:
+        description: "Held-out eval examples per task"
+        required: false
+        default: "16"
+      layers:
+        description: "Initial layers to adapt, or all"
+        required: false
+        default: "1"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/paczero-smollm-fast-faithful.yml"
+      - "scripts/paczero_mlxlm_faithful_adaptation.py"
+      - "scripts/paczero_mlxlm_lora_reproduction.py"
+      - "scripts/paczero_core.py"
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  smollm-fast-faithful:
+    name: SmolLM fast faithful ${{ matrix.task }}
+    runs-on: macos-26
+    timeout-minutes: 180
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-smollm-fast]') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model_slug: smollm-135m-4bit
+            model: mlx-community/SmolLM-135M-4bit
+            task: sst2
+            seed: 20260613
+          - model_slug: smollm-135m-4bit
+            model: mlx-community/SmolLM-135M-4bit
+            task: squad
+            seed: 20260614
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONWARNINGS: "ignore"
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
+      HF_XET_HIGH_PERFORMANCE: "1"
+      STEPS: ${{ github.event.inputs.steps || '20' }}
+      TRAIN_EXAMPLES: ${{ github.event.inputs.train_examples || '8' }}
+      DEV_EXAMPLES: ${{ github.event.inputs.dev_examples || '8' }}
+      EVAL_EXAMPLES: ${{ github.event.inputs.eval_examples || '16' }}
+      LAYERS: ${{ github.event.inputs.layers || '1' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install MLX-LM dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade mlx mlx-lm huggingface_hub hf_transfer safetensors numpy datasets
+
+      - name: Run fast SmolLM faithful PACZero audit
+        run: |
+          slug="${{ matrix.model_slug }}-${{ matrix.task }}"
+          mkdir -p "benchmark-logs/paczero-smollm-fast-faithful/${slug}" \
+                   "benchmark-results/paczero-smollm-fast-faithful/${slug}" \
+                   "benchmark-results/paczero-smollm-fast-faithful-adapters/${slug}"
+          stamp="$(date -u '+%Y%m%dT%H%M%SZ')"
+          log_file="benchmark-logs/paczero-smollm-fast-faithful/${slug}/smollm-fast-faithful-${stamp}.txt"
+          latest_file="benchmark-logs/paczero-smollm-fast-faithful/${slug}/smollm-fast-faithful-latest.txt"
+          result_file="benchmark-results/paczero-smollm-fast-faithful/${slug}/smollm_fast_faithful_results.json"
+          adapter_file="benchmark-results/paczero-smollm-fast-faithful-adapters/${slug}/qv_lora_rank8_alpha16.npz"
+          echo "LOG_FILE=$log_file" >> "$GITHUB_ENV"
+          echo "LATEST_FILE=$latest_file" >> "$GITHUB_ENV"
+          echo "RESULT_FILE=$result_file" >> "$GITHUB_ENV"
+          echo "ADAPTER_FILE=$adapter_file" >> "$GITHUB_ENV"
+          set -o pipefail
+          python scripts/paczero_mlxlm_faithful_adaptation.py \
+            --model "${{ matrix.model }}" \
+            --slug "${{ matrix.model_slug }}" \
+            --task "${{ matrix.task }}" \
+            --projections q_proj,v_proj \
+            --layers "${LAYERS}" \
+            --rank 8 \
+            --alpha 16.0 \
+            --seed "${{ matrix.seed }}" \
+            --steps "${STEPS}" \
+            --train-examples "${TRAIN_EXAMPLES}" \
+            --dev-examples "${DEV_EXAMPLES}" \
+            --eval-examples "${EVAL_EXAMPLES}" \
+            --num-subsets 126 \
+            --mu 0.05 \
+            --lr 0.05 \
+            --clip 25.0 \
+            --eval-every 5 \
+            --json-out "$result_file" \
+            --adapter-out "$adapter_file" \
+            2>&1 | tee "$log_file"
+          cp "$log_file" "$latest_file"
+
+      - name: Add ultra-verbose SmolLM summary
+        if: always()
+        run: |
+          echo "# PACZero SmolLM fast faithful audit: ${{ matrix.task }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Model: \`${{ matrix.model }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Task: \`${{ matrix.task }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Projection fidelity: \`q_proj + v_proj\`; LoRA rank/alpha: \`8/16\`; M: \`126\`; scale: \`${TRAIN_EXAMPLES}/${DEV_EXAMPLES}/${EVAL_EXAMPLES}\`; steps: \`${STEPS}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Log: \`${LATEST_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Result JSON: \`${RESULT_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Adapter file: \`${ADAPTER_FILE:-not-created}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "${LOG_FILE:-}" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 700 "$LOG_FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit fast SmolLM faithful output for ${{ matrix.task }}
+        if: always()
+        run: |
+          set -e
+          slug="${{ matrix.model_slug }}-${{ matrix.task }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "benchmark-logs/paczero-smollm-fast-faithful/${slug}/" \
+                  "benchmark-results/paczero-smollm-fast-faithful/${slug}/" \
+                  "benchmark-results/paczero-smollm-fast-faithful-adapters/${slug}/" || true
+          if git diff --cached --quiet; then
+            echo "No fast SmolLM faithful output changes to commit for ${slug}."
+            exit 0
+          fi
+          git commit -m "Add fast SmolLM PACZero faithful output for ${slug} [skip ci] [skip paczero-smollm-fast]"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed fast SmolLM faithful output for ${slug} on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push failed for ${slug}; rebasing and retrying attempt ${attempt}..."
+            git pull --rebase --autostash origin main
+          done
+          git push
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paczero-smollm-fast-faithful-${{ matrix.task }}
+          path: |
+            benchmark-logs/paczero-smollm-fast-faithful/${{ matrix.model_slug }}-${{ matrix.task }}
+            benchmark-results/paczero-smollm-fast-faithful/${{ matrix.model_slug }}-${{ matrix.task }}
+            benchmark-results/paczero-smollm-fast-faithful-adapters/${{ matrix.model_slug }}-${{ matrix.task }}
+          if-no-files-found: warn
