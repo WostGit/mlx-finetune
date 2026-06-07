@@ -31,6 +31,9 @@ on:
       - "scripts/paczero_mlxlm_lora_reproduction.py"
       - "scripts/paczero_core.py"
       - "scripts/paczero_smollm_10of10_aggregate.py"
+      - "scripts/paczero_zpl_negative_control.py"
+      - "PACZERO_MLX_ZENODO_RELEASE.md"
+      - ".zenodo.json"
 
 permissions:
   contents: write
@@ -190,7 +193,11 @@ jobs:
         run: |
           git pull --rebase --autostash origin main
 
-      - name: Aggregate SST-2 and SQuAD reviewer-proof results
+      - name: Run ZPL negative-control privacy audit
+        run: |
+          python scripts/paczero_zpl_negative_control.py
+
+      - name: Aggregate SST-2, SQuAD, and negative-control reviewer-proof results
         run: |
           python scripts/paczero_smollm_10of10_aggregate.py
 
