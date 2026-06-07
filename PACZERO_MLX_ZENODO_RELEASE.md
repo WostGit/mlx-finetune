@@ -6,6 +6,8 @@ This artifact is a fast, reviewer-facing **MLX port demo of the PACZero-ZPL priv
 
 The release demonstrates that the PACZero-ZPL concepts can be ported to MLX by running the mechanism on `mlx-community/SmolLM-135M-4bit` across both SST-2 and SQuAD task paths with strict transcript auditing.
 
+Final release workflow trigger marker: `2026-06-08-final-github-actions-run`.
+
 ## Paper-concept to MLX-evidence map
 
 | PACZero paper concept | MLX port evidence in this release |
