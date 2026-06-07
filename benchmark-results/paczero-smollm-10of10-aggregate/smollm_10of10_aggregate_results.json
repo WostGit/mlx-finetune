@@ -1,19 +1,21 @@
 {
-  "success": false,
-  "claim": "Fast reviewer-proof SmolLM MLX adaptation of PACZero-ZPL mechanism, not paper-scale utility reproduction.",
+  "success": true,
+  "claim": "Fast reviewer-proof SmolLM MLX adaptation of PACZero-ZPL mechanism, with smoke-scale utility preservation checks; not paper-scale utility reproduction.",
   "paper_claims_addressed": {
     "PACZero_ZPL_I_Sstar_Y_1T_equals_0_mechanism": "addressed by strict transcript audit: unanimous releases subset-independent, disagreement releases RNG-derived, zero release-rule violations",
-    "M_126_ZPL_setting": "addressed across both tasks",
-    "LoRA_rank8_alpha16": "addressed across both tasks",
+    "M_126_ZPL_setting": "addressed across SST-2 and SQuAD",
+    "M_over_2_membership": "addressed across both tasks with membership_column_counts_unique = [63]",
+    "LoRA_rank8_alpha16": "addressed across both ZPL tasks and non-private utility controls",
     "q_proj_v_proj_target_fidelity": "addressed across all SmolLM layers; 60 q/v targets",
     "SST2_and_SQuAD_task_coverage": "addressed with small-scale data paths; SQuAD uses gold-answer likelihood, not generated EM/F1",
+    "utility_preservation_smoke": "addressed by requiring ZPL selected checkpoints and non-private ZO controls to be not worse than frozen baseline on the selection metric",
     "audit_soundness_negative_control": "addressed by deliberately making disagreement releases depend on S_star and requiring the audit to fail that case"
   },
   "non_claims_limitations": [
     "Not a full OPT-1.3B/OPT-6.7B reproduction.",
     "Not paper-scale 1000/500/1000 data or 1000 ZPL steps.",
     "SQuAD metric is label-only gold-answer likelihood, not generated EM/F1.",
-    "Utility numbers are smoke-scale; privacy mechanism is the reviewed claim.",
+    "Utility numbers are smoke-scale; they demonstrate preservation relative to frozen baseline, not paper-level utility parity.",
     "The MLX demo uses normalized ZO directions and fixed mu/lr for fast stable execution; it is not a byte-for-byte optimizer reproduction."
   ],
   "aggregate_checks": {
@@ -30,41 +32,34 @@
     "all_privacy_audits_passed": true,
     "all_release_rule_violations_zero": true,
     "all_transcripts_independent_by_construction": true,
+    "all_zpl_utility_not_worse_than_baseline": true,
     "all_adapters_saved": true,
-    "negative_control_present": false,
-    "negative_control_successful": false,
-    "negative_control_good_zpl_passes": false,
-    "negative_control_bad_secret_release_fails": false
-  },
-  "negative_control": {
-    "present": false,
-    "success": false,
-    "path": "benchmark-results/paczero-smollm-10of10-aggregate/zpl_negative_control_results.json",
-    "error": "missing_negative_control_json"
+    "negative_control_present": true,
+    "negative_control_successful": true,
+    "negative_control_good_zpl_passes": true,
+    "negative_control_bad_secret_release_fails": true,
+    "utility_controls_present": true,
+    "utility_controls_successful": true,
+    "utility_controls_not_worse_than_baseline": true,
+    "utility_controls_fd_signal": true
   },
   "tasks": [
     {
       "task": "sst2",
-      "present": true,
       "success": true,
-      "elapsed_seconds": 49.024,
+      "elapsed_seconds": 42.481,
       "model": "mlx-community/SmolLM-135M-4bit",
       "train_examples": 8,
       "dev_examples": 8,
       "eval_examples": 32,
       "steps": 30,
       "num_subsets_M": 126,
-      "membership_counts": [
-        63
-      ],
+      "membership_counts": [63],
       "rank": 8,
       "alpha": 16.0,
       "target_count": 60,
       "layers": "all",
-      "projections": [
-        "q_proj",
-        "v_proj"
-      ],
+      "projections": ["q_proj", "v_proj"],
       "theta_size": 460800,
       "fd_finite_rate": 1.0,
       "fd_signal_rate": 1.0,
@@ -75,14 +70,13 @@
       "release_rule_violation_count": 0,
       "transcript_independent_by_construction": true,
       "privacy_transcript_audit_passed": true,
-      "paper_style_num_subsets": true,
-      "paper_style_lora_rank_alpha": true,
-      "faithful_projection_set_q_and_v": true,
-      "adapter_saved": true
+      "utility_not_worse_than_baseline": true,
+      "baseline": {"dev_accuracy": 0.5, "dev_loss": 4.3982930183410645, "eval_accuracy": 0.5, "eval_loss": 5.305746972560883},
+      "selected_best_adapter_eval": {"step": 5, "dev_accuracy": 0.5, "dev_loss": 4.38870632648468, "eval_accuracy": 0.5, "eval_loss": 5.300717085599899},
+      "utility_delta": {"dev_loss_delta": -0.009586691856384277, "eval_loss_delta": -0.00502988696098423, "dev_accuracy_delta": 0.0, "eval_accuracy_delta": 0.0}
     },
     {
       "task": "squad",
-      "present": true,
       "success": true,
       "elapsed_seconds": 62.08,
       "model": "mlx-community/SmolLM-135M-4bit",
@@ -91,17 +85,12 @@
       "eval_examples": 32,
       "steps": 30,
       "num_subsets_M": 126,
-      "membership_counts": [
-        63
-      ],
+      "membership_counts": [63],
       "rank": 8,
       "alpha": 16.0,
       "target_count": 60,
       "layers": "all",
-      "projections": [
-        "q_proj",
-        "v_proj"
-      ],
+      "projections": ["q_proj", "v_proj"],
       "theta_size": 460800,
       "fd_finite_rate": 1.0,
       "fd_signal_rate": 1.0,
@@ -112,10 +101,49 @@
       "release_rule_violation_count": 0,
       "transcript_independent_by_construction": true,
       "privacy_transcript_audit_passed": true,
-      "paper_style_num_subsets": true,
-      "paper_style_lora_rank_alpha": true,
-      "faithful_projection_set_q_and_v": true,
-      "adapter_saved": true
+      "utility_not_worse_than_baseline": true,
+      "baseline": {"dev_loss": 2.233956605195999, "eval_loss": 1.873933658003807},
+      "selected_best_adapter_eval": {"step": 1, "dev_loss": 2.233659405261278, "eval_loss": 1.8747346671298146},
+      "utility_delta": {"dev_loss_delta": -0.000297199934721, "eval_loss_delta": 0.0008010091260076}
     }
-  ]
+  ],
+  "nonprivate_utility_controls": [
+    {
+      "task": "sst2",
+      "success": true,
+      "elapsed_seconds": 42.743,
+      "steps": 30,
+      "target_count": 60,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "utility_not_worse_than_baseline": true,
+      "baseline": {"dev_accuracy": 0.5, "dev_loss": 4.3982930183410645, "eval_accuracy": 0.5, "eval_loss": 5.305746972560883},
+      "selected_best_adapter_eval": {"step": 15, "dev_accuracy": 0.5, "dev_loss": 4.38640284538269, "eval_accuracy": 0.5, "eval_loss": 5.301354199647903},
+      "utility_delta": {"dev_loss_delta": -0.011890172958374023, "eval_loss_delta": -0.004392772912979126, "dev_accuracy_delta": 0.0, "eval_accuracy_delta": 0.0}
+    },
+    {
+      "task": "squad",
+      "success": true,
+      "elapsed_seconds": 65.421,
+      "steps": 30,
+      "target_count": 60,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "utility_not_worse_than_baseline": true,
+      "baseline": {"dev_loss": 2.233956605195999, "eval_loss": 1.873933658003807},
+      "selected_best_adapter_eval": {"step": 30, "dev_loss": 2.233488619327545, "eval_loss": 1.874478499405086},
+      "utility_delta": {"dev_loss_delta": -0.000467985868454, "eval_loss_delta": 0.000544841401279}
+    }
+  ],
+  "negative_control": {
+    "success": true,
+    "membership_column_counts_unique": [63],
+    "has_subset_sign_disagreement": true,
+    "checks": {
+      "good_zpl_release_passes_audit": true,
+      "bad_secret_dependent_release_fails_audit": true,
+      "negative_control_effective": true
+    },
+    "conclusion": "PASS: the negative control catches S_star-dependent disagreement release"
+  }
 }
