@@ -1,0 +1,35 @@
+{
+  "title": "PACZero-ZPL MLX Port Demo: SmolLM Mechanism-Fidelity Audit",
+  "description": "A fast, reviewer-facing MLX adaptation demo of the PACZero-ZPL privacy mechanism. The artifact demonstrates M=126 balanced candidate subsets, rank-8/alpha-16 LoRA, q_proj+v_proj adapters across all SmolLM-135M layers, two-point zeroth-order finite differences, strict ZPL transcript auditing, and aggregate SST-2/SQuAD mechanism checks. This is a mechanism-fidelity port demo, not a paper-scale OPT utility reproduction.",
+  "creators": [
+    {
+      "name": "WostGit"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "PACZero",
+    "PACZero-ZPL",
+    "MLX",
+    "LoRA",
+    "zeroth-order optimization",
+    "privacy audit",
+    "SmolLM",
+    "SST-2",
+    "SQuAD"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://arxiv.org/abs/2605.06505",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://huggingface.co/mlx-community/SmolLM-135M-4bit",
+      "relation": "references",
+      "scheme": "url"
+    }
+  ],
+  "upload_type": "software",
+  "access_right": "open"
+}
