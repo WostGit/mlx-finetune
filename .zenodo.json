@@ -1,6 +1,6 @@
 {
   "title": "PACZero-ZPL MLX Port Demo: SmolLM Mechanism-Fidelity Audit",
-  "description": "A fast, reviewer-facing MLX adaptation demo of the PACZero-ZPL privacy mechanism. The artifact demonstrates M=126 balanced candidate subsets, rank-8/alpha-16 LoRA, q_proj+v_proj adapters across all SmolLM-135M layers, two-point zeroth-order finite differences, strict ZPL transcript auditing, and aggregate SST-2/SQuAD mechanism checks. This is a mechanism-fidelity port demo, not a paper-scale OPT utility reproduction.",
+  "description": "A compact MLX adaptation demo of the PACZero-ZPL privacy mechanism. The artifact demonstrates M=126 balanced candidate subsets, rank-8/alpha-16 LoRA, q_proj+v_proj adapters across all SmolLM-135M layers, two-point zeroth-order finite differences, strict ZPL transcript auditing, utility preservation checks, non-private utility controls, and aggregate SST-2/SQuAD mechanism checks. This is a mechanism-fidelity port demo, not a paper-scale OPT utility reproduction.",
   "creators": [
     {
       "name": "WostGit"
