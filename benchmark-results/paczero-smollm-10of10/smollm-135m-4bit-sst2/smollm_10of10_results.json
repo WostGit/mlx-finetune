@@ -1,0 +1,2948 @@
+{
+  "success": true,
+  "model": "mlx-community/SmolLM-135M-4bit",
+  "slug": "smollm-135m-4bit",
+  "task": "sst2",
+  "elapsed_seconds": 42.865,
+  "dataset_source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices",
+  "train_examples": 8,
+  "dev_examples": 8,
+  "eval_examples": 32,
+  "paper_fidelity_reference": {
+    "mechanism": "PACZero-ZPL",
+    "paper_zpl_M": 126,
+    "paper_lora_rank": 8,
+    "paper_lora_alpha": 16,
+    "paper_lora_targets": "q_proj and v_proj in OPT attention modules",
+    "paper_tasks": [
+      "sst2",
+      "squad"
+    ],
+    "paper_scale_reference": {
+      "train": 1000,
+      "dev": 500,
+      "eval": 1000,
+      "zpl_steps": 1000
+    },
+    "this_is_not_exact_opt_reproduction": true
+  },
+  "parameterization": "faithful_adaptation_qv_lora_paczero_zpl_strict_audit",
+  "target_paths": [
+    "model.layers.0.self_attn.q_proj",
+    "model.layers.0.self_attn.v_proj",
+    "model.layers.1.self_attn.q_proj",
+    "model.layers.1.self_attn.v_proj",
+    "model.layers.2.self_attn.q_proj",
+    "model.layers.2.self_attn.v_proj",
+    "model.layers.3.self_attn.q_proj",
+    "model.layers.3.self_attn.v_proj",
+    "model.layers.4.self_attn.q_proj",
+    "model.layers.4.self_attn.v_proj",
+    "model.layers.5.self_attn.q_proj",
+    "model.layers.5.self_attn.v_proj",
+    "model.layers.6.self_attn.q_proj",
+    "model.layers.6.self_attn.v_proj",
+    "model.layers.7.self_attn.q_proj",
+    "model.layers.7.self_attn.v_proj",
+    "model.layers.8.self_attn.q_proj",
+    "model.layers.8.self_attn.v_proj",
+    "model.layers.9.self_attn.q_proj",
+    "model.layers.9.self_attn.v_proj",
+    "model.layers.10.self_attn.q_proj",
+    "model.layers.10.self_attn.v_proj",
+    "model.layers.11.self_attn.q_proj",
+    "model.layers.11.self_attn.v_proj",
+    "model.layers.12.self_attn.q_proj",
+    "model.layers.12.self_attn.v_proj",
+    "model.layers.13.self_attn.q_proj",
+    "model.layers.13.self_attn.v_proj",
+    "model.layers.14.self_attn.q_proj",
+    "model.layers.14.self_attn.v_proj",
+    "model.layers.15.self_attn.q_proj",
+    "model.layers.15.self_attn.v_proj",
+    "model.layers.16.self_attn.q_proj",
+    "model.layers.16.self_attn.v_proj",
+    "model.layers.17.self_attn.q_proj",
+    "model.layers.17.self_attn.v_proj",
+    "model.layers.18.self_attn.q_proj",
+    "model.layers.18.self_attn.v_proj",
+    "model.layers.19.self_attn.q_proj",
+    "model.layers.19.self_attn.v_proj",
+    "model.layers.20.self_attn.q_proj",
+    "model.layers.20.self_attn.v_proj",
+    "model.layers.21.self_attn.q_proj",
+    "model.layers.21.self_attn.v_proj",
+    "model.layers.22.self_attn.q_proj",
+    "model.layers.22.self_attn.v_proj",
+    "model.layers.23.self_attn.q_proj",
+    "model.layers.23.self_attn.v_proj",
+    "model.layers.24.self_attn.q_proj",
+    "model.layers.24.self_attn.v_proj",
+    "model.layers.25.self_attn.q_proj",
+    "model.layers.25.self_attn.v_proj",
+    "model.layers.26.self_attn.q_proj",
+    "model.layers.26.self_attn.v_proj",
+    "model.layers.27.self_attn.q_proj",
+    "model.layers.27.self_attn.v_proj",
+    "model.layers.28.self_attn.q_proj",
+    "model.layers.28.self_attn.v_proj",
+    "model.layers.29.self_attn.q_proj",
+    "model.layers.29.self_attn.v_proj"
+  ],
+  "target_infos": [
+    {
+      "target_path": "model.layers.0.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.0.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.1.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.1.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.1.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.1.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.2.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.2.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.2.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.2.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.3.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.3.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.3.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.3.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.4.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.4.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.4.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.4.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.5.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.5.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.5.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.5.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.6.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.6.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.6.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.6.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.7.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.7.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.7.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.7.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.8.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.8.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.8.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.8.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.9.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.9.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.9.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.9.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.10.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.10.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.10.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.10.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.11.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.11.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.11.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.11.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.12.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.12.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.12.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.12.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.13.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.13.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.13.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.13.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.14.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.14.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.14.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.14.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.15.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.15.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.15.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.15.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.16.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.16.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.16.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.16.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.17.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.17.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.17.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.17.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.18.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.18.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.18.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.18.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.19.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.19.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.19.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.19.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.20.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.20.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.20.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.20.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.21.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.21.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.21.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.21.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.22.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.22.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.22.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.22.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.23.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.23.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.23.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.23.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.24.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.24.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.24.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.24.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.25.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.25.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.25.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.25.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.26.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.26.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.26.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.26.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.27.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.27.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.27.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.27.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.28.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.28.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.28.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.28.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.29.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.29.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.29.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.29.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    }
+  ],
+  "layers": "all",
+  "projections": [
+    "q_proj",
+    "v_proj"
+  ],
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 460800,
+  "seed": 20260615,
+  "steps": 30,
+  "num_subsets": 126,
+  "mu": 0.05,
+  "lr": 0.05,
+  "clip": 25.0,
+  "checks": {
+    "paper_style_num_subsets": true,
+    "paper_style_lora_rank_alpha": true,
+    "faithful_projection_set_q_and_v": true,
+    "has_at_least_two_lora_targets": true,
+    "has_disjoint_eval_split": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "privacy_transcript_audit_passed": true,
+    "utility_selection_not_worse_than_baseline_on_selection_metric": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 5.034183979034424,
+    "train_loss_min": 4.171041488647461,
+    "train_loss_max": 6.243013381958008,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.3982930183410645,
+    "dev_loss_min": 3.9206809997558594,
+    "dev_loss_max": 5.336252212524414,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.305746972560883,
+    "eval_loss_min": 3.6150474548339844,
+    "eval_loss_max": 7.054501533508301,
+    "eval_accuracy": 0.5
+  },
+  "final": {
+    "train_loss": 5.037920355796814,
+    "train_loss_min": 4.157783508300781,
+    "train_loss_max": 6.231880187988281,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.399818420410156,
+    "dev_loss_min": 3.9314098358154297,
+    "dev_loss_max": 5.34001350402832,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.307348251342773,
+    "eval_loss_min": 3.613819122314453,
+    "eval_loss_max": 7.053417205810547,
+    "eval_accuracy": 0.5
+  },
+  "best_checkpoint": {
+    "step": 5,
+    "train_loss": 5.035681247711182,
+    "train_loss_min": 4.155490875244141,
+    "train_loss_max": 6.25146484375,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.38870632648468,
+    "dev_loss_min": 3.924043655395508,
+    "dev_loss_max": 5.315185546875,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.300717085599899,
+    "eval_loss_min": 3.6159629821777344,
+    "eval_loss_max": 7.054354667663574,
+    "eval_accuracy": 0.5
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 5.035681247711182,
+    "train_loss_min": 4.155490875244141,
+    "train_loss_max": 6.25146484375,
+    "train_accuracy": 0.375,
+    "dev_loss": 4.38870632648468,
+    "dev_loss_min": 3.924043655395508,
+    "dev_loss_max": 5.315185546875,
+    "dev_accuracy": 0.5,
+    "eval_loss": 5.300717085599899,
+    "eval_loss_min": 3.6159629821777344,
+    "eval_loss_max": 7.054354667663574,
+    "eval_accuracy": 0.5
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.3593635559082031,
+  "fd_abs_max_mean": 0.1776005427042643,
+  "fd_abs_mean_mean": 0.08222957452138265,
+  "privacy_accounting": {
+    "mechanism": "PACZero-ZPL audited sign release",
+    "claim_scope": "implementation-level transcript audit; not differential privacy",
+    "not_differential_privacy": true,
+    "mutual_information_claim_under_zpl_rule": "I(S_star;Y_1:T)=0 because unanimous releases are identical for all candidate subsets and disagreement releases are independent RNG signs that never index S_star.",
+    "num_subsets_M": 126,
+    "examples_per_column_expected": 63,
+    "membership_column_counts_unique": [
+      63
+    ],
+    "membership_balanced": true,
+    "steps": 30,
+    "audited_steps": 30,
+    "unanimous_steps": 3,
+    "disagreement_steps": 27,
+    "disagreement_releases_randomized": 27,
+    "release_sign_counts": {
+      "positive": 10,
+      "negative": 20
+    },
+    "privacy_audit": {
+      "all_unanimous_steps_subset_independent": true,
+      "all_disagreement_steps_randomized": true,
+      "secret_subset_never_indexed_for_release": true,
+      "release_rule_violation_count": 0,
+      "transcript_distribution_independent_of_secret_subset_by_construction": true,
+      "conclusion": "PASS"
+    },
+    "privacy_trace_head": [
+      {
+        "step": 1,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 44,
+          "positive": 82
+        },
+        "subset_means_min": -0.08362770080566406,
+        "subset_means_max": 0.21839141845703125,
+        "subset_means_mean": 0.021451730036140836,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 2,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 41,
+          "positive": 85
+        },
+        "subset_means_min": -0.05337715148925781,
+        "subset_means_max": 0.11438369750976562,
+        "subset_means_mean": 0.013627846314883648,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 3,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 52,
+          "positive": 74
+        },
+        "subset_means_min": -0.05493481953938802,
+        "subset_means_max": 0.12177467346191406,
+        "subset_means_mean": 0.01014486173743654,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 4,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 115,
+          "positive": 11
+        },
+        "subset_means_min": -0.11023521423339844,
+        "subset_means_max": 0.06079673767089844,
+        "subset_means_mean": -0.04169355282167188,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 5,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 78,
+          "positive": 48
+        },
+        "subset_means_min": -0.09816169738769531,
+        "subset_means_max": 0.08073806762695312,
+        "subset_means_mean": -0.011465797438733251,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 6,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 19,
+          "positive": 107
+        },
+        "subset_means_min": -0.07849693298339844,
+        "subset_means_max": 0.15186309814453125,
+        "subset_means_mean": 0.02963743332382052,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 7,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 30,
+          "positive": 96
+        },
+        "subset_means_min": -0.08892059326171875,
+        "subset_means_max": 0.3593635559082031,
+        "subset_means_mean": 0.05060789824793578,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 8,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 91,
+          "positive": 35
+        },
+        "subset_means_min": -0.17769813537597656,
+        "subset_means_max": 0.06325721740722656,
+        "subset_means_mean": -0.015962000246401185,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 9,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.11977831522623698,
+        "subset_means_max": -0.03680229187011719,
+        "subset_means_mean": -0.07891639848595214,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 10,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 24,
+          "positive": 102
+        },
+        "subset_means_min": -0.05421161651611328,
+        "subset_means_max": 0.11865615844726562,
+        "subset_means_mean": 0.02716591785283857,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_tail": [
+      {
+        "step": 21,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 67,
+          "positive": 59
+        },
+        "subset_means_min": -0.1309967041015625,
+        "subset_means_max": 0.1946735382080078,
+        "subset_means_mean": -0.000252578984762986,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 22,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.18243789672851562,
+        "subset_means_max": -0.006389617919921875,
+        "subset_means_mean": -0.09926058700025216,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 23,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 34,
+          "positive": 92
+        },
+        "subset_means_min": -0.06429672241210938,
+        "subset_means_max": 0.08031845092773438,
+        "subset_means_mean": 0.013044425419398717,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 24,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 117,
+          "positive": 9
+        },
+        "subset_means_min": -0.10611216227213542,
+        "subset_means_max": 0.027777353922526043,
+        "subset_means_mean": -0.039217579662124046,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 25,
+        "branch": "unanimous_subset_independent",
+        "release_sign": -1,
+        "unanimous": true,
+        "unique_subset_signs": [
+          -1
+        ],
+        "subset_sign_counts": {
+          "negative": 126,
+          "positive": 0
+        },
+        "subset_means_min": -0.12070178985595703,
+        "subset_means_max": -0.012063980102539062,
+        "subset_means_mean": -0.07167839661567207,
+        "rng_derived_release": false,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 26,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 45,
+          "positive": 81
+        },
+        "subset_means_min": -0.09284019470214844,
+        "subset_means_max": 0.1845550537109375,
+        "subset_means_mean": 0.026168607890560875,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 27,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 24,
+          "positive": 102
+        },
+        "subset_means_min": -0.10470867156982422,
+        "subset_means_max": 0.15790939331054688,
+        "subset_means_mean": 0.030418187492468638,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 28,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 67,
+          "positive": 59
+        },
+        "subset_means_min": -0.12920379638671875,
+        "subset_means_max": 0.05954742431640625,
+        "subset_means_mean": -0.001655365243970852,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 29,
+        "branch": "disagreement_randomized",
+        "release_sign": -1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 15,
+          "positive": 111
+        },
+        "subset_means_min": -0.07925033569335938,
+        "subset_means_max": 0.12040138244628906,
+        "subset_means_mean": 0.03740179457632051,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      },
+      {
+        "step": 30,
+        "branch": "disagreement_randomized",
+        "release_sign": 1,
+        "unanimous": false,
+        "unique_subset_signs": [
+          -1,
+          1
+        ],
+        "subset_sign_counts": {
+          "negative": 88,
+          "positive": 38
+        },
+        "subset_means_min": -0.10574976603190105,
+        "subset_means_max": 0.1491546630859375,
+        "subset_means_mean": -0.013343937362763167,
+        "rng_derived_release": true,
+        "secret_subset_index_used_for_release": false,
+        "subset_independent_by_construction": true,
+        "violation_reasons": []
+      }
+    ],
+    "privacy_trace_full_saved_in_log": true
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-smollm-10of10-adapters/smollm-135m-4bit-sst2/all_layers_qv_lora_rank8_alpha16.npz",
+    "bytes": 1924896,
+    "adapter_count": 60,
+    "adapter_shapes": [
+      {
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.1.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.1.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.2.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.2.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.3.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.3.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.4.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.4.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.5.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.5.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.6.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.6.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.7.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.7.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.8.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.8.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.9.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.9.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.10.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.10.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.11.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.11.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.12.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.12.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.13.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.13.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.14.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.14.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.15.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.15.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.16.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.16.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.17.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.17.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.18.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.18.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.19.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.19.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.20.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.20.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.21.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.21.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.22.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.22.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.23.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.23.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.24.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.24.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.25.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.25.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.26.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.26.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.27.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.27.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.28.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.28.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.29.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.29.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      }
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 5.035550594329834,
+      "train_loss_min": 4.159877777099609,
+      "train_loss_max": 6.2415618896484375,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.397995829582214,
+      "dev_loss_min": 3.920835494995117,
+      "dev_loss_max": 5.345640182495117,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.315745860338211,
+      "eval_loss_min": 3.618276596069336,
+      "eval_loss_max": 7.074893951416016,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.21839141845703125,
+      "fd_abs_mean": 0.08654356002807617,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 5,
+      "train_loss": 5.035681247711182,
+      "train_loss_min": 4.155490875244141,
+      "train_loss_max": 6.25146484375,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.38870632648468,
+      "dev_loss_min": 3.924043655395508,
+      "dev_loss_max": 5.315185546875,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.300717085599899,
+      "eval_loss_min": 3.6159629821777344,
+      "eval_loss_max": 7.054354667663574,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.167388916015625,
+      "fd_abs_mean": 0.07301568984985352,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 10,
+      "train_loss": 5.037641882896423,
+      "train_loss_min": 4.16099739074707,
+      "train_loss_max": 6.24138069152832,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.395455360412598,
+      "dev_loss_min": 3.9157943725585938,
+      "dev_loss_max": 5.336484909057617,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.306971967220306,
+      "eval_loss_min": 3.6021690368652344,
+      "eval_loss_max": 7.044924736022949,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.11865615844726562,
+      "fd_abs_mean": 0.07974743843078613,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 15,
+      "train_loss": 5.043327689170837,
+      "train_loss_min": 4.15635871887207,
+      "train_loss_max": 6.262125015258789,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.396442890167236,
+      "dev_loss_min": 3.917848587036133,
+      "dev_loss_max": 5.339208602905273,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.305204927921295,
+      "eval_loss_min": 3.6172409057617188,
+      "eval_loss_max": 7.045612335205078,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.20231246948242188,
+      "fd_abs_mean": 0.10027289390563965,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 20,
+      "train_loss": 5.039632558822632,
+      "train_loss_min": 4.163707733154297,
+      "train_loss_max": 6.236429214477539,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.396880865097046,
+      "dev_loss_min": 3.9229183197021484,
+      "dev_loss_max": 5.344392776489258,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.309032917022705,
+      "eval_loss_min": 3.6133384704589844,
+      "eval_loss_max": 7.059202194213867,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.172271728515625,
+      "fd_abs_mean": 0.0813150405883789,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 25,
+      "train_loss": 5.037832140922546,
+      "train_loss_min": 4.165010452270508,
+      "train_loss_max": 6.24015998840332,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.3975605964660645,
+      "dev_loss_min": 3.9339675903320312,
+      "dev_loss_max": 5.3263702392578125,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.3099724650383,
+      "eval_loss_min": 3.606731414794922,
+      "eval_loss_max": 7.061859130859375,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.14611244201660156,
+      "fd_abs_mean": 0.08899331092834473,
+      "zpl_branch": "unanimous_subset_independent",
+      "release_sign": -1,
+      "privacy_rule_violations_so_far": 0
+    },
+    {
+      "step": 30,
+      "train_loss": 5.037920355796814,
+      "train_loss_min": 4.157783508300781,
+      "train_loss_max": 6.231880187988281,
+      "train_accuracy": 0.375,
+      "dev_loss": 4.399818420410156,
+      "dev_loss_min": 3.9314098358154297,
+      "dev_loss_max": 5.34001350402832,
+      "dev_accuracy": 0.5,
+      "eval_loss": 5.307348251342773,
+      "eval_loss_min": 3.613819122314453,
+      "eval_loss_max": 7.053417205810547,
+      "eval_accuracy": 0.5,
+      "fd_abs_max": 0.1491546630859375,
+      "fd_abs_mean": 0.08653998374938965,
+      "zpl_branch": "disagreement_randomized",
+      "release_sign": 1,
+      "privacy_rule_violations_so_far": 0
+    }
+  ],
+  "limitations": [
+    "Default workflow is medium/smoke scale unless inputs are increased to 1000/500/1000 and 1000 steps.",
+    "Qwen/Llama MLX models are adaptations, not exact OPT-1.3B/OPT-6.7B reproduction.",
+    "SQuAD metric here is gold-answer label-likelihood loss, not generated EM/F1.",
+    "Use --layers all for all-layer q/v coverage; default CI uses initial layer count for runtime."
+  ]
+}
