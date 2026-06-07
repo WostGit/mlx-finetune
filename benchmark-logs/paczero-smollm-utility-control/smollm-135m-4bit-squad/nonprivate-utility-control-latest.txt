@@ -1,0 +1,1098 @@
+# PACZero SmolLM non-private ZO utility control
+This is intentionally NOT private. It is a utility control for the ZPL I=0 run.
+UTILITY_CONTROL::cli_args={"adapter_out": "benchmark-results/paczero-smollm-utility-control-adapters/smollm-135m-4bit-squad/nonprivate_all_layers_qv_lora_rank8_alpha16.npz", "alpha": 16.0, "dev_examples": 8, "eval_every": 5, "eval_examples": 32, "json_out": "benchmark-results/paczero-smollm-utility-control/smollm-135m-4bit-squad/nonprivate_utility_control_results.json", "layers": "all", "lr": 0.05, "model": "mlx-community/SmolLM-135M-4bit", "mu": 0.05, "projections": "q_proj,v_proj", "rank": 8, "seed": 20260619, "slug": "smollm-135m-4bit", "steps": 30, "task": "squad", "train_examples": 8}
+UTILITY_CONTROL::python="3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]"
+UTILITY_CONTROL::package_mlx="0.31.2"
+UTILITY_CONTROL::package_mlx-lm="0.31.3"
+UTILITY_CONTROL::package_datasets="5.0.0"
+UTILITY_CONTROL::package_numpy="2.4.6"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Generating train split:   0%|          | 0/87599 [00:00<?, ? examples/s]Generating train split:  88%|████████▊ | 77000/87599 [00:00<00:00, 763865.12 examples/s]Generating train split: 100%|██████████| 87599/87599 [00:00<00:00, 808728.84 examples/s]
+Generating validation split:   0%|          | 0/10570 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 10570/10570 [00:00<00:00, 928981.69 examples/s]
+UTILITY_CONTROL::dataset_loaded={"dev": 8, "eval": 32, "source": "rajpurkar/squad train plus disjoint validation dev/eval slices", "task": "squad", "train": 8}
+UTILITY_CONTROL::resolved_lora_targets={"count": 60, "layers_arg": "all", "targets": ["model.layers.0.self_attn.q_proj", "model.layers.0.self_attn.v_proj", "model.layers.1.self_attn.q_proj", "model.layers.1.self_attn.v_proj", "model.layers.2.self_attn.q_proj", "model.layers.2.self_attn.v_proj", "model.layers.3.self_attn.q_proj", "model.layers.3.self_attn.v_proj", "model.layers.4.self_attn.q_proj", "model.layers.4.self_attn.v_proj", "model.layers.5.self_attn.q_proj", "model.layers.5.self_attn.v_proj", "model.layers.6.self_attn.q_proj", "model.layers.6.self_attn.v_proj", "model.layers.7.self_attn.q_proj", "model.layers.7.self_attn.v_proj", "model.layers.8.self_attn.q_proj", "model.layers.8.self_attn.v_proj", "model.layers.9.self_attn.q_proj", "model.layers.9.self_attn.v_proj", "model.layers.10.self_attn.q_proj", "model.layers.10.self_attn.v_proj", "model.layers.11.self_attn.q_proj", "model.layers.11.self_attn.v_proj", "model.layers.12.self_attn.q_proj", "model.layers.12.self_attn.v_proj", "model.layers.13.self_attn.q_proj", "model.layers.13.self_attn.v_proj", "model.layers.14.self_attn.q_proj", "model.layers.14.self_attn.v_proj", "model.layers.15.self_attn.q_proj", "model.layers.15.self_attn.v_proj", "model.layers.16.self_attn.q_proj", "model.layers.16.self_attn.v_proj", "model.layers.17.self_attn.q_proj", "model.layers.17.self_attn.v_proj", "model.layers.18.self_attn.q_proj", "model.layers.18.self_attn.v_proj", "model.layers.19.self_attn.q_proj", "model.layers.19.self_attn.v_proj", "model.layers.20.self_attn.q_proj", "model.layers.20.self_attn.v_proj", "model.layers.21.self_attn.q_proj", "model.layers.21.self_attn.v_proj", "model.layers.22.self_attn.q_proj", "model.layers.22.self_attn.v_proj", "model.layers.23.self_attn.q_proj", "model.layers.23.self_attn.v_proj", "model.layers.24.self_attn.q_proj", "model.layers.24.self_attn.v_proj", "model.layers.25.self_attn.q_proj", "model.layers.25.self_attn.v_proj", "model.layers.26.self_attn.q_proj", "model.layers.26.self_attn.v_proj", "model.layers.27.self_attn.q_proj", "model.layers.27.self_attn.v_proj", "model.layers.28.self_attn.q_proj", "model.layers.28.self_attn.v_proj", "model.layers.29.self_attn.q_proj", "model.layers.29.self_attn.v_proj"]}
+UTILITY_CONTROL::combined_lora_theta={"target_count": 60, "theta_size": 460800}
+UTILITY_CONTROL::baseline_metrics={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.233956605195999, "dev_loss_max": 8.260950088500977, "dev_loss_min": 0.3804255723953247, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.873933658003807, "eval_loss_max": 9.467060089111328, "eval_loss_min": 0.4474605917930603, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.317985862493515, "train_loss_max": 12.079496383666992, "train_loss_min": 0.8439457416534424}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.2338262423872948, "dev_loss_max": 8.259400367736816, "dev_loss_min": 0.38211971521377563, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8729208810254931, "eval_loss_max": 9.45748519897461, "eval_loss_min": 0.4463399350643158, "fd_abs_max": 0.03384590148925781, "fd_abs_mean": 0.01978449523448944, "mean_fd": -0.0030326098203659058, "release_sign": -1, "step": 1, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.317894659936428, "train_loss_max": 12.094930648803711, "train_loss_min": 0.8429581522941589}
+UTILITY_CONTROL::new_best_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.2338262423872948, "dev_loss_max": 8.259400367736816, "dev_loss_min": 0.38211971521377563, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8729208810254931, "eval_loss_max": 9.45748519897461, "eval_loss_min": 0.4463399350643158, "step": 1, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.317894659936428, "train_loss_max": 12.094930648803711, "train_loss_min": 0.8429581522941589}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.234650406986475, "dev_loss_max": 8.270092964172363, "dev_loss_min": 0.3822104036808014, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8745150743052363, "eval_loss_max": 9.452901840209961, "eval_loss_min": 0.44965532422065735, "fd_abs_max": 0.19436359405517578, "fd_abs_mean": 0.05142182111740112, "mean_fd": -0.04189044237136841, "release_sign": -1, "step": 5, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.315527066588402, "train_loss_max": 12.091699600219727, "train_loss_min": 0.8451107740402222}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.234960474073887, "dev_loss_max": 8.277495384216309, "dev_loss_min": 0.38198620080947876, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8744501285254955, "eval_loss_max": 9.456466674804688, "eval_loss_min": 0.44877350330352783, "fd_abs_max": 0.1013493537902832, "fd_abs_mean": 0.0393928587436676, "mean_fd": 0.009807497262954712, "release_sign": 1, "step": 10, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.3168499022722244, "train_loss_max": 12.086257934570312, "train_loss_min": 0.8426958322525024}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.2356922328472137, "dev_loss_max": 8.273307800292969, "dev_loss_min": 0.3806067705154419, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8745843982324004, "eval_loss_max": 9.461191177368164, "eval_loss_min": 0.44818517565727234, "fd_abs_max": 0.111541748046875, "fd_abs_mean": 0.04604071378707886, "mean_fd": 0.0011602044105529785, "release_sign": 1, "step": 15, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.318142332136631, "train_loss_max": 12.090560913085938, "train_loss_min": 0.8434465527534485}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.2360291108489037, "dev_loss_max": 8.275657653808594, "dev_loss_min": 0.38106197118759155, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8728421591222286, "eval_loss_max": 9.450054168701172, "eval_loss_min": 0.4483951926231384, "fd_abs_max": 0.11936187744140625, "fd_abs_mean": 0.05200088024139404, "mean_fd": 0.004075467586517334, "release_sign": 1, "step": 20, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.3192268013954163, "train_loss_max": 12.088895797729492, "train_loss_min": 0.8432416915893555}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.236036218702793, "dev_loss_max": 8.265303611755371, "dev_loss_min": 0.38388973474502563, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.8736600810661912, "eval_loss_max": 9.467178344726562, "eval_loss_min": 0.44811269640922546, "fd_abs_max": 0.10554075241088867, "fd_abs_mean": 0.047424063086509705, "mean_fd": 0.01818932592868805, "release_sign": 1, "step": 25, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.318553254008293, "train_loss_max": 12.103796005249023, "train_loss_min": 0.8430083990097046}
+UTILITY_CONTROL::eval_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.233488619327545, "dev_loss_max": 8.267156600952148, "dev_loss_min": 0.3834143877029419, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.874478499405086, "eval_loss_max": 9.463048934936523, "eval_loss_min": 0.4491526186466217, "fd_abs_max": 0.13822078704833984, "fd_abs_mean": 0.03589652478694916, "mean_fd": -0.027381256222724915, "release_sign": -1, "step": 30, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.3153236657381058, "train_loss_max": 12.087299346923828, "train_loss_min": 0.8446516990661621}
+UTILITY_CONTROL::new_best_checkpoint={"dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "dev_loss": 2.233488619327545, "dev_loss_max": 8.267156600952148, "dev_loss_min": 0.3834143877029419, "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "eval_loss": 1.874478499405086, "eval_loss_max": 9.463048934936523, "eval_loss_min": 0.4491526186466217, "step": 30, "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1", "train_loss": 3.3153236657381058, "train_loss_max": 12.087299346923828, "train_loss_min": 0.8446516990661621}
+SMOLLM_NONPRIVATE_UTILITY_CONTROL_RESULT_JSON=
+{
+  "success": true,
+  "model": "mlx-community/SmolLM-135M-4bit",
+  "slug": "smollm-135m-4bit",
+  "task": "squad",
+  "elapsed_seconds": 65.421,
+  "dataset_source": "rajpurkar/squad train plus disjoint validation dev/eval slices",
+  "train_examples": 8,
+  "dev_examples": 8,
+  "eval_examples": 32,
+  "parameterization": "non_private_mean_sign_zo_lora_utility_control",
+  "privacy_claim": "none; this control intentionally uses the full training mean FD sign and is not ZPL-private",
+  "target_paths": [
+    "model.layers.0.self_attn.q_proj",
+    "model.layers.0.self_attn.v_proj",
+    "model.layers.1.self_attn.q_proj",
+    "model.layers.1.self_attn.v_proj",
+    "model.layers.2.self_attn.q_proj",
+    "model.layers.2.self_attn.v_proj",
+    "model.layers.3.self_attn.q_proj",
+    "model.layers.3.self_attn.v_proj",
+    "model.layers.4.self_attn.q_proj",
+    "model.layers.4.self_attn.v_proj",
+    "model.layers.5.self_attn.q_proj",
+    "model.layers.5.self_attn.v_proj",
+    "model.layers.6.self_attn.q_proj",
+    "model.layers.6.self_attn.v_proj",
+    "model.layers.7.self_attn.q_proj",
+    "model.layers.7.self_attn.v_proj",
+    "model.layers.8.self_attn.q_proj",
+    "model.layers.8.self_attn.v_proj",
+    "model.layers.9.self_attn.q_proj",
+    "model.layers.9.self_attn.v_proj",
+    "model.layers.10.self_attn.q_proj",
+    "model.layers.10.self_attn.v_proj",
+    "model.layers.11.self_attn.q_proj",
+    "model.layers.11.self_attn.v_proj",
+    "model.layers.12.self_attn.q_proj",
+    "model.layers.12.self_attn.v_proj",
+    "model.layers.13.self_attn.q_proj",
+    "model.layers.13.self_attn.v_proj",
+    "model.layers.14.self_attn.q_proj",
+    "model.layers.14.self_attn.v_proj",
+    "model.layers.15.self_attn.q_proj",
+    "model.layers.15.self_attn.v_proj",
+    "model.layers.16.self_attn.q_proj",
+    "model.layers.16.self_attn.v_proj",
+    "model.layers.17.self_attn.q_proj",
+    "model.layers.17.self_attn.v_proj",
+    "model.layers.18.self_attn.q_proj",
+    "model.layers.18.self_attn.v_proj",
+    "model.layers.19.self_attn.q_proj",
+    "model.layers.19.self_attn.v_proj",
+    "model.layers.20.self_attn.q_proj",
+    "model.layers.20.self_attn.v_proj",
+    "model.layers.21.self_attn.q_proj",
+    "model.layers.21.self_attn.v_proj",
+    "model.layers.22.self_attn.q_proj",
+    "model.layers.22.self_attn.v_proj",
+    "model.layers.23.self_attn.q_proj",
+    "model.layers.23.self_attn.v_proj",
+    "model.layers.24.self_attn.q_proj",
+    "model.layers.24.self_attn.v_proj",
+    "model.layers.25.self_attn.q_proj",
+    "model.layers.25.self_attn.v_proj",
+    "model.layers.26.self_attn.q_proj",
+    "model.layers.26.self_attn.v_proj",
+    "model.layers.27.self_attn.q_proj",
+    "model.layers.27.self_attn.v_proj",
+    "model.layers.28.self_attn.q_proj",
+    "model.layers.28.self_attn.v_proj",
+    "model.layers.29.self_attn.q_proj",
+    "model.layers.29.self_attn.v_proj"
+  ],
+  "target_count": 60,
+  "target_infos_head": [
+    {
+      "target_path": "model.layers.0.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.0.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    },
+    {
+      "target_path": "model.layers.1.self_attn.q_proj",
+      "input_dim": 576,
+      "output_dim": 576,
+      "theta_size": 9216,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.1.self_attn.q_proj",
+        "weight_shape": [
+          576,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 576
+      }
+    },
+    {
+      "target_path": "model.layers.1.self_attn.v_proj",
+      "input_dim": 576,
+      "output_dim": 192,
+      "theta_size": 6144,
+      "dimension_inference": {
+        "module_type": "QuantizedLinear",
+        "target_path": "model.layers.1.self_attn.v_proj",
+        "weight_shape": [
+          192,
+          72
+        ],
+        "weight_dtype": "mlx.core.uint32",
+        "output_source": "weight.shape[0]",
+        "quantized_input_inference": {
+          "reason": "uint32_4bit_packed_weight",
+          "packed_input_dim": 72,
+          "values_per_uint32": 8,
+          "dense_input_dim": 576
+        },
+        "input_source": "packed_quantized_weight.shape[1]*8",
+        "input_dim": 576,
+        "output_dim": 192
+      }
+    }
+  ],
+  "layers": "all",
+  "projections": [
+    "q_proj",
+    "v_proj"
+  ],
+  "rank": 8,
+  "alpha": 16.0,
+  "theta_size": 460800,
+  "seed": 20260619,
+  "steps": 30,
+  "mu": 0.05,
+  "lr": 0.05,
+  "checks": {
+    "not_private_control": true,
+    "paper_style_lora_rank_alpha": true,
+    "faithful_projection_set_q_and_v": true,
+    "all_layers_requested": true,
+    "has_60_qv_targets_for_smollm": true,
+    "fd_finite_rate_ok": true,
+    "fd_signal_rate_ok": true,
+    "utility_selection_not_worse_than_baseline_on_selection_metric": true,
+    "adapter_saved": true
+  },
+  "baseline": {
+    "train_loss": 3.317985862493515,
+    "train_loss_min": 0.8439457416534424,
+    "train_loss_max": 12.079496383666992,
+    "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "dev_loss": 2.233956605195999,
+    "dev_loss_min": 0.3804255723953247,
+    "dev_loss_max": 8.260950088500977,
+    "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "eval_loss": 1.873933658003807,
+    "eval_loss_min": 0.4474605917930603,
+    "eval_loss_max": 9.467060089111328,
+    "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1"
+  },
+  "final": {
+    "train_loss": 3.3153236657381058,
+    "train_loss_min": 0.8446516990661621,
+    "train_loss_max": 12.087299346923828,
+    "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "dev_loss": 2.233488619327545,
+    "dev_loss_min": 0.3834143877029419,
+    "dev_loss_max": 8.267156600952148,
+    "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "eval_loss": 1.874478499405086,
+    "eval_loss_min": 0.4491526186466217,
+    "eval_loss_max": 9.463048934936523,
+    "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1"
+  },
+  "best_checkpoint": {
+    "step": 30,
+    "train_loss": 3.3153236657381058,
+    "train_loss_min": 0.8446516990661621,
+    "train_loss_max": 12.087299346923828,
+    "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "dev_loss": 2.233488619327545,
+    "dev_loss_min": 0.3834143877029419,
+    "dev_loss_max": 8.267156600952148,
+    "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "eval_loss": 1.874478499405086,
+    "eval_loss_min": 0.4491526186466217,
+    "eval_loss_max": 9.463048934936523,
+    "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1"
+  },
+  "selected_best_adapter_eval": {
+    "train_loss": 3.3153236657381058,
+    "train_loss_min": 0.8446516990661621,
+    "train_loss_max": 12.087299346923828,
+    "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "dev_loss": 2.233488619327545,
+    "dev_loss_min": 0.3834143877029419,
+    "dev_loss_max": 8.267156600952148,
+    "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+    "eval_loss": 1.874478499405086,
+    "eval_loss_min": 0.4491526186466217,
+    "eval_loss_max": 9.463048934936523,
+    "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1"
+  },
+  "fd_finite_rate": 1.0,
+  "fd_signal_rate": 1.0,
+  "fd_abs_max_max": 0.2897834777832031,
+  "fd_abs_max_mean": 0.11132311820983887,
+  "fd_abs_mean_mean": 0.036753845711549125,
+  "release_sign_counts": {
+    "positive": 13,
+    "negative": 17
+  },
+  "adapter_file": {
+    "path": "benchmark-results/paczero-smollm-utility-control-adapters/smollm-135m-4bit-squad/nonprivate_all_layers_qv_lora_rank8_alpha16.npz",
+    "bytes": 1924896,
+    "adapter_count": 60,
+    "adapter_shapes": [
+      {
+        "target_path": "model.layers.0.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.0.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.1.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.1.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.2.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.2.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.3.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.3.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.4.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.4.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.5.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.5.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.6.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.6.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.7.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.7.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.8.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.8.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.9.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.9.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.10.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.10.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.11.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.11.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.12.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.12.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.13.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.13.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.14.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.14.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.15.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.15.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.16.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.16.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.17.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.17.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.18.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.18.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.19.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.19.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.20.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.20.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.21.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.21.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.22.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.22.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.23.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.23.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.24.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.24.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.25.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.25.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.26.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.26.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.27.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.27.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.28.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.28.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.29.self_attn.q_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          576,
+          8
+        ]
+      },
+      {
+        "target_path": "model.layers.29.self_attn.v_proj",
+        "A_shape": [
+          8,
+          576
+        ],
+        "B_shape": [
+          192,
+          8
+        ]
+      }
+    ]
+  },
+  "history": [
+    {
+      "step": 1,
+      "train_loss": 3.317894659936428,
+      "train_loss_min": 0.8429581522941589,
+      "train_loss_max": 12.094930648803711,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.2338262423872948,
+      "dev_loss_min": 0.38211971521377563,
+      "dev_loss_max": 8.259400367736816,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8729208810254931,
+      "eval_loss_min": 0.4463399350643158,
+      "eval_loss_max": 9.45748519897461,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.03384590148925781,
+      "fd_abs_mean": 0.01978449523448944,
+      "mean_fd": -0.0030326098203659058,
+      "release_sign": -1
+    },
+    {
+      "step": 5,
+      "train_loss": 3.315527066588402,
+      "train_loss_min": 0.8451107740402222,
+      "train_loss_max": 12.091699600219727,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.234650406986475,
+      "dev_loss_min": 0.3822104036808014,
+      "dev_loss_max": 8.270092964172363,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8745150743052363,
+      "eval_loss_min": 0.44965532422065735,
+      "eval_loss_max": 9.452901840209961,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.19436359405517578,
+      "fd_abs_mean": 0.05142182111740112,
+      "mean_fd": -0.04189044237136841,
+      "release_sign": -1
+    },
+    {
+      "step": 10,
+      "train_loss": 3.3168499022722244,
+      "train_loss_min": 0.8426958322525024,
+      "train_loss_max": 12.086257934570312,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.234960474073887,
+      "dev_loss_min": 0.38198620080947876,
+      "dev_loss_max": 8.277495384216309,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8744501285254955,
+      "eval_loss_min": 0.44877350330352783,
+      "eval_loss_max": 9.456466674804688,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.1013493537902832,
+      "fd_abs_mean": 0.0393928587436676,
+      "mean_fd": 0.009807497262954712,
+      "release_sign": 1
+    },
+    {
+      "step": 15,
+      "train_loss": 3.318142332136631,
+      "train_loss_min": 0.8434465527534485,
+      "train_loss_max": 12.090560913085938,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.2356922328472137,
+      "dev_loss_min": 0.3806067705154419,
+      "dev_loss_max": 8.273307800292969,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8745843982324004,
+      "eval_loss_min": 0.44818517565727234,
+      "eval_loss_max": 9.461191177368164,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.111541748046875,
+      "fd_abs_mean": 0.04604071378707886,
+      "mean_fd": 0.0011602044105529785,
+      "release_sign": 1
+    },
+    {
+      "step": 20,
+      "train_loss": 3.3192268013954163,
+      "train_loss_min": 0.8432416915893555,
+      "train_loss_max": 12.088895797729492,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.2360291108489037,
+      "dev_loss_min": 0.38106197118759155,
+      "dev_loss_max": 8.275657653808594,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8728421591222286,
+      "eval_loss_min": 0.4483951926231384,
+      "eval_loss_max": 9.450054168701172,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.11936187744140625,
+      "fd_abs_mean": 0.05200088024139404,
+      "mean_fd": 0.004075467586517334,
+      "release_sign": 1
+    },
+    {
+      "step": 25,
+      "train_loss": 3.318553254008293,
+      "train_loss_min": 0.8430083990097046,
+      "train_loss_max": 12.103796005249023,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.236036218702793,
+      "dev_loss_min": 0.38388973474502563,
+      "dev_loss_max": 8.265303611755371,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.8736600810661912,
+      "eval_loss_min": 0.44811269640922546,
+      "eval_loss_max": 9.467178344726562,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.10554075241088867,
+      "fd_abs_mean": 0.047424063086509705,
+      "mean_fd": 0.01818932592868805,
+      "release_sign": 1
+    },
+    {
+      "step": 30,
+      "train_loss": 3.3153236657381058,
+      "train_loss_min": 0.8446516990661621,
+      "train_loss_max": 12.087299346923828,
+      "train_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "dev_loss": 2.233488619327545,
+      "dev_loss_min": 0.3834143877029419,
+      "dev_loss_max": 8.267156600952148,
+      "dev_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "eval_loss": 1.874478499405086,
+      "eval_loss_min": 0.4491526186466217,
+      "eval_loss_max": 9.463048934936523,
+      "eval_answer_likelihood_metric": "mean_label_only_gold_answer_loss_lower_is_better_not_generated_em_f1",
+      "fd_abs_max": 0.13822078704833984,
+      "fd_abs_mean": 0.03589652478694916,
+      "mean_fd": -0.027381256222724915,
+      "release_sign": -1
+    }
+  ],
+  "limitations": [
+    "This is a fast non-private utility control, not PACZero-ZPL and not I=0.",
+    "Utility is smoke-scale; it contextualizes the ZPL run but does not reproduce paper utility numbers."
+  ]
+}
