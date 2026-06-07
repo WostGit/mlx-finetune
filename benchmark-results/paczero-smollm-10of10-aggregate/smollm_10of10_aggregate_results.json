@@ -1,0 +1,109 @@
+{
+  "success": true,
+  "claim": "Fast reviewer-proof SmolLM MLX adaptation of PACZero-ZPL mechanism, not paper-scale utility reproduction.",
+  "paper_claims_addressed": {
+    "PACZero_ZPL_I_Sstar_Y_1T_equals_0_mechanism": "addressed by strict transcript audit: unanimous releases subset-independent, disagreement releases RNG-derived, zero release-rule violations",
+    "M_126_ZPL_setting": "addressed across both tasks",
+    "LoRA_rank8_alpha16": "addressed across both tasks",
+    "q_proj_v_proj_target_fidelity": "addressed across all SmolLM layers; 60 q/v targets",
+    "SST2_and_SQuAD_task_coverage": "addressed with small-scale data paths; SQuAD uses gold-answer likelihood, not generated EM/F1"
+  },
+  "non_claims_limitations": [
+    "Not a full OPT-1.3B/OPT-6.7B reproduction.",
+    "Not paper-scale 1000/500/1000 data or 1000 ZPL steps.",
+    "SQuAD metric is label-only gold-answer likelihood, not generated EM/F1.",
+    "Utility numbers are smoke-scale; privacy mechanism is the reviewed claim."
+  ],
+  "aggregate_checks": {
+    "both_task_results_present": true,
+    "both_tasks_successful": true,
+    "all_use_M_126": true,
+    "all_membership_M_over_2": true,
+    "all_rank8_alpha16": true,
+    "all_qv_projection_set": true,
+    "all_layers_requested": true,
+    "all_have_60_qv_targets_for_smollm": true,
+    "all_fd_finite": true,
+    "all_fd_signal": true,
+    "all_privacy_audits_passed": true,
+    "all_release_rule_violations_zero": true,
+    "all_transcripts_independent_by_construction": true,
+    "all_adapters_saved": true
+  },
+  "tasks": [
+    {
+      "task": "sst2",
+      "present": true,
+      "success": true,
+      "elapsed_seconds": 43.964,
+      "model": "mlx-community/SmolLM-135M-4bit",
+      "train_examples": 8,
+      "dev_examples": 8,
+      "eval_examples": 32,
+      "steps": 30,
+      "num_subsets_M": 126,
+      "membership_counts": [
+        63
+      ],
+      "rank": 8,
+      "alpha": 16.0,
+      "target_count": 60,
+      "layers": "all",
+      "projections": [
+        "q_proj",
+        "v_proj"
+      ],
+      "theta_size": 460800,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "audited_steps": 30,
+      "unanimous_steps": 3,
+      "disagreement_steps": 27,
+      "disagreement_releases_randomized": 27,
+      "release_rule_violation_count": 0,
+      "transcript_independent_by_construction": true,
+      "privacy_transcript_audit_passed": true,
+      "paper_style_num_subsets": true,
+      "paper_style_lora_rank_alpha": true,
+      "faithful_projection_set_q_and_v": true,
+      "adapter_saved": true
+    },
+    {
+      "task": "squad",
+      "present": true,
+      "success": true,
+      "elapsed_seconds": 61.725,
+      "model": "mlx-community/SmolLM-135M-4bit",
+      "train_examples": 8,
+      "dev_examples": 8,
+      "eval_examples": 32,
+      "steps": 30,
+      "num_subsets_M": 126,
+      "membership_counts": [
+        63
+      ],
+      "rank": 8,
+      "alpha": 16.0,
+      "target_count": 60,
+      "layers": "all",
+      "projections": [
+        "q_proj",
+        "v_proj"
+      ],
+      "theta_size": 460800,
+      "fd_finite_rate": 1.0,
+      "fd_signal_rate": 1.0,
+      "audited_steps": 30,
+      "unanimous_steps": 0,
+      "disagreement_steps": 30,
+      "disagreement_releases_randomized": 30,
+      "release_rule_violation_count": 0,
+      "transcript_independent_by_construction": true,
+      "privacy_transcript_audit_passed": true,
+      "paper_style_num_subsets": true,
+      "paper_style_lora_rank_alpha": true,
+      "faithful_projection_set_q_and_v": true,
+      "adapter_saved": true
+    }
+  ]
+}
