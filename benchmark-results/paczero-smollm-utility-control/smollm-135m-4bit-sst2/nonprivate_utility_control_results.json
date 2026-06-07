@@ -3,7 +3,7 @@
   "model": "mlx-community/SmolLM-135M-4bit",
   "slug": "smollm-135m-4bit",
   "task": "sst2",
-  "elapsed_seconds": 46.794,
+  "elapsed_seconds": 43.451,
   "dataset_source": "nyu-mll/glue/sst2 train plus disjoint validation dev/eval slices",
   "train_examples": 8,
   "dev_examples": 8,
