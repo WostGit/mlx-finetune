@@ -3,22 +3,26 @@
   "purpose": "Negative-control audit: prove the checker catches the forbidden PACZero-ZPL failure mode where disagreement release depends on S_star.",
   "num_examples": 8,
   "num_subsets_M": 126,
-  "membership_column_counts_unique": [63],
+  "membership_column_counts_unique": [
+    63
+  ],
   "membership_row_count_min": 1,
   "has_subset_sign_disagreement": true,
   "good_zpl_release": {
     "branch": "disagreement_randomized",
-    "release_sign": 1,
+    "release_sign": -1,
     "secret_subset_index_used_for_release": false,
     "rng_derived_release": true,
     "violations": []
   },
   "bad_secret_dependent_release": {
     "branch": "disagreement_bad_secret_subset_dependent",
-    "release_sign": -1,
+    "release_sign": 1,
     "secret_subset_index_used_for_release": true,
     "rng_derived_release": false,
-    "violations": ["disagreement_release_depends_on_secret_subset_index"]
+    "violations": [
+      "disagreement_release_depends_on_secret_subset_index"
+    ]
   },
   "checks": {
     "good_zpl_release_passes_audit": true,
