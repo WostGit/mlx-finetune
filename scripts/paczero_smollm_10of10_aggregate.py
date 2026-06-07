@@ -7,6 +7,7 @@ from typing import Any
 
 TASKS = ["sst2", "squad"]
 BASE = Path("benchmark-results/paczero-smollm-10of10")
+UTILITY_BASE = Path("benchmark-results/paczero-smollm-utility-control")
 OUT_DIR = Path("benchmark-results/paczero-smollm-10of10-aggregate")
 OUT_JSON = OUT_DIR / "smollm_10of10_aggregate_results.json"
 OUT_MD = OUT_DIR / "smollm_10of10_reviewer_report.md"
@@ -17,6 +18,16 @@ def load_task(task: str) -> dict[str, Any]:
     path = BASE / f"smollm-135m-4bit-{task}" / "smollm_10of10_results.json"
     if not path.exists():
         return {"task": task, "present": False, "path": str(path), "success": False, "error": "missing_result_json"}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["present"] = True
+    data["path"] = str(path)
+    return data
+
+
+def load_utility_control(task: str) -> dict[str, Any]:
+    path = UTILITY_BASE / f"smollm-135m-4bit-{task}" / "nonprivate_utility_control_results.json"
+    if not path.exists():
+        return {"task": task, "present": False, "path": str(path), "success": False, "error": "missing_utility_control_json"}
     data = json.loads(path.read_text(encoding="utf-8"))
     data["present"] = True
     data["path"] = str(path)
@@ -64,10 +75,37 @@ def summarize_task(data: dict[str, Any]) -> dict[str, Any]:
         "release_rule_violation_count": audit.get("release_rule_violation_count"),
         "transcript_independent_by_construction": audit.get("transcript_distribution_independent_of_secret_subset_by_construction"),
         "privacy_transcript_audit_passed": checks.get("privacy_transcript_audit_passed"),
+        "utility_not_worse_than_baseline": checks.get("utility_selection_not_worse_than_baseline_on_selection_metric"),
         "paper_style_num_subsets": checks.get("paper_style_num_subsets"),
         "paper_style_lora_rank_alpha": checks.get("paper_style_lora_rank_alpha"),
         "faithful_projection_set_q_and_v": checks.get("faithful_projection_set_q_and_v"),
         "adapter_saved": checks.get("adapter_saved"),
+        "baseline": data.get("baseline"),
+        "best_checkpoint": data.get("best_checkpoint"),
+        "selected_best_adapter_eval": data.get("selected_best_adapter_eval"),
+    }
+
+
+def summarize_utility_control(data: dict[str, Any]) -> dict[str, Any]:
+    checks = data.get("checks", {}) if isinstance(data.get("checks"), dict) else {}
+    return {
+        "task": data.get("task", "unknown"),
+        "present": bool(data.get("present")),
+        "success": bool(data.get("success")),
+        "elapsed_seconds": data.get("elapsed_seconds"),
+        "steps": data.get("steps"),
+        "rank": data.get("rank"),
+        "alpha": data.get("alpha"),
+        "target_count": data.get("target_count"),
+        "layers": data.get("layers"),
+        "projections": data.get("projections"),
+        "fd_finite_rate": data.get("fd_finite_rate"),
+        "fd_signal_rate": data.get("fd_signal_rate"),
+        "utility_not_worse_than_baseline": checks.get("utility_selection_not_worse_than_baseline_on_selection_metric"),
+        "adapter_saved": checks.get("adapter_saved"),
+        "baseline": data.get("baseline"),
+        "best_checkpoint": data.get("best_checkpoint"),
+        "selected_best_adapter_eval": data.get("selected_best_adapter_eval"),
     }
 
 
@@ -75,6 +113,8 @@ def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     raw = [load_task(task) for task in TASKS]
     summaries = [summarize_task(item) for item in raw]
+    utility_raw = [load_utility_control(task) for task in TASKS]
+    utility_summaries = [summarize_utility_control(item) for item in utility_raw]
     negative_control = load_negative_control()
     negative_checks = negative_control.get("checks", {}) if isinstance(negative_control.get("checks"), dict) else {}
 
@@ -92,34 +132,41 @@ def main() -> int:
         "all_privacy_audits_passed": all(item["privacy_transcript_audit_passed"] is True for item in summaries),
         "all_release_rule_violations_zero": all(item["release_rule_violation_count"] == 0 for item in summaries),
         "all_transcripts_independent_by_construction": all(item["transcript_independent_by_construction"] is True for item in summaries),
+        "all_zpl_utility_not_worse_than_baseline": all(item["utility_not_worse_than_baseline"] is True for item in summaries),
         "all_adapters_saved": all(item["adapter_saved"] is True for item in summaries),
         "negative_control_present": bool(negative_control.get("present")),
         "negative_control_successful": bool(negative_control.get("success")),
         "negative_control_good_zpl_passes": negative_checks.get("good_zpl_release_passes_audit") is True,
         "negative_control_bad_secret_release_fails": negative_checks.get("bad_secret_dependent_release_fails_audit") is True,
+        "utility_controls_present": all(item["present"] for item in utility_summaries),
+        "utility_controls_successful": all(item["success"] for item in utility_summaries),
+        "utility_controls_not_worse_than_baseline": all(item["utility_not_worse_than_baseline"] is True for item in utility_summaries),
+        "utility_controls_fd_signal": all(float(item["fd_signal_rate"] or 0.0) >= 0.8 for item in utility_summaries),
     }
     success = all(aggregate_checks.values())
     payload = {
         "success": success,
-        "claim": "Fast reviewer-proof SmolLM MLX adaptation of PACZero-ZPL mechanism, not paper-scale utility reproduction.",
+        "claim": "Fast reviewer-proof SmolLM MLX adaptation of PACZero-ZPL mechanism, with smoke-scale utility preservation checks; not paper-scale utility reproduction.",
         "paper_claims_addressed": {
             "PACZero_ZPL_I_Sstar_Y_1T_equals_0_mechanism": "addressed by strict transcript audit: unanimous releases subset-independent, disagreement releases RNG-derived, zero release-rule violations",
             "M_126_ZPL_setting": "addressed across both tasks",
-            "LoRA_rank8_alpha16": "addressed across both tasks",
+            "LoRA_rank8_alpha16": "addressed across both ZPL tasks and non-private utility controls",
             "q_proj_v_proj_target_fidelity": "addressed across all SmolLM layers; 60 q/v targets",
             "SST2_and_SQuAD_task_coverage": "addressed with small-scale data paths; SQuAD uses gold-answer likelihood, not generated EM/F1",
+            "utility_preservation_smoke": "addressed by requiring ZPL selected checkpoints and non-private ZO controls to be not worse than frozen baseline on the selection metric",
             "audit_soundness_negative_control": "addressed by deliberately making disagreement releases depend on S_star and requiring the audit to fail that case",
         },
         "non_claims_limitations": [
             "Not a full OPT-1.3B/OPT-6.7B reproduction.",
             "Not paper-scale 1000/500/1000 data or 1000 ZPL steps.",
             "SQuAD metric is label-only gold-answer likelihood, not generated EM/F1.",
-            "Utility numbers are smoke-scale; privacy mechanism is the reviewed claim.",
+            "Utility numbers are smoke-scale; they demonstrate preservation relative to frozen baseline, not paper-level utility parity.",
             "The MLX demo uses normalized ZO directions and fixed mu/lr for fast stable execution; it is not a byte-for-byte optimizer reproduction.",
         ],
         "aggregate_checks": aggregate_checks,
         "negative_control": negative_control,
         "tasks": summaries,
+        "nonprivate_utility_controls": utility_summaries,
     }
     OUT_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
@@ -150,16 +197,28 @@ def main() -> int:
         lines.append(f"| `{key}` | {value} |")
     lines.extend([
         "",
-        "## Task summaries",
+        "## ZPL task summaries",
         "",
-        "| Task | Success | Runtime s | M | Membership | Targets | Steps | FD finite | FD signal | Privacy audit | Violations |",
-        "|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| Task | Success | Runtime s | M | Membership | Targets | Steps | FD finite | FD signal | I=0 audit | Utility >= baseline | Violations |",
+        "|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|",
     ])
     for item in summaries:
         lines.append(
             f"| {item['task']} | {item['success']} | {item['elapsed_seconds']} | {item['num_subsets_M']} | "
             f"{item['membership_counts']} | {item['target_count']} | {item['steps']} | {item['fd_finite_rate']} | "
-            f"{item['fd_signal_rate']} | {item['privacy_transcript_audit_passed']} | {item['release_rule_violation_count']} |"
+            f"{item['fd_signal_rate']} | {item['privacy_transcript_audit_passed']} | {item['utility_not_worse_than_baseline']} | {item['release_rule_violation_count']} |"
+        )
+    lines.extend([
+        "",
+        "## Non-private ZO utility controls",
+        "",
+        "| Task | Success | Runtime s | Targets | Steps | FD finite | FD signal | Utility >= baseline | Adapter saved |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ])
+    for item in utility_summaries:
+        lines.append(
+            f"| {item['task']} | {item['success']} | {item['elapsed_seconds']} | {item['target_count']} | {item['steps']} | "
+            f"{item['fd_finite_rate']} | {item['fd_signal_rate']} | {item['utility_not_worse_than_baseline']} | {item['adapter_saved']} |"
         )
     lines.extend([
         "",
