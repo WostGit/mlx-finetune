@@ -46,12 +46,67 @@ class ZOStepResult:
     per_sample_fd_mean: float
 
 
+def _repair_empty_candidate_subsets(membership: Array, rng: np.random.Generator) -> Array:
+    """Repair empty rows while preserving the M/2-per-example invariant.
+
+    For very small reviewer-proof runs, random half-subset assignment can leave
+    one of the M candidate subsets empty even though every example appears in
+    exactly M/2 subsets.  Empty rows make subset means undefined and are not a
+    meaningful PACZero candidate subset.  This repair swaps memberships from
+    overfull rows into empty rows column-by-column, preserving each column count
+    exactly while ensuring every row has at least one example whenever the total
+    number of memberships is sufficient.
+    """
+
+    fixed = np.array(membership, dtype=bool, copy=True)
+    num_subsets, num_examples = fixed.shape
+    total_memberships = int(fixed.sum())
+    if total_memberships < num_subsets:
+        raise ValueError(
+            "cannot make every candidate subset non-empty: "
+            f"total memberships {total_memberships} < num_subsets {num_subsets}"
+        )
+
+    # Repeatedly move one column membership from a row with count > 1 to an empty row.
+    # This keeps every example's membership count unchanged.
+    for _ in range(num_subsets * max(1, num_examples) * 4):
+        row_counts = fixed.astype(np.int64).sum(axis=1)
+        empty_rows = np.flatnonzero(row_counts == 0)
+        if empty_rows.size == 0:
+            return fixed
+        donor_rows = np.flatnonzero(row_counts > 1)
+        if donor_rows.size == 0:
+            break
+        empty = int(empty_rows[0])
+        donor_order = rng.permutation(donor_rows)
+        repaired = False
+        for donor in donor_order:
+            donor = int(donor)
+            candidate_cols = np.flatnonzero(fixed[donor] & ~fixed[empty])
+            if candidate_cols.size == 0:
+                continue
+            col = int(rng.choice(candidate_cols))
+            fixed[donor, col] = False
+            fixed[empty, col] = True
+            repaired = True
+            break
+        if not repaired:
+            break
+
+    row_counts = fixed.astype(np.int64).sum(axis=1)
+    if np.any(row_counts == 0):
+        raise ValueError("failed to repair empty PACZero candidate subsets")
+    return fixed
+
+
 def make_balanced_membership(num_examples: int, num_subsets: int, seed: int = 0) -> Array:
     """Return an M x N boolean membership matrix.
 
     Each example appears in exactly M/2 candidate subsets.  This is the key
     structural property used by PAC privacy: before observing the release, each
-    example has prior membership probability 1/2.
+    example has prior membership probability 1/2.  The constructor also ensures
+    every candidate subset is non-empty whenever possible, so tiny smoke tests
+    with large M still produce defined subset means.
 
     Args:
         num_examples: N, the number of training examples.
@@ -74,11 +129,12 @@ def make_balanced_membership(num_examples: int, num_subsets: int, seed: int = 0)
         chosen = rng.choice(num_subsets, size=half, replace=False)
         membership[chosen, example_idx] = True
 
+    membership = _repair_empty_candidate_subsets(membership, rng)
     return membership
 
 
 def assert_balanced_membership(membership: Array) -> None:
-    """Validate the M/2-per-example invariant."""
+    """Validate the M/2-per-example invariant plus non-empty subsets."""
 
     if membership.ndim != 2:
         raise AssertionError(f"membership must be 2D, got shape {membership.shape}")
