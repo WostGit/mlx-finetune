@@ -3,7 +3,7 @@
   "model": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
   "slug": "qwen2.5-0.5b-4bit",
   "task": "squad",
-  "elapsed_seconds": 1126.202,
+  "elapsed_seconds": 1413.116,
   "dataset_source": "rajpurkar/squad train plus disjoint validation dev/eval slices",
   "train_examples": 32,
   "dev_examples": 32,
