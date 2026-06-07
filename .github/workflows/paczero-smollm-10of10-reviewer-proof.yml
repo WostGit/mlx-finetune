@@ -30,6 +30,7 @@ on:
       - "scripts/paczero_mlxlm_faithful_adaptation.py"
       - "scripts/paczero_mlxlm_lora_reproduction.py"
       - "scripts/paczero_core.py"
+      - "scripts/paczero_smollm_10of10_aggregate.py"
 
 permissions:
   contents: write
@@ -173,4 +174,62 @@ jobs:
             benchmark-logs/paczero-smollm-10of10/${{ matrix.model_slug }}-${{ matrix.task }}
             benchmark-results/paczero-smollm-10of10/${{ matrix.model_slug }}-${{ matrix.task }}
             benchmark-results/paczero-smollm-10of10-adapters/${{ matrix.model_slug }}-${{ matrix.task }}
+          if-no-files-found: warn
+
+  aggregate-smollm-10of10:
+    name: Aggregate SmolLM 10/10 reviewer proof
+    needs: smollm-10of10-reviewer-proof
+    runs-on: ubuntu-latest
+    if: always() && (github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip paczero-smollm-10of10]'))
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Pull committed task outputs
+        run: |
+          git pull --rebase --autostash origin main
+
+      - name: Aggregate SST-2 and SQuAD reviewer-proof results
+        run: |
+          python scripts/paczero_smollm_10of10_aggregate.py
+
+      - name: Add aggregate reviewer report to summary
+        if: always()
+        run: |
+          echo "# Aggregate PACZero SmolLM 10/10 reviewer report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f benchmark-results/paczero-smollm-10of10-aggregate/smollm_10of10_reviewer_report.md ]; then
+            cat benchmark-results/paczero-smollm-10of10-aggregate/smollm_10of10_reviewer_report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Aggregate report was not created." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit aggregate SmolLM 10-of-10 report
+        if: always()
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add benchmark-results/paczero-smollm-10of10-aggregate/ || true
+          if git diff --cached --quiet; then
+            echo "No aggregate SmolLM report changes to commit."
+            exit 0
+          fi
+          git commit -m "Add aggregate SmolLM PACZero 10-of-10 reviewer report [skip ci] [skip paczero-smollm-10of10]"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed aggregate SmolLM report on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push failed for aggregate report; rebasing and retrying attempt ${attempt}..."
+            git pull --rebase --autostash origin main
+          done
+          git push
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paczero-smollm-10of10-aggregate
+          path: benchmark-results/paczero-smollm-10of10-aggregate
           if-no-files-found: warn
